@@ -1,0 +1,115 @@
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import * as React from "react";
+import { cn } from "@shared/lib/cn";
+import { Button, type ButtonProps } from "./button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "./dialog";
+
+interface ConfirmDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description?: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  tone?: ButtonProps["variant"];
+  onConfirm: () => void | Promise<void>;
+  loading?: boolean;
+}
+
+export function ConfirmDialog({
+  open,
+  onOpenChange,
+  title,
+  description,
+  confirmLabel = "Confirm",
+  cancelLabel = "Cancel",
+  tone = "primary",
+  onConfirm,
+  loading = false,
+}: ConfirmDialogProps) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className={cn("max-w-md")}>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          {description && <DialogDescription>{description}</DialogDescription>}
+        </DialogHeader>
+        <DialogFooter>
+          <DialogPrimitive.Close asChild>
+            <Button variant="outline" disabled={loading}>
+              {cancelLabel}
+            </Button>
+          </DialogPrimitive.Close>
+          <Button
+            variant={tone}
+            onClick={() => void onConfirm()}
+            disabled={loading}
+          >
+            {loading ? "Working..." : confirmLabel}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+type ConfirmOptions = Omit<ConfirmDialogProps, "open" | "onOpenChange" | "onConfirm" | "loading">;
+
+interface ConfirmState {
+  open: boolean;
+  options: ConfirmOptions | null;
+  resolve: ((confirmed: boolean) => void) | null;
+}
+
+export function useConfirm() {
+  const [state, setState] = React.useState<ConfirmState>({
+    open: false,
+    options: null,
+    resolve: null,
+  });
+  const [loading, setLoading] = React.useState(false);
+
+  const confirm = React.useCallback(
+    (options: ConfirmOptions) =>
+      new Promise<boolean>((resolve) => {
+        setState({ open: true, options, resolve });
+      }),
+    [],
+  );
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      state.resolve?.(false);
+      setState({ open: false, options: null, resolve: null });
+    }
+  };
+
+  const handleConfirm = async () => {
+    setLoading(true);
+    try {
+      state.resolve?.(true);
+      setState({ open: false, options: null, resolve: null });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const dialog = state.options ? (
+    <ConfirmDialog
+      open={state.open}
+      onOpenChange={handleOpenChange}
+      onConfirm={handleConfirm}
+      loading={loading}
+      {...state.options}
+    />
+  ) : null;
+
+  return { confirm, dialog };
+}
