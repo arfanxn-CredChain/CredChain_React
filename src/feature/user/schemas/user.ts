@@ -18,6 +18,30 @@ export const birthDateSchema = z
 
 export const metaSchema = z.record(z.string(), z.unknown());
 
+export const metaEntrySchema = z.object({
+  key: z.string().min(1, "Key required").max(64, "Key too long"),
+  value: z.string().max(1024, "Value too long"),
+});
+
+export const metaEntriesSchema = z
+  .array(metaEntrySchema)
+  .max(32, "Too many entries")
+  .superRefine((entries, ctx) => {
+    const seen = new Set<string>();
+    entries.forEach((entry, idx) => {
+      if (entry.key && seen.has(entry.key)) {
+        ctx.addIssue({
+          code: "custom",
+          path: [idx, "key"],
+          message: "Duplicate key",
+        });
+      }
+      if (entry.key) seen.add(entry.key);
+    });
+  });
+
+export type MetaEntryInput = z.infer<typeof metaEntrySchema>;
+
 const baseUserFields = {
   name: z.string().min(1, "Name is required").max(256, "Name too long"),
   number: optionalEmptyToNull(z.string().max(256, "Number too long")),
