@@ -6,6 +6,7 @@ import { TopNav } from "./TopNav";
 import { useStore } from "@app/store";
 import { Role } from "@shared/auth/role";
 import { mockUserWithMeta } from "@/test/fixtures";
+import { i18n } from "@shared/i18n/config";
 
 const mockMutate = vi.fn();
 vi.mock("@feature/auth/api/useLogout", () => ({
@@ -31,5 +32,37 @@ describe("TopNav logout confirmation", () => {
     await userEvent.click(await screen.findByText(/log out/i));
     expect(await screen.findByRole("alertdialog")).toBeInTheDocument();
     expect(mockMutate).not.toHaveBeenCalled();
+  });
+});
+
+describe("TopNav search", () => {
+  beforeEach(() => {
+    void i18n.changeLanguage("en");
+    useStore.setState({
+      user: mockUserWithMeta({ role: Role.ADMIN }),
+      isAuthenticated: true,
+    });
+  });
+
+  it("shows dropdown results when typing a matching query", async () => {
+    renderTopNav();
+    const input = screen.getByRole("searchbox");
+    await userEvent.type(input, "user");
+    expect(await screen.findByText("Users")).toBeInTheDocument();
+  });
+
+  it("shows no dropdown when query is empty", async () => {
+    renderTopNav();
+    const input = screen.getByRole("searchbox");
+    await userEvent.clear(input);
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+  });
+
+  it("clears query on Escape", async () => {
+    renderTopNav();
+    const input = screen.getByRole("searchbox") as HTMLInputElement;
+    await userEvent.type(input, "user");
+    await userEvent.keyboard("{Escape}");
+    expect(input.value).toBe("");
   });
 });

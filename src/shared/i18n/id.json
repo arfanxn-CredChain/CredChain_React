@@ -47,5 +47,14 @@
   "credential.revoke.forbidden": "Anda tidak memiliki izin untuk mencabut kredensial.",
   "credential.fetch.not_found": "Kredensial tidak ditemukan.",
   "credential.verify.hash_mismatch": "Dokumen tidak sesuai dengan catatan on-chain.",
-  "credential.verify.revoked": "Kredensial ini telah dicabut."
+  "credential.verify.revoked": "Kredensial ini telah dicabut.",
+
+  "nav.overview": "Ikhtisar",
+  "nav.users": "Pengguna",
+  "nav.credentials": "Kredensial",
+  "nav.myCredentials": "Kredensial Saya",
+  "nav.settings": "Pengaturan",
+  "nav.profile": "Profil",
+  "nav.help": "Bantuan",
+  "nav.about": "Tentang"
 }

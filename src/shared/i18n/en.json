@@ -47,5 +47,14 @@
   "credential.revoke.forbidden": "You do not have permission to revoke credentials.",
   "credential.fetch.not_found": "Credential not found.",
   "credential.verify.hash_mismatch": "The document does not match the on-chain record.",
-  "credential.verify.revoked": "This credential has been revoked."
+  "credential.verify.revoked": "This credential has been revoked.",
+
+  "nav.overview": "Overview",
+  "nav.users": "Users",
+  "nav.credentials": "Credentials",
+  "nav.myCredentials": "My Credentials",
+  "nav.settings": "Settings",
+  "nav.profile": "Profile",
+  "nav.help": "Help",
+  "nav.about": "About"
 }

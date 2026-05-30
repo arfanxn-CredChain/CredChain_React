@@ -1,10 +1,12 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Menu, ShieldCheck, Search, UserCircle, User, Mail, LogOut } from "lucide-react";
 import { useStore } from "@app/store";
 import { formatRole } from "@shared/auth/role";
 import { useLogout } from "@feature/auth/api/useLogout";
 import { useConfirm } from "@ui/confirm-dialog";
+import { useNavSearch } from "@shared/hooks/useNavSearch";
 import { LanguageSwitcher } from "@shared/components/LanguageSwitcher";
 import {
   DropdownMenu,
@@ -24,6 +26,10 @@ export function TopNav({ onMenuClick }: TopNavProps) {
   const logout = useLogout();
   const { t } = useTranslation();
   const { confirm, dialog } = useConfirm();
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+  const searchResults = useNavSearch(searchQuery);
+  const showDropdown = searchQuery.length > 0;
 
   const handleLogout = async () => {
     const ok = await confirm({
@@ -55,17 +61,53 @@ export function TopNav({ onMenuClick }: TopNavProps) {
 
       <div className="flex items-center gap-4 sm:gap-6">
         <div className="hidden md:flex relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-4 w-4 text-gray-400" aria-hidden="true" />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-4 w-4 text-gray-400" aria-hidden="true" />
+            </div>
+            <input
+              type="search"
+              inputMode="search"
+              enterKeyHint="search"
+              role="searchbox"
+              className="block w-64 pl-10 pr-3 py-2 border border-gray-200 lg:border-none rounded-full bg-white lg:bg-black/20 text-navy lg:text-gray-300 placeholder-gray-400 lg:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gold text-sm shadow-sm"
+              placeholder="Search..."
+              aria-label="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") setSearchQuery("");
+                if (e.key === "Enter" && searchResults.length > 0) {
+                  navigate(searchResults[0].href);
+                  setSearchQuery("");
+                }
+              }}
+              onBlur={() => setTimeout(() => setSearchQuery(""), 150)}
+            />
+            {showDropdown && searchResults.length > 0 && (
+              <div
+                role="menu"
+                className="absolute left-0 right-0 top-full mt-1 z-50 w-64 rounded-md border bg-popover p-1 text-popover-foreground shadow-md"
+              >
+                {searchResults.map((item) => (
+                  <button
+                    key={item.href}
+                    type="button"
+                    role="menuitem"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      navigate(item.href);
+                      setSearchQuery("");
+                    }}
+                    className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-left hover:bg-accent hover:text-accent-foreground focus:outline-none focus:bg-accent"
+                  >
+                    <item.icon className="h-4 w-4 text-gray-400" aria-hidden="true" />
+                    {t(item.i18nKey)}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-          <input
-            type="search"
-            inputMode="search"
-            enterKeyHint="search"
-            className="block w-64 pl-10 pr-3 py-2 border border-gray-200 lg:border-none rounded-full bg-white lg:bg-black/20 text-navy lg:text-gray-300 placeholder-gray-400 lg:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gold text-sm shadow-sm"
-            placeholder="Search..."
-            aria-label="Search"
-          />
         </div>
 
         <LanguageSwitcher />
