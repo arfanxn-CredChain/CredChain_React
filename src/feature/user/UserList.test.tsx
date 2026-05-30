@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it } from "vitest";
 import { useStore } from "@app/store";
 import { Role } from "@shared/auth/role";
+import { i18n } from "@shared/i18n/config";
 import { TestProviders } from "@/test/TestProviders";
 import { UserList } from "./UserList";
 
@@ -10,7 +11,8 @@ function renderUserList() {
   return render(<UserList />, { wrapper: TestProviders });
 }
 
-beforeEach(() => {
+beforeEach(async () => {
+  await i18n.changeLanguage("en");
   // Reset store with admin user so the component renders the manage UI
   useStore.setState({
     user: {

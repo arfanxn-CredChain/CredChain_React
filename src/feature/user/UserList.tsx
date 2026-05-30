@@ -1,10 +1,11 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Search, ChevronRight, UserCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { Plus, Search, Filter, ChevronRight, UserCircle } from "lucide-react";
 import { useUsers } from "./api/useUsers";
 import { useStore } from "@app/store";
 import { Role, canAccessAny } from "@shared/auth/role";
 import { useDebouncedValue } from "@shared/hooks/useDebouncedValue";
+import { useUserListParams } from "./hooks/useUserListParams";
 
 import { PageHeader } from "@shared/components/PageHeader";
 import { EmptyState } from "@shared/components/EmptyState";
@@ -15,6 +16,12 @@ import { Button } from "@ui/button";
 import { Card } from "@ui/card";
 import { Input } from "@ui/input";
 import { Skeleton } from "@ui/skeleton";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -28,25 +35,22 @@ import { UserRoleBadge } from "./components/UserRoleBadge";
 import { UserStatusBadge } from "./components/UserStatusBadge";
 import { truncateAddress } from "@shared/lib/format";
 
-const PAGE_SIZE = 25;
-
 export function UserList() {
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const debouncedSearch = useDebouncedValue(search, 300);
+  const { t } = useTranslation();
+  const { params, setParam } = useUserListParams();
+  const debouncedSearch = useDebouncedValue(params.search, 300);
 
   const currentUser = useStore((s) => s.user);
   const canManageUsers = canAccessAny(currentUser?.role, [Role.ADMIN, Role.SUPER_ADMIN]);
 
   const { data, isLoading, isError } = useUsers({
-    page,
-    limit: PAGE_SIZE,
+    ...params,
     search: debouncedSearch || undefined,
   });
 
   const users = data?.items ?? [];
   const total = data?.total ?? 0;
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(total / params.limit));
   const isEmpty = !isLoading && users.length === 0;
 
   return (
@@ -75,19 +79,36 @@ export function UserList() {
               enterKeyHint="search"
               leadingIcon={Search}
               placeholder="Search by name, email or role..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
+              value={params.search}
+              onChange={(e) => setParam("search", e.target.value)}
               aria-label="Search users"
             />
           </div>
-          {!isLoading && (
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">
-              {total.toLocaleString()} {total === 1 ? "entity" : "entities"}
-            </span>
-          )}
+          <div className="flex items-center gap-2 shrink-0">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Filter className="h-4 w-4 mr-2" /> {t("user.filter.label")}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setParam("deleted", "all")}>
+                  {t("user.filter.all")} {params.deleted === "all" && "✓"}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setParam("deleted", "none")}>
+                  {t("user.filter.live")} {params.deleted === "none" && "✓"}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setParam("deleted", "only")}>
+                  {t("user.filter.deleted")} {params.deleted === "only" && "✓"}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            {!isLoading && (
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">
+                {t("user.list.count", { count: total })}
+              </span>
+            )}
+          </div>
         </div>
 
         {isError ? (
@@ -191,22 +212,22 @@ export function UserList() {
             {totalPages > 1 && (
               <div className="flex items-center justify-between p-4 sm:p-6 border-t border-gray-50">
                 <span className="text-sm text-gray-500">
-                  Page {page} of {totalPages}
+                  Page {params.page} of {totalPages}
                 </span>
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    disabled={page <= 1 || isLoading}
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={params.page <= 1 || isLoading}
+                    onClick={() => setParam("page", Math.max(1, params.page - 1))}
                   >
                     Previous
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    disabled={page >= totalPages || isLoading}
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={params.page >= totalPages || isLoading}
+                    onClick={() => setParam("page", Math.min(totalPages, params.page + 1))}
                   >
                     Next
                   </Button>
