@@ -66,7 +66,7 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
         phone_number: user.phone_number ?? undefined,
         birth_date: user.birth_date ? user.birth_date.slice(0, 10) : undefined,
         email: user.email,
-        role: user.role,
+        role: user.role as "admin" | "issuer" | "holder" | undefined,
         meta_entries: entries,
       });
     }
@@ -220,7 +220,7 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
               <Field label="Role" error={errors.role?.message}>
                 <Select
                   value={form.watch("role")}
-                  onValueChange={(v) => form.setValue("role", v as Role, { shouldDirty: true })}
+                  onValueChange={(v) => form.setValue("role", v as "admin" | "issuer" | "holder", { shouldDirty: true })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select role" />
