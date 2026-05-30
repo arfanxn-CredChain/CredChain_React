@@ -6,10 +6,10 @@ import { useStore } from "@app/store";
 import { Role, canAccessAny } from "@shared/auth/role";
 import { useDebouncedValue } from "@shared/hooks/useDebouncedValue";
 import { useUserListParams } from "./hooks/useUserListParams";
+import { cn } from "@shared/lib/cn";
 
 import { PageHeader } from "@shared/components/PageHeader";
 import { EmptyState } from "@shared/components/EmptyState";
-import { MonoId } from "@shared/components/MonoId";
 import { UserAvatar } from "@shared/components/UserAvatar";
 import { RoleGate } from "@shared/auth/guards";
 import { Button } from "@ui/button";
@@ -133,7 +133,7 @@ export function UserList() {
                 <TableRow>
                   <TableHead>Entity</TableHead>
                   <TableHead>Role</TableHead>
-                  <TableHead>Contact</TableHead>
+                  <TableHead>{t("user.column.phone")}</TableHead>
                   <TableHead>Wallet / Status</TableHead>
                   <TableHead className="relative">
                     <span className="sr-only">Actions</span>
@@ -168,12 +168,18 @@ export function UserList() {
                       </TableRow>
                     ))
                   : users.map((user) => (
-                      <TableRow key={user.id} className="cursor-pointer">
+                      <TableRow key={user.id} className={cn("cursor-pointer", user.deleted_at && "bg-error/5")}>
                         <TableCell>
                           <div className="flex items-center">
                              <UserAvatar user={user} size="md" className="flex-shrink-0" />
                              <div className="ml-4">
-                              <div className="text-sm font-bold text-navy">
+                              <div
+                                className={cn(
+                                  "text-sm font-bold text-fg max-w-[14rem] truncate",
+                                  user.deleted_at && "line-through text-gray-400",
+                                )}
+                                title={user.name ?? "Unnamed"}
+                              >
                                 {user.name ?? "Unnamed"}
                               </div>
                               <div className="text-xs text-gray-500 font-medium mt-0.5">
@@ -186,10 +192,9 @@ export function UserList() {
                           <UserRoleBadge role={user.role} />
                         </TableCell>
                         <TableCell>
-                          <div className="text-sm font-medium text-navy">
-                            {user.phone_number ?? "—"}
-                          </div>
-                          <MonoId value={user.id} className="mt-0.5" />
+                          {user.phone_number ? (
+                            <span className="text-sm font-medium text-fg">{user.phone_number}</span>
+                          ) : null}
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center text-xs font-mono text-gray-500 mb-1">
