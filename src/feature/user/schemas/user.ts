@@ -122,6 +122,12 @@ export const userSelfEmailSchema = z.object({
 
 export type UserSelfEmailInput = z.infer<typeof userSelfEmailSchema>;
 
+export const userInlineEditFormSchema = userUpdateSchema
+  .omit({ meta: true })
+  .extend({ meta_entries: metaEntriesSchema.optional() });
+
+export type UserInlineEditFormInput = z.infer<typeof userInlineEditFormSchema>;
+
 export function defaultUserStoreRow(): UserStoreInput {
   return {
     name: "",
