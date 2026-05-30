@@ -2,13 +2,11 @@ import { Outlet } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
 import { DecorBlob } from "@shared/components/DecorBlob";
 import { LanguageSwitcher } from "@shared/components/LanguageSwitcher";
-import { ThemeToggle } from "@shared/components/ThemeToggle";
 
 export function AuthLayout() {
   return (
     <div className="min-h-screen bg-surface flex relative">
       <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
-        <ThemeToggle variant="dark" />
         <LanguageSwitcher variant="dark" />
       </div>
       {/* Left - branding panel (lg+) */}
