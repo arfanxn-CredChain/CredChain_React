@@ -30,7 +30,7 @@ export const useStore = create<StoreState>()(
 
       // UI slice
       sidebarOpen: false,
-      locale: "en",
+      locale: "id",
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
       toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
       setLocale: (locale) => set({ locale }),
