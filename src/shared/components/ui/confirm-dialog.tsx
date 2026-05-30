@@ -41,7 +41,7 @@ export function ConfirmDialog({
         if (!next) onCancel();
       }}
     >
-      <DialogContent className={cn("max-w-md")}>
+      <DialogContent role="alertdialog" className={cn("max-w-md")}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
