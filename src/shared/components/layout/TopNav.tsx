@@ -8,6 +8,7 @@ import { useLogout } from "@feature/auth/api/useLogout";
 import { useConfirm } from "@ui/confirm-dialog";
 import { useNavSearch } from "@shared/hooks/useNavSearch";
 import { LanguageSwitcher } from "@shared/components/LanguageSwitcher";
+import { ThemeToggle } from "@shared/components/ThemeToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -110,6 +111,7 @@ export function TopNav({ onMenuClick }: TopNavProps) {
           </div>
         </div>
 
+        <ThemeToggle />
         <LanguageSwitcher />
 
         <DropdownMenu>
