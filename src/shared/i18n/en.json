@@ -26,6 +26,15 @@
   "user.email.invalid_id_token": "Invalid Google ID token.",
   "user.email.mismatched_id_token": "The Google account email does not match the requested email.",
   "user.email.conflict": "This email address is already in use by another account.",
+  "user.email.current": "Current email",
+  "user.email.updating": "Updating email...",
+  "user.email.update.title": "Update Email",
+  "user.email.update.intro": "Sign in with another Google account to change your email.",
+  "user.email.update.instruction": "Click the button below and sign in with the Google account you want to use. We will read the email from Google and ask you to confirm.",
+  "user.email.update.googleFailed": "Google sign-in failed. Please try again.",
+  "user.email.confirm.title": "Confirm new email",
+  "user.email.confirm.body": "Set your account email to {{email}}? You will be signed out of other devices.",
+  "user.email.confirm.action": "Update email",
   "user.role.blockchain_sync_failed": "Role update failed due to a blockchain sync error.",
   "user.update.role_forbidden": "You do not have permission to update this role.",
   "user.update.admin_to_admin_forbidden": "Admins cannot update other Admins.",
@@ -56,5 +65,7 @@
   "nav.settings": "Settings",
   "nav.profile": "Profile",
   "nav.help": "Help",
-  "nav.about": "About"
+  "nav.about": "About",
+
+  "common.cancel": "Cancel"
 }

@@ -26,6 +26,15 @@
   "user.email.invalid_id_token": "Token Google ID tidak valid.",
   "user.email.mismatched_id_token": "Email akun Google tidak sesuai dengan email yang diminta.",
   "user.email.conflict": "Alamat email ini sudah digunakan oleh akun lain.",
+  "user.email.current": "Email saat ini",
+  "user.email.updating": "Memperbarui email...",
+  "user.email.update.title": "Perbarui Email",
+  "user.email.update.intro": "Masuk dengan akun Google lain untuk mengubah email Anda.",
+  "user.email.update.instruction": "Klik tombol di bawah dan masuk dengan akun Google yang ingin Anda gunakan. Kami akan membaca email dari Google dan meminta konfirmasi Anda.",
+  "user.email.update.googleFailed": "Masuk Google gagal. Silakan coba lagi.",
+  "user.email.confirm.title": "Konfirmasi email baru",
+  "user.email.confirm.body": "Setel email akun Anda ke {{email}}? Anda akan keluar dari perangkat lain.",
+  "user.email.confirm.action": "Perbarui email",
   "user.role.blockchain_sync_failed": "Pembaruan peran gagal karena kesalahan sinkronisasi blockchain.",
   "user.update.role_forbidden": "Anda tidak memiliki izin untuk memperbarui peran ini.",
   "user.update.admin_to_admin_forbidden": "Admin tidak dapat memperbarui Admin lain.",
@@ -56,5 +65,7 @@
   "nav.settings": "Pengaturan",
   "nav.profile": "Profil",
   "nav.help": "Bantuan",
-  "nav.about": "Tentang"
+  "nav.about": "Tentang",
+
+  "common.cancel": "Batal"
 }
