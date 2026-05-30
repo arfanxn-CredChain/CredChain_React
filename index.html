@@ -13,25 +13,6 @@
     />
     <title>CredChain</title>
   </head>
-  <script>
-    (function () {
-      try {
-        var raw = localStorage.getItem("credchain-store");
-        var theme = raw ? JSON.parse(raw)?.state?.theme : "system";
-        var resolved =
-          theme === "system"
-            ? matchMedia("(prefers-color-scheme: dark)").matches
-              ? "dark"
-              : "light"
-            : theme;
-        if (resolved === "dark") {
-          document.documentElement.classList.add("dark");
-        }
-      } catch (e) {
-        /* ignore */
-      }
-    })();
-  </script>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
