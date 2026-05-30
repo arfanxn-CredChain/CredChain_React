@@ -3,7 +3,8 @@ import { useTranslation } from "react-i18next";
 import { ShieldCheck, LogOut, X } from "lucide-react";
 import { cn } from "@shared/lib/cn";
 import { useStore } from "@app/store";
-import { canAccess } from "@shared/auth/role";
+import { canAccess, formatRole } from "@shared/auth/role";
+import { UserAvatar } from "@shared/components/UserAvatar";
 import { useLogout } from "@feature/auth/api/useLogout";
 import { useConfirm } from "@ui/confirm-dialog";
 import { NAV_ITEMS } from "@shared/components/layout/nav-items";
@@ -56,6 +57,20 @@ export function Sidebar({ onClose }: SidebarProps) {
             </button>
           )}
         </div>
+
+        {user && (
+          <div className="px-4 mt-2 mb-6 flex items-center gap-3">
+            <UserAvatar user={user} size="lg" />
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-bold text-surface truncate">
+                {user.name ?? user.email}
+              </div>
+              <div className="text-xs text-gray-400 truncate capitalize">
+                {formatRole(user.role)}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Nav */}
         <nav className="flex-1 space-y-1 px-4 mt-2" aria-label="Main navigation">

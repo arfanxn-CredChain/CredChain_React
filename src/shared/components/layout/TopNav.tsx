@@ -1,9 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Menu, ShieldCheck, Search, UserCircle, User, Mail, LogOut } from "lucide-react";
+import { Menu, ShieldCheck, Search, User, Mail, LogOut } from "lucide-react";
 import { useStore } from "@app/store";
 import { formatRole } from "@shared/auth/role";
+import { UserAvatar } from "@shared/components/UserAvatar";
 import { useLogout } from "@feature/auth/api/useLogout";
 import { useConfirm } from "@ui/confirm-dialog";
 import { useNavSearch } from "@shared/hooks/useNavSearch";
@@ -128,7 +129,7 @@ export function TopNav({ onMenuClick }: TopNavProps) {
                   {user?.role ? formatRole(user.role) : ""}
                 </div>
               </div>
-              <UserCircle className="h-10 w-10 text-surface lg:text-navy" aria-hidden="true" />
+              {user && <UserAvatar user={user} size="md" />}
             </button>
           </DropdownMenuTrigger>
 

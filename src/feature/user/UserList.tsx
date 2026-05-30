@@ -9,6 +9,7 @@ import { useDebouncedValue } from "@shared/hooks/useDebouncedValue";
 import { PageHeader } from "@shared/components/PageHeader";
 import { EmptyState } from "@shared/components/EmptyState";
 import { MonoId } from "@shared/components/MonoId";
+import { UserAvatar } from "@shared/components/UserAvatar";
 import { RoleGate } from "@shared/auth/guards";
 import { Button } from "@ui/button";
 import { Card } from "@ui/card";
@@ -149,10 +150,8 @@ export function UserList() {
                       <TableRow key={user.id} className="cursor-pointer">
                         <TableCell>
                           <div className="flex items-center">
-                            <div className="flex-shrink-0 h-10 w-10 bg-navy/5 rounded-full flex items-center justify-center">
-                              <UserCircle className="h-6 w-6 text-navy/60" aria-hidden="true" />
-                            </div>
-                            <div className="ml-4">
+                             <UserAvatar user={user} size="md" className="flex-shrink-0" />
+                             <div className="ml-4">
                               <div className="text-sm font-bold text-navy">
                                 {user.name ?? "Unnamed"}
                               </div>
