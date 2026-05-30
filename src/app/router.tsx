@@ -6,6 +6,7 @@ import { DashboardLayout } from "@shared/components/layout/DashboardLayout";
 import { ProtectedRoute, PublicRoute } from "@shared/auth/guards";
 import { Role } from "@shared/auth/role";
 import { Login } from "@feature/auth/Login";
+import { RootRedirect } from "@shared/components/RootRedirect";
 import { NotFound } from "@shared/components/NotFound";
 import { RouteErrorBoundary } from "@shared/components/RouteErrorBoundary";
 import { LoadingSpinner } from "@shared/components/LoadingSpinner";
@@ -41,6 +42,8 @@ function lazyRoute<T extends Record<string, React.ComponentType>>(
 }
 
 export const router = createBrowserRouter([
+  { path: "/", element: <RootRedirect /> },
+
   // Public routes (no auth)
   {
     element: <PublicLayout />,
@@ -48,6 +51,14 @@ export const router = createBrowserRouter([
       {
         path: "/credentials/verify/:credentialId",
         ...lazyRoute(() => import("@feature/credential/VerifyCredential"), "VerifyCredential"),
+      },
+      {
+        path: "/help",
+        ...lazyRoute(() => import("@feature/help/Help"), "Help"),
+      },
+      {
+        path: "/about",
+        ...lazyRoute(() => import("@feature/about/About"), "About"),
       },
     ],
   },
