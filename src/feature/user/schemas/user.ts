@@ -139,3 +139,30 @@ export function defaultUserStoreRow(): UserStoreInput {
     role: Role.HOLDER,
   };
 }
+
+export const userStoreFormSchema = userStoreSchema
+  .omit({ meta: true })
+  .extend({ meta_entries: metaEntriesSchema.optional() });
+
+export type UserStoreFormInput = z.infer<typeof userStoreFormSchema>;
+
+export const userBatchStoreFormSchema = z.object({
+  users: z
+    .array(userStoreFormSchema)
+    .min(1, "Add at least one user")
+    .max(100, "Maximum 100 users per batch"),
+});
+
+export type UserBatchStoreFormInput = z.infer<typeof userBatchStoreFormSchema>;
+
+export function defaultUserStoreFormRow(): UserStoreFormInput {
+  return {
+    name: "",
+    number: undefined,
+    phone_number: undefined,
+    email: "",
+    birth_date: undefined,
+    meta_entries: [],
+    role: Role.HOLDER,
+  };
+}
