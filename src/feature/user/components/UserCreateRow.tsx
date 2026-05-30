@@ -14,11 +14,12 @@ import {
 import { Role } from "@shared/auth/role";
 import { cn } from "@shared/lib/cn";
 
-import type { UserBatchStoreInput } from "../schemas/user";
+import type { UserBatchStoreFormInput } from "../schemas/user";
+import { MetaEditor } from "./MetaEditor";
 
 interface UserCreateRowProps {
   index: number;
-  form: UseFormReturn<UserBatchStoreInput>;
+  form: UseFormReturn<UserBatchStoreFormInput>;
   onRemove?: () => void;
 }
 
@@ -146,6 +147,15 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
           </Select>
         </FormField>
       </div>
+
+      <details className="mt-4">
+        <summary className="cursor-pointer text-sm font-medium text-gray-500 hover:text-fg py-2 list-none">
+          + Add custom fields
+        </summary>
+        <div className="mt-4 ml-2">
+          <MetaEditor control={form.control} name={`users.${index}.meta_entries`} />
+        </div>
+      </details>
     </div>
   );
 }

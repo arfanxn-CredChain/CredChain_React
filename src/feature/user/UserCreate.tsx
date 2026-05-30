@@ -9,18 +9,19 @@ import { Card } from "@ui/card";
 
 import { useCreateUsers } from "./api/useCreateUsers";
 import {
-  type UserBatchStoreInput,
-  defaultUserStoreRow,
-  userBatchStoreSchema,
+  type UserBatchStoreFormInput,
+  defaultUserStoreFormRow,
+  userBatchStoreFormSchema,
 } from "./schemas/user";
+import { mergeMeta } from "./lib/meta";
 import { UserCreateRow } from "./components/UserCreateRow";
 
 export function UserCreate() {
   const navigate = useNavigate();
 
-  const form = useForm<UserBatchStoreInput>({
-    resolver: zodResolver(userBatchStoreSchema),
-    defaultValues: { users: [defaultUserStoreRow()] },
+  const form = useForm<UserBatchStoreFormInput>({
+    resolver: zodResolver(userBatchStoreFormSchema),
+    defaultValues: { users: [defaultUserStoreFormRow()] },
     mode: "onBlur",
   });
 
@@ -31,7 +32,13 @@ export function UserCreate() {
   });
 
   const onSubmit = form.handleSubmit((data) => {
-    createUsers.mutate(data, {
+    const payload = {
+      users: data.users.map(({ meta_entries, ...row }) => ({
+        ...row,
+        meta: mergeMeta(meta_entries ?? [], {}),
+      })),
+    };
+    createUsers.mutate(payload, {
       onSuccess: () => navigate("/users"),
     });
   });
@@ -61,7 +68,7 @@ export function UserCreate() {
             <Button
               type="button"
               variant="dashed"
-              onClick={() => append(defaultUserStoreRow())}
+              onClick={() => append(defaultUserStoreFormRow())}
               disabled={fields.length >= 100}
             >
               <Plus className="h-4 w-4" />

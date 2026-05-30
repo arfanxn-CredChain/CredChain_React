@@ -51,3 +51,29 @@ export const mockCredentials: CredentialDTO[] = [
   makeCredential({ id: "cred_2", title: "Senior Software Engineer", revoked: false }),
   makeCredential({ id: "cred_3", title: "Workshop Completion", revoked: true }),
 ];
+
+export function mockUserWithMeta(overrides: Partial<UserDTO> = {}): UserDTO {
+  return makeUser({
+    id: "usr_meta_1",
+    number: "EMP-001",
+    birth_date: "1990-01-01",
+    meta: { department: "Engineering", level: "L3" },
+    ...overrides,
+  });
+}
+
+export function mockDeletedUser(overrides: Partial<UserDTO> = {}): UserDTO {
+  return mockUserWithMeta({
+    id: "usr_deleted_1",
+    deleted_at: "2026-02-01T00:00:00Z",
+    ...overrides,
+  });
+}
+
+export function mockUserNoPhone(overrides: Partial<UserDTO> = {}): UserDTO {
+  return mockUserWithMeta({
+    id: "usr_nophone_1",
+    phone_number: null,
+    ...overrides,
+  });
+}

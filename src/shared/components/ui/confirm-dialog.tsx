@@ -13,30 +13,35 @@ import {
 
 interface ConfirmDialogProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
   title: string;
   description?: string;
   confirmLabel?: string;
   cancelLabel?: string;
   tone?: ButtonProps["variant"];
   onConfirm: () => void | Promise<void>;
+  onCancel: () => void;
   loading?: boolean;
 }
 
 export function ConfirmDialog({
   open,
-  onOpenChange,
   title,
   description,
   confirmLabel = "Confirm",
   cancelLabel = "Cancel",
   tone = "primary",
   onConfirm,
+  onCancel,
   loading = false,
 }: ConfirmDialogProps) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={cn("max-w-md")}>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) onCancel();
+      }}
+    >
+      <DialogContent role="alertdialog" className={cn("max-w-md")}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
@@ -48,6 +53,7 @@ export function ConfirmDialog({
             </Button>
           </DialogPrimitive.Close>
           <Button
+            autoFocus
             variant={tone}
             onClick={() => void onConfirm()}
             disabled={loading}
@@ -60,7 +66,10 @@ export function ConfirmDialog({
   );
 }
 
-type ConfirmOptions = Omit<ConfirmDialogProps, "open" | "onOpenChange" | "onConfirm" | "loading">;
+type ConfirmOptions = Omit<
+  ConfirmDialogProps,
+  "open" | "onConfirm" | "onCancel" | "loading"
+>;
 
 interface ConfirmState {
   open: boolean;
@@ -84,11 +93,9 @@ export function useConfirm() {
     [],
   );
 
-  const handleOpenChange = (open: boolean) => {
-    if (!open) {
-      state.resolve?.(false);
-      setState({ open: false, options: null, resolve: null });
-    }
+  const handleCancel = () => {
+    state.resolve?.(false);
+    setState({ open: false, options: null, resolve: null });
   };
 
   const handleConfirm = async () => {
@@ -104,7 +111,7 @@ export function useConfirm() {
   const dialog = state.options ? (
     <ConfirmDialog
       open={state.open}
-      onOpenChange={handleOpenChange}
+      onCancel={handleCancel}
       onConfirm={handleConfirm}
       loading={loading}
       {...state.options}

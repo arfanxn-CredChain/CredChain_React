@@ -21,7 +21,6 @@ export function AppErrorBoundary({ children }: { children: React.ReactNode }) {
         </div>
       )}
       onError={(error) => {
-        // eslint-disable-next-line no-console
         console.error("App boundary:", error);
       }}
     >

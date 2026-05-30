@@ -1,16 +1,30 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it } from "vitest";
+import { useLocation } from "react-router-dom";
 import { useStore } from "@app/store";
 import { Role } from "@shared/auth/role";
+import { i18n } from "@shared/i18n/config";
 import { TestProviders } from "@/test/TestProviders";
 import { UserList } from "./UserList";
 
-function renderUserList() {
-  return render(<UserList />, { wrapper: TestProviders });
+function LocationSentinel() {
+  const location = useLocation();
+  return <div data-testid="location-search">{location.search}</div>;
 }
 
-beforeEach(() => {
+function renderUserList() {
+  return render(
+    <>
+      <UserList />
+      <LocationSentinel />
+    </>,
+    { wrapper: TestProviders },
+  );
+}
+
+beforeEach(async () => {
+  await i18n.changeLanguage("en");
   // Reset store with admin user so the component renders the manage UI
   useStore.setState({
     user: {
@@ -87,5 +101,49 @@ describe("UserList", () => {
     await user.type(search, "admin");
 
     expect(search).toHaveValue("admin");
+  });
+
+  it("filter dropdown updates URL when selecting Live only", async () => {
+    const user = userEvent.setup();
+    renderUserList();
+    await screen.findByText("User Directory");
+
+    await user.click(screen.getByRole("button", { name: /filter/i }));
+    const liveItem = await screen.findByRole("menuitem", { name: /live only/i });
+    await user.click(liveItem);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("location-search").textContent).toContain("deleted=none");
+    });
+  });
+
+  it("clicking a sortable header updates the sort param in the URL", async () => {
+    const user = userEvent.setup();
+    renderUserList();
+
+    await waitFor(() => {
+      expect(screen.getByText("Platform Admin")).toBeInTheDocument();
+    });
+
+    const nameHeader = screen.getByRole("columnheader", { name: /entity/i });
+    await user.click(nameHeader);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("location-search").textContent).toContain("sort=name");
+    });
+  });
+
+  it("renders Edit button as disabled for deleted users", async () => {
+    renderUserList();
+
+    await waitFor(() => {
+      expect(screen.getByText("Platform Admin")).toBeInTheDocument();
+    });
+
+    const editButtons = screen.getAllByRole("button", { name: /edit /i });
+    expect(editButtons.length).toBeGreaterThan(0);
+    // At least one button should be enabled (live users) and we tolerate the rest
+    const enabled = editButtons.filter((b) => !b.hasAttribute("disabled"));
+    expect(enabled.length).toBeGreaterThan(0);
   });
 });

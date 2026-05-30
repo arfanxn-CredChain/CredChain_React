@@ -24,3 +24,35 @@ test.describe("public routes", () => {
     await expect(page.getByText(/record not found|credential verification/i)).toBeVisible();
   });
 });
+
+test.describe("Help page", () => {
+  test("is reachable without login", async ({ page }) => {
+    await page.goto("/help");
+    await expect(page.getByRole("heading", { level: 2 })).toBeVisible();
+  });
+
+  test("FAQ details expand on click", async ({ page }) => {
+    await page.goto("/help");
+    const firstSummary = page.locator("details summary").first();
+    await firstSummary.click();
+    const details = firstSummary.locator("..");
+    await expect(details).toHaveAttribute("open", "");
+  });
+
+  test("language switcher visible on Help page", async ({ page }) => {
+    await page.goto("/help");
+    await expect(page.getByRole("button", { name: /change language/i })).toBeVisible();
+  });
+});
+
+test.describe("About page", () => {
+  test("is reachable without login", async ({ page }) => {
+    await page.goto("/about");
+    await expect(page.getByRole("heading", { level: 2 })).toBeVisible();
+  });
+
+  test("shows version", async ({ page }) => {
+    await page.goto("/about");
+    await expect(page.getByText(/version/i)).toBeVisible();
+  });
+});

@@ -8,17 +8,20 @@ import { OfflineBanner } from "@shared/components/OfflineBanner";
 import { i18n } from "@shared/i18n/config";
 import { queryClient } from "@shared/api/query-client";
 import { env } from "@shared/lib/env";
+import { ThemeProvider } from "@app/ThemeProvider";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <I18nextProvider i18n={i18n}>
         <GoogleOAuthProvider clientId={env.googleClientId}>
-          <AppErrorBoundary>
-            <OfflineBanner />
-            {children}
-            <Toaster />
-          </AppErrorBoundary>
+          <ThemeProvider>
+            <AppErrorBoundary>
+              <OfflineBanner />
+              {children}
+              <Toaster />
+            </AppErrorBoundary>
+          </ThemeProvider>
         </GoogleOAuthProvider>
       </I18nextProvider>
     </QueryClientProvider>

@@ -1,5 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
+import { LanguageSwitcher } from "@shared/components/LanguageSwitcher";
+import { ThemeToggle } from "@shared/components/ThemeToggle";
 
 export function PublicLayout() {
   return (
@@ -11,6 +13,10 @@ export function PublicLayout() {
             <span className="font-display text-xl font-bold text-surface tracking-tight">
               CredChain
             </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <ThemeToggle variant="dark" />
+            <LanguageSwitcher variant="dark" />
           </div>
         </div>
       </header>

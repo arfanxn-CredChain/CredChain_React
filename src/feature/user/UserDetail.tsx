@@ -7,6 +7,7 @@ import { EyebrowLabel } from "@shared/components/EyebrowLabel";
 import { MonoId } from "@shared/components/MonoId";
 import { Card } from "@ui/card";
 import { Skeleton } from "@ui/skeleton";
+import { UserAvatar } from "@shared/components/UserAvatar";
 import { UserRoleBadge } from "./components/UserRoleBadge";
 import { UserStatusBadge } from "./components/UserStatusBadge";
 import { formatDate, formatDateTime } from "@shared/lib/format";
@@ -48,12 +49,15 @@ export function UserDetail() {
         <>
           <Card className="p-6 sm:p-8">
             <div className="flex items-start justify-between gap-4 mb-6">
-              <div>
-                <EyebrowLabel>Identity</EyebrowLabel>
-                <h3 className="font-display text-xl font-bold text-navy">
-                  {user.name ?? "Unnamed entity"}
-                </h3>
-                <p className="text-sm text-gray-500 mt-1">{user.email}</p>
+              <div className="flex items-start gap-4">
+                <UserAvatar user={user} size="xl" />
+                <div>
+                  <EyebrowLabel>Identity</EyebrowLabel>
+                  <h3 className="font-display text-xl font-bold text-navy">
+                    {user.name ?? "Unnamed entity"}
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1">{user.email}</p>
+                </div>
               </div>
               <div className="flex flex-col items-end gap-2">
                 <UserRoleBadge role={user.role} />
