@@ -36,7 +36,7 @@ describe("UserAvatar", () => {
   });
 
   it("falls back to id when wallet_address missing", () => {
-    const user = mockUserWithMeta({ wallet_address: null, id: "fallback-id" });
+    const user = mockUserWithMeta({ wallet_address: "", id: "fallback-id" });
     render(<UserAvatar user={user} />);
     expect(screen.getByRole("presentation")).toBeInTheDocument();
   });
