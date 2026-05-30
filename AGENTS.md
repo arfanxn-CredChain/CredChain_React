@@ -152,7 +152,26 @@ Tinted shadows (signature): `shadow-md shadow-navy/20`, `shadow-lg shadow-gold/2
 
 `<DecorBlob>` — single soft radial gradient per hero area, never multiple competing blobs.
 
+**Theme-aware text:** the `.text-fg` utility resolves to navy (light mode) or gray-50 (dark mode) via `:root.dark` overrides in `src/styles/index.css`. Use `.text-fg` instead of hardcoded `text-navy` for body text. The dark theme has a complete token override block — every semantic alias (primary, secondary, muted, surface, base) flips appropriately.
+
 See `DESIGN_SYSTEM.md` Section 6.5 for the full visual language principles (anti-patterns, density philosophy, asymmetry rules).
+
+### Theme System
+
+Three-mode theme support: `light`, `dark`, `system`. No external theme library — everything is wired by hand:
+
+- **`ThemeProvider`** (`@app/ThemeProvider.tsx`) reads `useStore.theme` and toggles the `dark` class on `<html>`. Listens to `prefers-color-scheme` media query when mode is `system`.
+- **No-flash inline script** in `index.html` runs synchronously before the body mounts. It reads the persisted theme from localStorage and applies the `dark` class immediately, so users never see a light-mode flash on dark-mode page loads.
+- **`useStore.theme`** is persisted alongside `user`, `isAuthenticated`, and `locale`.
+- **`<ThemeToggle>`** dropdown (Light / Dark / System) is mounted in `TopNav`, `AuthLayout`, and `PublicLayout`.
+- **`:root.dark` token overrides** in `src/styles/index.css` flip every semantic token (primary, secondary, muted, surface, base) for dark mode. The `.text-fg` utility uses these overrides automatically.
+- **Sonner Toaster** is wired to the resolved theme via `useTheme()` so toasts match the active mode.
+
+When adding theme-aware UI:
+
+- Prefer `.text-fg` over `text-navy` for body text
+- Use semantic aliases (`bg-surface`, `bg-base`, `text-primary`) over palette tokens (`bg-white`, `bg-navy`)
+- For one-off elements, write `dark:` variants explicitly (`bg-white dark:bg-gray-900`)
 
 ### State Management (TanStack Query + Zustand)
 
@@ -163,7 +182,7 @@ See `DESIGN_SYSTEM.md` Section 6.5 for the full visual language principles (anti
 | Server state | TanStack Query | All API data: users, credentials, paginated lists |
 | Client state | Zustand `useStore` | Current user session, UI (sidebar, locale) |
 
-`useStore` is persisted to localStorage via `persist` middleware. Only `user`, `isAuthenticated`, and `locale` are persisted. **Tokens are never persisted** (httpOnly cookies handle them).
+`useStore` is persisted to localStorage via `persist` middleware. Only `user`, `isAuthenticated`, `locale`, and `theme` are persisted. **Tokens are never persisted** (httpOnly cookies handle them).
 
 Query key conventions (in `feature/*/api/keys.ts`):
 
@@ -271,6 +290,8 @@ onError: (error) => {
 **Backend code → frontend key:** `CODE_TO_MESSAGE_KEY` map in `@shared/api/codes.ts`. Mirrors `CredChain_Golang/infrastructure/http/responder/mapper.go`. Adding a domain code requires updating: (a) this map, (b) both `locales/{en,id}.json` files, (c) backend's `CodeToMessageKey` and `HttpCodes` maps, (d) backend's locale files.
 
 **Locale state:** `useStore.locale` is the source of truth. `LanguageSwitcher` updates both i18next AND Zustand. `SessionHydrator` syncs `i18next.changeLanguage()` with stored locale on mount. Axios sends `Accept-Language` header so backend serves the matching locale.
+
+**Default locale:** Indonesian (`id`). The persisted locale is read from localStorage in `i18n/config.ts` before i18next initializes, so users never see a flash of English on Indonesian-default pages.
 
 ### Component Recipes
 
@@ -434,7 +455,7 @@ All env vars must be prefixed with `VITE_` to be exposed to the browser. Reading
 | Integration | Vitest + MSW | Feature flows with mocked `/api` |
 | E2E | Playwright | Auth flow, public routes, a11y smoke |
 
-**Current count:** 66 tests across 6 spec files (verified in current master).
+**Current count:** 179 tests across 28 spec files (verified in current master).
 
 **Coverage thresholds** (in `vitest.config.ts`): 90% lines / 85% branches / 90% functions / 90% statements, **per-file**.
 
@@ -466,6 +487,7 @@ When adding tests, prefer integration tests via MSW over heavy mocking. Schema t
 | Validation | Zod | ^3 |
 | i18n | i18next + react-i18next | ^23 / ^14 |
 | Auth | @react-oauth/google | ^0.12 |
+| Avatar | @dicebear/core + @dicebear/identicon | latest |
 | Toasts | sonner | ^1 (via `notify` helper) |
 | Class merge | clsx + tailwind-merge | latest (via `cn()`) |
 | Tests | Vitest 3 + Testing Library + MSW 2 | |
