@@ -19,6 +19,13 @@ import { Card } from "@ui/card";
 import { Input } from "@ui/input";
 import { Skeleton } from "@ui/skeleton";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@ui/select";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -259,25 +266,49 @@ export function UserList() {
             {totalPages > 1 && (
               <div className="flex items-center justify-between p-4 sm:p-6 border-t border-gray-50">
                 <span className="text-sm text-gray-500">
-                  Page {params.page} of {totalPages}
+                  {t("user.pagination.showing", {
+                    from: Math.min((params.page - 1) * params.limit + 1, total),
+                    to: Math.min(params.page * params.limit, total),
+                    total,
+                    label: t("user.list.count", { count: total }).split(" ").slice(1).join(" "),
+                  })}
                 </span>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={params.page <= 1 || isLoading}
-                    onClick={() => setParam("page", Math.max(1, params.page - 1))}
+                <div className="flex items-center gap-4">
+                  <Select
+                    value={String(params.limit)}
+                    onValueChange={(v) => setParam("limit", parseInt(v, 10))}
                   >
-                    Previous
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={params.page >= totalPages || isLoading}
-                    onClick={() => setParam("page", Math.min(totalPages, params.page + 1))}
-                  >
-                    Next
-                  </Button>
+                    <SelectTrigger className="w-20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="25">25</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
+                      <SelectItem value="100">100</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div className="flex gap-2">
+                    {params.page > 1 && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={isLoading}
+                        onClick={() => setParam("page", params.page - 1)}
+                      >
+                        Previous
+                      </Button>
+                    )}
+                    {params.page < totalPages && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={isLoading}
+                        onClick={() => setParam("page", params.page + 1)}
+                      >
+                        Next
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
