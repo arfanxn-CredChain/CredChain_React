@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Menu, ShieldCheck, Search, UserCircle, User, Mail, LogOut } from "lucide-react";
 import { useStore } from "@app/store";
 import { formatRole } from "@shared/auth/role";
 import { useLogout } from "@feature/auth/api/useLogout";
+import { useConfirm } from "@ui/confirm-dialog";
 import { LanguageSwitcher } from "@shared/components/LanguageSwitcher";
 import {
   DropdownMenu,
@@ -20,13 +22,23 @@ interface TopNavProps {
 export function TopNav({ onMenuClick }: TopNavProps) {
   const user = useStore((s) => s.user);
   const logout = useLogout();
+  const { t } = useTranslation();
+  const { confirm, dialog } = useConfirm();
 
-  const handleLogout = () => {
-    logout.mutate();
+  const handleLogout = async () => {
+    const ok = await confirm({
+      title: t("auth.logout.confirm.title"),
+      description: t("auth.logout.confirm.body"),
+      confirmLabel: t("auth.logout.confirm.action"),
+      cancelLabel: t("common.cancel"),
+      tone: "destructive",
+    });
+    if (ok) logout.mutate();
   };
 
   return (
-    <header className="bg-navy lg:bg-transparent px-4 sm:px-8 py-4 lg:py-5 flex items-center justify-between shadow-md lg:shadow-none z-10 relative safe-area-top no-print">
+    <>
+      <header className="bg-navy lg:bg-transparent px-4 sm:px-8 py-4 lg:py-5 flex items-center justify-between shadow-md lg:shadow-none z-10 relative safe-area-top no-print">
       <div className="flex items-center gap-4">
         <button
           onClick={onMenuClick}
@@ -110,5 +122,7 @@ export function TopNav({ onMenuClick }: TopNavProps) {
         </DropdownMenu>
       </div>
     </header>
+    {dialog}
+    </>
   );
 }
