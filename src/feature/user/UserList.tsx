@@ -1,12 +1,14 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Search, Filter, ChevronRight, UserCircle } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Plus, Search, Filter, Pencil, UserCircle } from "lucide-react";
 import { useUsers } from "./api/useUsers";
 import { useStore } from "@app/store";
 import { Role, canAccessAny } from "@shared/auth/role";
 import { useDebouncedValue } from "@shared/hooks/useDebouncedValue";
 import { useUserListParams } from "./hooks/useUserListParams";
 import { cn } from "@shared/lib/cn";
+import type { UserDTO } from "@shared/types/api";
 
 import { PageHeader } from "@shared/components/PageHeader";
 import { EmptyState } from "@shared/components/EmptyState";
@@ -33,12 +35,15 @@ import {
 
 import { UserRoleBadge } from "./components/UserRoleBadge";
 import { UserStatusBadge } from "./components/UserStatusBadge";
+import { SortableTableHead } from "./components/SortableTableHead";
+import { UserEditDrawer } from "./components/UserEditDrawer";
 import { truncateAddress } from "@shared/lib/format";
 
 export function UserList() {
   const { t } = useTranslation();
-  const { params, setParam } = useUserListParams();
+  const { params, setParam, setMany } = useUserListParams();
   const debouncedSearch = useDebouncedValue(params.search, 300);
+  const [editingUser, setEditingUser] = useState<UserDTO | null>(null);
 
   const currentUser = useStore((s) => s.user);
   const canManageUsers = canAccessAny(currentUser?.role, [Role.ADMIN, Role.SUPER_ADMIN]);
@@ -52,6 +57,14 @@ export function UserList() {
   const total = data?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / params.limit));
   const isEmpty = !isLoading && users.length === 0;
+
+  function handleSort(key: string) {
+    if (params.sort === key) {
+      setMany({ sort: key, order: params.order === "desc" ? "asc" : "desc" });
+    } else {
+      setMany({ sort: key, order: "desc" });
+    }
+  }
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -131,10 +144,34 @@ export function UserList() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Entity</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>{t("user.column.phone")}</TableHead>
-                  <TableHead>Wallet / Status</TableHead>
+                  <SortableTableHead
+                    label="Entity"
+                    sortKey="name"
+                    currentSort={params.sort}
+                    currentOrder={params.order}
+                    onSort={handleSort}
+                  />
+                  <SortableTableHead
+                    label="Role"
+                    sortKey="role"
+                    currentSort={params.sort}
+                    currentOrder={params.order}
+                    onSort={handleSort}
+                  />
+                  <SortableTableHead
+                    label={t("user.column.phone")}
+                    sortKey="phone_number"
+                    currentSort={params.sort}
+                    currentOrder={params.order}
+                    onSort={handleSort}
+                  />
+                  <SortableTableHead
+                    label="Wallet / Status"
+                    sortKey="created_at"
+                    currentSort={params.sort}
+                    currentOrder={params.order}
+                    onSort={handleSort}
+                  />
                   <TableHead className="relative">
                     <span className="sr-only">Actions</span>
                   </TableHead>
@@ -203,10 +240,15 @@ export function UserList() {
                           <UserStatusBadge deletedAt={user.deleted_at} />
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button asChild variant="ghost" size="sm">
-                            <Link to={`/users/${user.id}`} aria-label={`View ${user.name ?? user.email}`}>
-                              View <ChevronRight className="h-4 w-4" />
-                            </Link>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setEditingUser(user)}
+                            disabled={!!user.deleted_at}
+                            aria-label={`Edit ${user.name ?? user.email}`}
+                          >
+                            <Pencil className="h-4 w-4 mr-1" />
+                            Edit
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -242,6 +284,8 @@ export function UserList() {
           </>
         )}
       </Card>
+
+      <UserEditDrawer user={editingUser} onClose={() => setEditingUser(null)} />
 
       {!canManageUsers && (
         <p className="text-xs text-gray-400 text-center">
