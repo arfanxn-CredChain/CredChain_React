@@ -3,7 +3,6 @@ import { I18nextProvider } from "react-i18next";
 import { RouterProvider, createMemoryRouter } from "react-router-dom";
 import type { ReactNode } from "react";
 import { i18n } from "@shared/i18n/config";
-import { ThemeProvider } from "@app/ThemeProvider";
 
 interface TestProvidersProps {
   children: ReactNode;
@@ -27,9 +26,7 @@ export function TestProviders({ children, initialEntries = ["/"] }: TestProvider
   return (
     <QueryClientProvider client={queryClient}>
       <I18nextProvider i18n={i18n}>
-        <ThemeProvider>
-          <RouterProvider router={router} />
-        </ThemeProvider>
+        <RouterProvider router={router} />
       </I18nextProvider>
     </QueryClientProvider>
   );
