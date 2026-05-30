@@ -32,3 +32,10 @@ test.describe("auth & route guards", () => {
     }
   });
 });
+
+test.describe("Root path redirect", () => {
+  test("unauthenticated user redirected to /login", async ({ page }) => {
+    await page.goto("/");
+    await expect(page).toHaveURL(/\/login/);
+  });
+});

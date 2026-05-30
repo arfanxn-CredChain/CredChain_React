@@ -37,4 +37,26 @@ test.describe("accessibility smoke tests", () => {
     );
     expect(criticalViolations).toEqual([]);
   });
+
+  test("Help page has no critical a11y violations", async ({ page }) => {
+    await page.goto("/help");
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa"])
+      .analyze();
+    const critical = results.violations.filter(
+      (v) => v.impact === "critical" || v.impact === "serious",
+    );
+    expect(critical).toEqual([]);
+  });
+
+  test("About page has no critical a11y violations", async ({ page }) => {
+    await page.goto("/about");
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa"])
+      .analyze();
+    const critical = results.violations.filter(
+      (v) => v.impact === "critical" || v.impact === "serious",
+    );
+    expect(critical).toEqual([]);
+  });
 });
