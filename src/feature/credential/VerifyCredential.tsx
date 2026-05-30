@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -28,12 +28,16 @@ export function VerifyCredential() {
 
   const [verifyState, setVerifyState] = useState<VerifyState>("idle");
   const [computedHash, setComputedHash] = useState<string | null>(null);
+  const [prevId, setPrevId] = useState(credentialId);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
+  // Reset verification state when navigating to a different credential.
+  // React 19 pattern: store deps and call setState during render (not in effect).
+  if (prevId !== credentialId) {
+    setPrevId(credentialId);
     setVerifyState("idle");
     setComputedHash(null);
-  }, [credentialId]);
+  }
 
   const handleFile = async (file: File) => {
     setVerifyState("hashing");
