@@ -29,12 +29,12 @@ export function SortableTableHead({
   return (
     <TableHead
       onClick={() => onSort(sortKey)}
-      className={cn("cursor-pointer select-none hover:text-fg", className)}
+      className={cn("cursor-pointer select-none hover:text-navy", className)}
     >
       <span className="flex items-center gap-1">
         {label}
         <Icon
-          className={cn("h-3.5 w-3.5", isActive ? "text-fg" : "text-gray-300")}
+          className={cn("h-3.5 w-3.5", isActive ? "text-navy" : "text-gray-300")}
           aria-hidden="true"
         />
       </span>

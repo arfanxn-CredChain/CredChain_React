@@ -20,7 +20,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         type={type}
         className={cn(
           "block w-full py-3 pr-3 border border-gray-200 rounded-xl shadow-sm",
-          "bg-gray-50 text-fg placeholder-gray-400 text-sm",
+          "bg-gray-50 text-navy placeholder-gray-400 text-sm",
           "focus:outline-none focus:ring-2 focus:ring-navy focus:border-transparent focus:bg-white",
           "transition-all",
           "disabled:opacity-60 disabled:cursor-not-allowed",

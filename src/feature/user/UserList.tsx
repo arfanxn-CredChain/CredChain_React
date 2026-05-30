@@ -219,7 +219,7 @@ export function UserList() {
                              <div className="ml-4">
                               <div
                                 className={cn(
-                                  "text-sm font-bold text-fg max-w-[14rem] truncate",
+                                  "text-sm font-bold text-navy max-w-[14rem] truncate",
                                   user.deleted_at && "line-through text-gray-400",
                                 )}
                                 title={user.name ?? "Unnamed"}
@@ -237,7 +237,7 @@ export function UserList() {
                         </TableCell>
                         <TableCell>
                           {user.phone_number ? (
-                            <span className="text-sm font-medium text-fg">{user.phone_number}</span>
+                            <span className="text-sm font-medium text-navy">{user.phone_number}</span>
                           ) : null}
                         </TableCell>
                         <TableCell>

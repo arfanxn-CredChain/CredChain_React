@@ -208,7 +208,7 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
             <div className="flex items-center gap-3">
               <UserAvatar user={user} size="md" />
               <div>
-                <h2 className="font-bold text-fg">{user?.name ?? "User"}</h2>
+                <h2 className="font-bold text-navy">{user?.name ?? "User"}</h2>
                 <p className="text-xs text-gray-500">{user?.email}</p>
               </div>
             </div>
@@ -216,7 +216,7 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
               type="button"
               onClick={() => void handleClose()}
               aria-label="Close"
-              className="rounded-md p-1 text-gray-400 hover:text-fg hover:bg-gray-100"
+              className="rounded-md p-1 text-gray-400 hover:text-navy hover:bg-gray-100"
             >
               <X className="h-5 w-5" />
             </button>

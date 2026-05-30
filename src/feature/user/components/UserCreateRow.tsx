@@ -149,7 +149,7 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
       </div>
 
       <details className="mt-4">
-        <summary className="cursor-pointer text-sm font-medium text-gray-500 hover:text-fg py-2 list-none">
+        <summary className="cursor-pointer text-sm font-medium text-gray-500 hover:text-navy py-2 list-none">
           + Add custom fields
         </summary>
         <div className="mt-4 ml-2">
