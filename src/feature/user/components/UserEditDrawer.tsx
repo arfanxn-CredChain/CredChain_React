@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useBlocker } from "react-router-dom";
 import { Drawer } from "vaul";
 import { X, User, Hash, Phone, Calendar, Mail } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -89,6 +90,32 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
     window.addEventListener("beforeunload", handler);
     return () => window.removeEventListener("beforeunload", handler);
   }, [user, hasDirty]);
+
+  // Layer 1: useBlocker for in-app navigation
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      !!user && hasDirty && currentLocation.pathname !== nextLocation.pathname,
+  );
+
+  useEffect(() => {
+    if (blocker.state !== "blocked") return;
+    void (async () => {
+      const ok = await confirm({
+        title: t("user.edit.discard.title"),
+        description: t("user.edit.discard.body", { name: user?.name ?? "user" }),
+        confirmLabel: t("user.edit.discard.action"),
+        cancelLabel: t("common.cancel"),
+        tone: "destructive",
+      });
+      if (ok) {
+        blocker.proceed?.();
+        onClose();
+        form.reset();
+      } else {
+        blocker.reset?.();
+      }
+    })();
+  }, [blocker, confirm, onClose, t, user?.name, form]);
 
   const handleSave = form.handleSubmit(async (data) => {
     const ok = await confirm({
