@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, cloneElement } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { User, Phone, Hash, Calendar, Save } from "lucide-react";
@@ -28,7 +28,7 @@ export function UserSelfProfile() {
         name: user.name ?? "",
         number: user.number ?? undefined,
         phone_number: user.phone_number ?? undefined,
-        birth_date: user.birth_date ?? undefined,
+        birth_date: user.birth_date ? user.birth_date.slice(0, 10) : undefined,
         meta: user.meta ?? null,
       });
     }
@@ -112,13 +112,14 @@ interface FieldProps {
 }
 
 function Field({ label, hint, error, optional, children }: FieldProps) {
+  const fieldId = label.toLowerCase().replace(/\s+/g, "-");
   return (
     <div className="space-y-1">
-      <Label>
+      <Label htmlFor={fieldId}>
         {label}
         {optional && <span className="ml-1 text-gray-400 font-normal">(optional)</span>}
       </Label>
-      {children}
+      {cloneElement(children as React.ReactElement<{ id?: string }>, { id: fieldId })}
       {error ? (
         <p className={cn("text-xs text-error mt-1")} role="alert">{error}</p>
       ) : hint ? (
