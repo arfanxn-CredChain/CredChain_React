@@ -174,8 +174,8 @@ export function Help() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <PageHeader
-        title="Help & FAQ"
-        description="Quick answers to the most common questions about CredChain."
+        title={t("help.title")}
+        description={t("help.intro")}
       />
 
       <Card className="relative p-6 sm:p-8">
@@ -211,7 +211,7 @@ export function Help() {
               <ShieldCheck className="h-5 w-5 text-navy" aria-hidden="true" />
             </div>
             <div>
-              <p className="font-bold text-navy">Need more help?</p>
+              <p className="font-bold text-navy">{t("help.contact.title")}</p>
               <p className="text-sm text-gray-500 mt-1">
                 {t(
                   "help.contact.body",

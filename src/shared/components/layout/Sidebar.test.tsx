@@ -6,6 +6,7 @@ import { Sidebar } from "./Sidebar";
 import { useStore } from "@app/store";
 import { Role } from "@shared/auth/role";
 import { mockUserWithMeta } from "@/test/fixtures";
+import { i18n } from "@shared/i18n/config";
 
 const mockMutate = vi.fn();
 vi.mock("@feature/auth/api/useLogout", () => ({
@@ -18,6 +19,7 @@ function renderSidebar() {
 
 describe("Sidebar logout confirmation", () => {
   beforeEach(() => {
+    void i18n.changeLanguage("en");
     mockMutate.mockClear();
     useStore.setState({
       user: mockUserWithMeta({ role: Role.ADMIN }),

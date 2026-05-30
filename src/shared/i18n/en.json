@@ -17,6 +17,7 @@
   "auth.logout.confirm.title": "Log out?",
   "auth.logout.confirm.body": "You'll be returned to the login screen.",
   "auth.logout.confirm.action": "Log out",
+  "auth.logout.signingOut": "Signing out...",
 
   "user.fetch.success": "User loaded.",
   "user.store.success": "User(s) registered successfully.",
@@ -69,6 +70,7 @@
   "nav.profile": "Profile",
   "nav.help": "Help",
   "nav.about": "About",
+  "nav.searchPlaceholder": "Search...",
 
   "common.cancel": "Cancel",
 

@@ -19,6 +19,7 @@ function renderTopNav() {
 
 describe("TopNav logout confirmation", () => {
   beforeEach(() => {
+    void i18n.changeLanguage("en");
     mockMutate.mockClear();
     useStore.setState({
       user: mockUserWithMeta({ role: Role.ADMIN }),

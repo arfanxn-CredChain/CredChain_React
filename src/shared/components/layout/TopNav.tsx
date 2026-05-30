@@ -55,7 +55,7 @@ export function TopNav({ onMenuClick }: TopNavProps) {
         </button>
         <ShieldCheck className="h-8 w-8 text-gold lg:hidden" aria-hidden="true" />
         <h1 className="font-display text-2xl font-bold text-navy hidden lg:block tracking-tight">
-          Dashboard
+          {t("nav.overview")}
         </h1>
       </div>
 
@@ -71,7 +71,7 @@ export function TopNav({ onMenuClick }: TopNavProps) {
               enterKeyHint="search"
               role="searchbox"
               className="block w-64 pl-10 pr-3 py-2 border border-gray-200 lg:border-none rounded-full bg-white lg:bg-black/20 text-navy lg:text-gray-300 placeholder-gray-400 lg:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gold text-sm shadow-sm"
-              placeholder="Search..."
+              placeholder={t("nav.searchPlaceholder")}
               aria-label="Search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -137,15 +137,15 @@ export function TopNav({ onMenuClick }: TopNavProps) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link to="/account/profile" className="flex items-center gap-2 cursor-pointer">
+                <Link to="/account/profile" className="flex items-center gap-2 cursor-pointer">
                 <User className="h-4 w-4 text-gray-400" aria-hidden="true" />
-                My Profile
+                {t("nav.profile")}
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/account/email" className="flex items-center gap-2 cursor-pointer">
+                <Link to="/account/email" className="flex items-center gap-2 cursor-pointer">
                 <Mail className="h-4 w-4 text-gray-400" aria-hidden="true" />
-                Update Email
+                {t("user.email.update.title")}
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -156,7 +156,7 @@ export function TopNav({ onMenuClick }: TopNavProps) {
               className="flex items-center gap-2 cursor-pointer"
             >
               <LogOut className="h-4 w-4" aria-hidden="true" />
-              {logout.isPending ? "Signing out..." : "Log out"}
+              {logout.isPending ? t("auth.logout.signingOut") : t("auth.logout.confirm.action")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

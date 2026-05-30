@@ -1,10 +1,14 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TestProviders } from "@/test/TestProviders";
+import { i18n } from "@shared/i18n/config";
 import { Help } from "./Help";
 
 describe("Help", () => {
+  beforeEach(() => {
+    void i18n.changeLanguage("en");
+  });
   it("renders page title", () => {
     render(<Help />, { wrapper: TestProviders });
     expect(screen.getByRole("heading", { level: 2 })).toBeInTheDocument();

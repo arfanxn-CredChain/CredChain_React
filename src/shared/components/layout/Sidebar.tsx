@@ -1,35 +1,12 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import {
-  ShieldCheck,
-  LayoutDashboard,
-  Users,
-  FileBadge,
-  Settings,
-  LogOut,
-  X,
-} from "lucide-react";
+import { ShieldCheck, LogOut, X } from "lucide-react";
 import { cn } from "@shared/lib/cn";
 import { useStore } from "@app/store";
-import { Role, canAccess } from "@shared/auth/role";
+import { canAccess } from "@shared/auth/role";
 import { useLogout } from "@feature/auth/api/useLogout";
 import { useConfirm } from "@ui/confirm-dialog";
-
-interface NavItem {
-  name: string;
-  href: string;
-  icon: React.ElementType;
-  minRole: Role;
-  exactRole?: Role;
-}
-
-const NAV_ITEMS: NavItem[] = [
-  { name: "Overview", href: "/dashboard", icon: LayoutDashboard, minRole: Role.ISSUER },
-  { name: "Users", href: "/users", icon: Users, minRole: Role.ISSUER },
-  { name: "Credentials", href: "/credentials", icon: FileBadge, minRole: Role.ISSUER },
-  { name: "My Credentials", href: "/credentials/self", icon: FileBadge, minRole: Role.HOLDER, exactRole: Role.HOLDER },
-  { name: "Settings", href: "/settings", icon: Settings, minRole: Role.ADMIN },
-];
+import { NAV_ITEMS } from "@shared/components/layout/nav-items";
 
 interface SidebarProps {
   onClose?: () => void;
@@ -54,8 +31,10 @@ export function Sidebar({ onClose }: SidebarProps) {
   };
 
   const visibleItems = NAV_ITEMS.filter((item) => {
+    if (!item.inSidebar) return false;
     if (item.exactRole) return user?.role === item.exactRole;
-    return canAccess(user?.role, item.minRole);
+    if (item.minRole) return canAccess(user?.role, item.minRole);
+    return true;
   });
 
   return (
@@ -96,7 +75,7 @@ export function Sidebar({ onClose }: SidebarProps) {
               }
             >
               <item.icon className="mr-3 h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
-              {item.name}
+              {t(item.i18nKey)}
             </NavLink>
           ))}
         </nav>
@@ -112,7 +91,7 @@ export function Sidebar({ onClose }: SidebarProps) {
               className="mr-3 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-surface"
               aria-hidden="true"
             />
-            {logout.isPending ? "Signing out..." : "Log out"}
+            {logout.isPending ? t("auth.logout.signingOut") : t("auth.logout.confirm.action")}
           </button>
         </div>
       </div>

@@ -17,6 +17,7 @@
   "auth.logout.confirm.title": "Keluar?",
   "auth.logout.confirm.body": "Anda akan diarahkan ke layar masuk.",
   "auth.logout.confirm.action": "Keluar",
+  "auth.logout.signingOut": "Sedang keluar...",
 
   "user.fetch.success": "Pengguna dimuat.",
   "user.store.success": "Pengguna berhasil didaftarkan.",
@@ -69,6 +70,7 @@
   "nav.profile": "Profil",
   "nav.help": "Bantuan",
   "nav.about": "Tentang",
+  "nav.searchPlaceholder": "Cari...",
 
   "common.cancel": "Batal",
 

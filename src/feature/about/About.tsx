@@ -1,4 +1,5 @@
 import { ShieldCheck, Users, FileBadge, User } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { PageHeader } from "@shared/components/PageHeader";
 import { Card } from "@ui/card";
 import { DecorBlob } from "@shared/components/DecorBlob";
@@ -7,54 +8,52 @@ import { EyebrowLabel } from "@shared/components/EyebrowLabel";
 declare const __APP_VERSION__: string;
 
 export function About() {
+  const { t } = useTranslation();
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <PageHeader
-        title="About CredChain"
-        description="Trust-minimized credentials, anchored on-chain."
+        title={t("about.title")}
+        description={t("about.intro")}
       />
       <Card className="p-6 sm:p-8 relative overflow-hidden">
         <DecorBlob tone="gold" position="top-right" size="lg" />
         <div className="relative z-10 space-y-8">
           <div>
             <h3 className="font-display text-2xl font-bold text-navy mb-2">
-              What is CredChain?
+              {t("about.what.title")}
             </h3>
             <p className="text-sm text-gray-500 leading-relaxed">
-              CredChain is a decentralized credential platform that issues and
-              verifies professional credentials on-chain. Every credential is
-              tamper-proof, soulbound to its owner, and verifiable without
-              trusting a single central authority.
+              {t("about.what.body")}
             </p>
           </div>
           <div>
             <h3 className="font-display text-xl font-semibold text-navy mb-4">
-              Roles
+              {t("about.roles.title")}
             </h3>
             <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
                 {
                   icon: ShieldCheck,
-                  label: "Super Admin",
-                  desc: "Bootstrapped by the platform operator. Owns the system. Only one exists.",
+                  label: t("about.roles.superAdmin"),
+                  desc: t("about.roles.superAdmin.desc"),
                   iconClass: "text-error",
                 },
                 {
                   icon: Users,
-                  label: "Admin",
-                  desc: "Manages users and settings. Can promote members to credential publishers.",
+                  label: t("about.roles.admin"),
+                  desc: t("about.roles.admin.desc"),
                   iconClass: "text-navy",
                 },
                 {
                   icon: FileBadge,
-                  label: "Issuer",
-                  desc: "Issues, revokes, and verifies credentials.",
+                  label: t("about.roles.issuer"),
+                  desc: t("about.roles.issuer.desc"),
                   iconClass: "text-gold",
                 },
                 {
                   icon: User,
-                  label: "Holder",
-                  desc: "Receives credentials and manages their own profile.",
+                  label: t("about.roles.holder"),
+                  desc: t("about.roles.holder.desc"),
                   iconClass: "text-gray-400",
                 },
               ].map(({ icon: Icon, label, desc, iconClass }) => (
@@ -74,7 +73,7 @@ export function About() {
               {__APP_VERSION__}
             </p>
             <p className="text-xs text-gray-400 mt-2">
-              Built with React, Tailwind CSS, and blockchain technology.
+              {t("about.tech")}
             </p>
           </div>
         </div>
