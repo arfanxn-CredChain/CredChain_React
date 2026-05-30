@@ -1,5 +1,4 @@
 import { ShieldCheck, Users, FileBadge, User } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import { PageHeader } from "@shared/components/PageHeader";
 import { Card } from "@ui/card";
 import { DecorBlob } from "@shared/components/DecorBlob";
@@ -8,7 +7,6 @@ import { EyebrowLabel } from "@shared/components/EyebrowLabel";
 declare const __APP_VERSION__: string;
 
 export function About() {
-  const { t } = useTranslation();
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <PageHeader
