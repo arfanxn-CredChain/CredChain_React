@@ -1,10 +1,14 @@
 import { Outlet } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
 import { DecorBlob } from "@shared/components/DecorBlob";
+import { LanguageSwitcher } from "@shared/components/LanguageSwitcher";
 
 export function AuthLayout() {
   return (
-    <div className="min-h-screen bg-surface flex">
+    <div className="min-h-screen bg-surface flex relative">
+      <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+        <LanguageSwitcher variant="dark" />
+      </div>
       {/* Left - branding panel (lg+) */}
       <div className="hidden lg:flex lg:w-1/2 bg-navy flex-col justify-center items-center relative overflow-hidden">
         <DecorBlob tone="gold" position="top-right" size="xl" />

@@ -68,9 +68,7 @@ export function TopNav({ onMenuClick }: TopNavProps) {
           />
         </div>
 
-        <div className="hidden lg:block">
-          <LanguageSwitcher />
-        </div>
+        <LanguageSwitcher />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
