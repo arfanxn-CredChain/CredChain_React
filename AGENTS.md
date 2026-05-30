@@ -72,7 +72,6 @@ CredChain_React/
       providers.tsx            # QueryClient + I18n + GoogleOAuth + ErrorBoundary + OfflineBanner + Toaster
       router.tsx               # createBrowserRouter with lazyRoute() helper
       SessionHydrator.tsx      # validates session via GET /users/self, syncs i18n with Zustand locale
-      ThemeProvider.tsx
       store/index.ts           # Zustand: auth slice + UI slice (persist middleware)
     feature/                   # one folder per business domain
       auth/                    # Login + useGoogleLogin + useLogout
@@ -152,26 +151,7 @@ Tinted shadows (signature): `shadow-md shadow-navy/20`, `shadow-lg shadow-gold/2
 
 `<DecorBlob>` — single soft radial gradient per hero area, never multiple competing blobs.
 
-**Theme-aware text:** the `.text-fg` utility resolves to navy (light mode) or gray-50 (dark mode) via `:root.dark` overrides in `src/styles/index.css`. Use `.text-fg` instead of hardcoded `text-navy` for body text. The dark theme has a complete token override block — every semantic alias (primary, secondary, muted, surface, base) flips appropriately.
-
 See `DESIGN_SYSTEM.md` Section 6.5 for the full visual language principles (anti-patterns, density philosophy, asymmetry rules).
-
-### Theme System
-
-Three-mode theme support: `light`, `dark`, `system`. No external theme library — everything is wired by hand:
-
-- **`ThemeProvider`** (`@app/ThemeProvider.tsx`) reads `useStore.theme` and toggles the `dark` class on `<html>`. Listens to `prefers-color-scheme` media query when mode is `system`.
-- **No-flash inline script** in `index.html` runs synchronously before the body mounts. It reads the persisted theme from localStorage and applies the `dark` class immediately, so users never see a light-mode flash on dark-mode page loads.
-- **`useStore.theme`** is persisted alongside `user`, `isAuthenticated`, and `locale`.
-- **`<ThemeToggle>`** dropdown (Light / Dark / System) is mounted in `TopNav`, `AuthLayout`, and `PublicLayout`.
-- **`:root.dark` token overrides** in `src/styles/index.css` flip every semantic token (primary, secondary, muted, surface, base) for dark mode. The `.text-fg` utility uses these overrides automatically.
-- **Sonner Toaster** is wired to the resolved theme via `useTheme()` so toasts match the active mode.
-
-When adding theme-aware UI:
-
-- Prefer `.text-fg` over `text-navy` for body text
-- Use semantic aliases (`bg-surface`, `bg-base`, `text-primary`) over palette tokens (`bg-white`, `bg-navy`)
-- For one-off elements, write `dark:` variants explicitly (`bg-white dark:bg-gray-900`)
 
 ### State Management (TanStack Query + Zustand)
 
@@ -182,7 +162,7 @@ When adding theme-aware UI:
 | Server state | TanStack Query | All API data: users, credentials, paginated lists |
 | Client state | Zustand `useStore` | Current user session, UI (sidebar, locale) |
 
-`useStore` is persisted to localStorage via `persist` middleware. Only `user`, `isAuthenticated`, `locale`, and `theme` are persisted. **Tokens are never persisted** (httpOnly cookies handle them).
+`useStore` is persisted to localStorage via `persist` middleware. Only `user`, `isAuthenticated`, and `locale` are persisted. **Tokens are never persisted** (httpOnly cookies handle them).
 
 Query key conventions (in `feature/*/api/keys.ts`):
 
@@ -323,7 +303,7 @@ className={`base classes ${isActive ? "active" : ""} ${className}`}
 
 **Custom shared components** (`@shared/components/*`):
 
-`PageHeader`, `EyebrowLabel`, `MonoId`, `DecorBlob`, `EmptyState`, `StatusPill`, `LoadingSpinner` / `FullPageSpinner`, `LanguageSwitcher`, `OfflineBanner`, `NotFound`, `RouteErrorBoundary`, `ErrorBoundary` (`AppErrorBoundary`), `UserAvatar`, `ThemeToggle`, `RootRedirect`.
+`PageHeader`, `EyebrowLabel`, `MonoId`, `DecorBlob`, `EmptyState`, `StatusPill`, `LoadingSpinner` / `FullPageSpinner`, `LanguageSwitcher`, `OfflineBanner`, `NotFound`, `RouteErrorBoundary`, `ErrorBoundary` (`AppErrorBoundary`), `UserAvatar`, `RootRedirect`.
 
 ### Error Handling Layers
 
@@ -522,6 +502,10 @@ Before pushing, run the repo's canonical verification command and confirm it pas
 - `CredChain_Solidity`: `npx hardhat compile && npx hardhat test`
 - `CredChain_Python`: `make lint && make typecheck && make test`
 - `CredChain_React`: `npm run lint && npm run build && npm run test && npm run check-locales`
+
+## Change Log
+
+- **2026-05-31 — Dark mode removed.** `ThemeProvider`, `ThemeToggle`, the `theme` slice in Zustand, the `:root.dark` CSS overrides, the `.text-fg` utility, and the no-flash inline script in `index.html` were all deleted. The app now renders only in light mode, faithful to `DESIGN_SYSTEM.md`. `text-navy` replaced every `text-fg` usage. `LanguageSwitcher`'s `variant="dark"` prop remains — it is a *background-aware* styling switch (for placement on the navy header/sidebar), not a theme switch.
 
 ## See Also
 
