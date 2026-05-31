@@ -47,6 +47,13 @@ export const CODE_TO_MESSAGE_KEY: Record<number, string> = {
   400204: "user.email.conflict",
   400205: "user.role.blockchain_sync_failed",
 
+  // Transfer Super Admin
+  300600: "user.transfer.success",
+  300641: "user.transfer.self_target_forbidden",
+  300642: "user.transfer.target_not_found",
+  300643: "user.transfer.target_trashed_forbidden",
+  300645: "user.transfer.blockchain_sync_failed",
+
   // Credential (10/30/40 + 03)
   100300: "credential.fetch.success",
   100301: "credential.issue.success",
