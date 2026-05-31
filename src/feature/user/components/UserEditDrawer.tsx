@@ -49,6 +49,8 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
       id: "",
       name: "",
       role: Role.HOLDER,
+      birth_date: undefined,
+      gender: undefined,
       meta_entries: [],
     },
   });
@@ -66,6 +68,7 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
         number: user.number ?? undefined,
         phone_number: user.phone_number ?? undefined,
         birth_date: user.birth_date ? user.birth_date.slice(0, 10) : undefined,
+        gender: user.gender ?? undefined,
         email: user.email,
         role: user.role as "admin" | "issuer" | "holder" | undefined,
         meta_entries: entries,
@@ -136,6 +139,7 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
     if (dirty.number) payload.number = data.number ?? null;
     if (dirty.phone_number) payload.phone_number = data.phone_number ?? null;
     if (dirty.birth_date) payload.birth_date = data.birth_date ?? null;
+    if (dirty.gender) payload.gender = data.gender ?? null;
     if (dirty.email) payload.email = data.email;
     if (dirty.role) payload.role = data.role;
     if (dirty.meta_entries) {
@@ -197,25 +201,25 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
         <Drawer.Overlay className="fixed inset-0 bg-black/40 z-40" />
         <Drawer.Content
           className={cn(
-            "fixed inset-y-0 right-0 z-50 flex max-w-md flex-col bg-surface shadow-2xl",
+            "fixed inset-y-0 right-0 z-50 flex w-full flex-col bg-surface shadow-2xl",
             "sm:max-w-lg md:max-w-xl",
           )}
         >
-          <Drawer.Title className="sr-only">Edit user</Drawer.Title>
-          <Drawer.Description className="sr-only">Update user fields</Drawer.Description>
+          <Drawer.Title className="sr-only">{t("user.edit.title")}</Drawer.Title>
+          <Drawer.Description className="sr-only">{t("user.edit.fullName")}</Drawer.Description>
 
           <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
             <div className="flex items-center gap-3">
               <UserAvatar user={user} size="md" />
               <div>
-                <h2 className="font-bold text-navy">{user?.name ?? "User"}</h2>
+                <h2 className="font-bold text-navy">{user?.name ?? t("user.edit.title")}</h2>
                 <p className="text-xs text-gray-500">{user?.email}</p>
               </div>
             </div>
             <button
               type="button"
               onClick={() => void handleClose()}
-              aria-label="Close"
+              aria-label={t("user.edit.close")}
               className="rounded-md p-1 text-gray-400 hover:text-navy hover:bg-gray-100"
             >
               <X className="h-5 w-5" />
@@ -224,19 +228,41 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
 
           <div className="flex-1 overflow-y-auto px-6 py-6">
             <form className="space-y-6" onSubmit={handleSave}>
-              <Field label="Full name" error={errors.name?.message}>
+              <Field label={t("user.edit.fullName")} error={errors.name?.message}>
                 <Input leadingIcon={User} {...form.register("name")} />
               </Field>
-              <Field label="Number / ID" error={errors.number?.message} optional>
+              <Field label={t("user.edit.numberId")} error={errors.number?.message} optional>
                 <Input leadingIcon={Hash} {...form.register("number")} />
               </Field>
-              <Field label="Phone" error={errors.phone_number?.message} optional>
+              <Field label={t("user.edit.phone")} error={errors.phone_number?.message} optional>
                 <Input type="tel" leadingIcon={Phone} {...form.register("phone_number")} />
               </Field>
-              <Field label="Birth date" error={errors.birth_date?.message} optional>
+              <Field label={t("user.edit.birthDate")} error={errors.birth_date?.message} optional>
                 <Input type="date" leadingIcon={Calendar} {...form.register("birth_date")} />
               </Field>
-              <Field label="Email" error={errors.email?.message}>
+              <Field label={t("user.field.gender")} error={errors.gender?.message} optional>
+                <Select
+                  value={form.watch("gender") ?? "__none__"}
+                  onValueChange={(v) =>
+                    form.setValue(
+                      "gender",
+                      v === "__none__" ? null : (v as "male" | "female" | "other"),
+                      { shouldDirty: true },
+                    )
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("user.field.gender.placeholder")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">{t("common.notSet")}</SelectItem>
+                    <SelectItem value="male">{t("user.field.gender.male")}</SelectItem>
+                    <SelectItem value="female">{t("user.field.gender.female")}</SelectItem>
+                    <SelectItem value="other">{t("user.field.gender.other")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field>
+              <Field label={t("user.edit.email")} error={errors.email?.message}>
                 <Input type="email" leadingIcon={Mail} {...form.register("email")} />
                 {form.formState.dirtyFields.email && (
                   <p className="text-xs text-warning mt-1" role="alert">
@@ -244,18 +270,18 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
                   </p>
                 )}
               </Field>
-              <Field label="Role" error={errors.role?.message}>
+              <Field label={t("user.edit.role")} error={errors.role?.message}>
                 <Select
                   value={form.watch("role")}
                   onValueChange={(v) => form.setValue("role", v as "admin" | "issuer" | "holder", { shouldDirty: true })}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select role" />
+                    <SelectValue placeholder={t("user.edit.role.placeholder")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={Role.HOLDER}>Holder</SelectItem>
-                    <SelectItem value={Role.ISSUER}>Issuer</SelectItem>
-                    <SelectItem value={Role.ADMIN}>Admin</SelectItem>
+                    <SelectItem value={Role.HOLDER}>{t("user.edit.role.holder")}</SelectItem>
+                    <SelectItem value={Role.ISSUER}>{t("user.edit.role.issuer")}</SelectItem>
+                    <SelectItem value={Role.ADMIN}>{t("user.edit.role.admin")}</SelectItem>
                   </SelectContent>
                 </Select>
               </Field>
@@ -273,7 +299,7 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
               onClick={() => void handleSave()}
               disabled={update.isPending || !form.formState.isDirty}
             >
-              {update.isPending ? "Saving..." : "Save changes"}
+              {update.isPending ? t("common.saving") : t("common.save")}
             </Button>
           </div>
         </Drawer.Content>
@@ -291,11 +317,12 @@ interface FieldProps {
 }
 
 function Field({ label, error, optional, children }: FieldProps) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-1">
       <Label>
         {label}
-        {optional && <span className="ml-1 text-gray-400 font-normal">(optional)</span>}
+        {optional && <span className="ml-1 text-gray-400 font-normal">{t("common.optional")}</span>}
       </Label>
       {children}
       {error && (
