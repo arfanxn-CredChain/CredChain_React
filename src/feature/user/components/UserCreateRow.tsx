@@ -1,4 +1,5 @@
 import type { UseFormReturn } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { Briefcase, Calendar, Hash, Mail, Phone, Trash2, User } from "lucide-react";
 
 import { Button } from "@ui/button";
@@ -23,15 +24,17 @@ interface UserCreateRowProps {
   onRemove?: () => void;
 }
 
-const ROLE_OPTIONS = [
-  { value: Role.HOLDER, label: "Holder" },
-  { value: Role.ISSUER, label: "Issuer" },
-  { value: Role.ADMIN, label: "Admin" },
-];
-
 export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
+  const { t } = useTranslation();
   const errors = form.formState.errors.users?.[index];
   const role = form.watch(`users.${index}.role`);
+  const gender = form.watch(`users.${index}.gender`);
+
+  const roleOptions = [
+    { value: Role.HOLDER, label: t("user.edit.role.holder") },
+    { value: Role.ISSUER, label: t("user.edit.role.issuer") },
+    { value: Role.ADMIN, label: t("user.edit.role.admin") },
+  ];
 
   return (
     <div className="flex flex-col gap-6 bg-gray-50/50 p-6 rounded-xl border border-gray-100 transition-all focus-within:border-gold/50 focus-within:bg-white relative">
@@ -42,7 +45,7 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
           size="icon"
           onClick={onRemove}
           className="absolute top-4 right-4 text-gray-400 hover:text-error hover:bg-error/10"
-          aria-label={`Remove entity ${index + 1}`}
+          aria-label={t("userCreate.removeAriaLabel", { n: index + 1 })}
         >
           <Trash2 className="h-4 w-4" />
         </Button>
@@ -50,19 +53,19 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full pr-8">
         <FormField
-          label="Full name"
+          label={t("user.edit.fullName")}
           error={errors?.name?.message}
         >
           <Input
             leadingIcon={User}
-            placeholder="Jane Doe"
+            placeholder={t("userCreate.field.name.placeholder")}
             autoComplete="name"
             {...form.register(`users.${index}.name`)}
           />
         </FormField>
 
         <FormField
-          label="Email address"
+          label={t("user.edit.email")}
           error={errors?.email?.message}
         >
           <Input
@@ -71,14 +74,14 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
             autoComplete="email"
             autoCapitalize="off"
             leadingIcon={Mail}
-            placeholder="user@credchain.demo"
+            placeholder={t("userCreate.field.email.placeholder")}
             {...form.register(`users.${index}.email`)}
           />
         </FormField>
 
         <FormField
-          label="Phone number"
-          hint="Use international format, e.g. +6281234567890"
+          label={t("user.edit.phone")}
+          hint={t("userCreate.field.phone.hint")}
           error={errors?.phone_number?.message}
           optional
         >
@@ -87,26 +90,26 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
             inputMode="tel"
             autoComplete="tel"
             leadingIcon={Phone}
-            placeholder="+6281234567890"
+            placeholder={t("userCreate.field.phone.placeholder")}
             {...form.register(`users.${index}.phone_number`)}
           />
         </FormField>
 
         <FormField
-          label="Number / ID"
-          hint="Employee ID, student number, etc."
+          label={t("user.edit.numberId")}
+          hint={t("userCreate.field.number.hint")}
           error={errors?.number?.message}
           optional
         >
           <Input
             leadingIcon={Hash}
-            placeholder="EMP-12345"
+            placeholder={t("userCreate.field.number.placeholder")}
             {...form.register(`users.${index}.number`)}
           />
         </FormField>
 
         <FormField
-          label="Birth date"
+          label={t("user.edit.birthDate")}
           error={errors?.birth_date?.message}
           optional
         >
@@ -118,7 +121,34 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
         </FormField>
 
         <FormField
-          label="Network role"
+          label={t("user.field.gender")}
+          error={errors?.gender?.message}
+          optional
+        >
+          <Select
+            value={gender ?? "__none__"}
+            onValueChange={(value) => {
+              form.setValue(
+                `users.${index}.gender`,
+                value === "__none__" ? undefined : (value as "male" | "female" | "other"),
+                { shouldValidate: true },
+              );
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={t("user.field.gender.placeholder")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__none__">{t("common.notSet")}</SelectItem>
+              <SelectItem value="male">{t("user.field.gender.male")}</SelectItem>
+              <SelectItem value="female">{t("user.field.gender.female")}</SelectItem>
+              <SelectItem value="other">{t("user.field.gender.other")}</SelectItem>
+            </SelectContent>
+          </Select>
+        </FormField>
+
+        <FormField
+          label={t("user.edit.role")}
           error={errors?.role?.message}
         >
           <Select
@@ -134,11 +164,11 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
             <SelectTrigger>
               <div className="flex items-center gap-3">
                 <Briefcase className="h-4 w-4 text-gray-400" aria-hidden="true" />
-                <SelectValue placeholder="Select a role" />
+                <SelectValue placeholder={t("user.edit.role.placeholder")} />
               </div>
             </SelectTrigger>
             <SelectContent>
-              {ROLE_OPTIONS.map((opt) => (
+              {roleOptions.map((opt) => (
                 <SelectItem key={opt.value} value={opt.value}>
                   {opt.label}
                 </SelectItem>
@@ -150,7 +180,7 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
 
       <details className="mt-4">
         <summary className="cursor-pointer text-sm font-medium text-gray-500 hover:text-navy py-2 list-none">
-          + Add custom fields
+          + {t("userCreate.customFields.toggle")}
         </summary>
         <div className="mt-4 ml-2">
           <MetaEditor control={form.control} name={`users.${index}.meta_entries`} />
@@ -169,11 +199,12 @@ interface FormFieldProps {
 }
 
 function FormField({ label, hint, error, optional, children }: FormFieldProps) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-1">
       <Label>
         {label}
-        {optional && <span className="ml-1 text-gray-400 font-normal">(optional)</span>}
+        {optional && <span className="ml-1 text-gray-400 font-normal">{t("common.optional")}</span>}
       </Label>
       {children}
       {error ? (
