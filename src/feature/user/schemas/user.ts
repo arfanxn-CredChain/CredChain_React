@@ -9,23 +9,23 @@ const optionalEmptyToNull = (schema: z.ZodString) =>
 
 export const phoneSchema = z
   .string()
-  .max(19, "Phone number too long")
-  .regex(STRICT_E164, "Use international format, e.g. +6281234567890");
+  .max(19, "zod.user.phoneTooLong")
+  .regex(STRICT_E164, "zod.user.phoneFormat");
 
 export const birthDateSchema = z
   .string()
-  .regex(ISO_DATE, "Use YYYY-MM-DD format");
+  .regex(ISO_DATE, "zod.user.dateFormat");
 
 export const metaSchema = z.record(z.string(), z.unknown());
 
 export const metaEntrySchema = z.object({
-  key: z.string().min(1, "Key required").max(64, "Key too long"),
-  value: z.string().max(1024, "Value too long"),
+  key: z.string().min(1, "zod.meta.keyRequired").max(64, "zod.meta.keyTooLong"),
+  value: z.string().max(1024, "zod.meta.valueTooLong"),
 });
 
 export const metaEntriesSchema = z
   .array(metaEntrySchema)
-  .max(32, "Too many entries")
+  .max(32, "zod.meta.tooManyEntries")
   .superRefine((entries, ctx) => {
     const seen = new Set<string>();
     entries.forEach((entry, idx) => {
@@ -33,7 +33,7 @@ export const metaEntriesSchema = z
         ctx.addIssue({
           code: "custom",
           path: [idx, "key"],
-          message: "Duplicate key",
+          message: "zod.meta.duplicateKey",
         });
       }
       if (entry.key) seen.add(entry.key);
@@ -42,26 +42,36 @@ export const metaEntriesSchema = z
 
 export type MetaEntryInput = z.infer<typeof metaEntrySchema>;
 
+export const genderSchema = z.enum(["male", "female", "other"]);
+
 const baseUserFields = {
-  name: z.string().min(1, "Name is required").max(256, "Name too long"),
-  number: optionalEmptyToNull(z.string().max(256, "Number too long")),
+  name: z.string().min(1, "zod.user.nameRequired").max(256, "zod.user.nameTooLong"),
+  number: optionalEmptyToNull(z.string().max(256, "zod.user.numberTooLong")),
   phone_number: optionalEmptyToNull(phoneSchema),
-  email: z.string().min(1, "Email is required").max(256, "Email too long").email("Invalid email"),
+  email: z
+    .string()
+    .min(1, "zod.user.emailRequired")
+    .max(256, "zod.user.emailTooLong")
+    .email("zod.user.emailInvalid"),
   birth_date: optionalEmptyToNull(birthDateSchema),
+  gender: genderSchema.nullable().optional(),
   meta: metaSchema.nullable().optional(),
 };
 
 export const userStoreSchema = z.object({
   ...baseUserFields,
   role: z.enum([Role.HOLDER, Role.ISSUER, Role.ADMIN], {
-    message: "Select a role",
+    message: "zod.user.roleRequired",
   }),
 });
 
 export type UserStoreInput = z.infer<typeof userStoreSchema>;
 
 export const userBatchStoreSchema = z.object({
-  users: z.array(userStoreSchema).min(1, "Add at least one user").max(100, "Maximum 100 users per batch"),
+  users: z
+    .array(userStoreSchema)
+    .min(1, "zod.batch.minOne")
+    .max(100, "zod.batch.maxHundred"),
 });
 
 export type UserBatchStoreInput = z.infer<typeof userBatchStoreSchema>;
@@ -72,6 +82,7 @@ export const userUpdateSchema = z.object({
   number: z.string().max(256).nullable().optional(),
   phone_number: phoneSchema.nullable().optional(),
   birth_date: birthDateSchema.nullable().optional(),
+  gender: genderSchema.nullable().optional(),
   meta: metaSchema.nullable().optional(),
   email: z.string().email().max(256).optional(),
   role: z.enum([Role.HOLDER, Role.ISSUER, Role.ADMIN]).optional(),
@@ -100,24 +111,20 @@ export const userBatchUpdateRoleSchema = z.object({
 export type UserBatchUpdateRoleInput = z.infer<typeof userBatchUpdateRoleSchema>;
 
 export const userBatchDeleteSchema = z.object({
-  ids: z.array(z.string().min(1)).min(1, "Select at least one user").max(100),
+  ids: z.array(z.string().min(1)).min(1, "zod.batch.deleteMinOne").max(100),
 });
 
 export type UserBatchDeleteInput = z.infer<typeof userBatchDeleteSchema>;
 
 export const userSelfProfileSchema = z.object({
-  name: z.string().min(1, "Name is required").max(256),
-  number: optionalEmptyToNull(z.string().max(256)),
   phone_number: optionalEmptyToNull(phoneSchema),
-  birth_date: optionalEmptyToNull(birthDateSchema),
-  meta: metaSchema.nullable().optional(),
 });
 
 export type UserSelfProfileInput = z.infer<typeof userSelfProfileSchema>;
 
 export const userSelfEmailSchema = z.object({
-  email: z.string().min(1, "Email is required").max(256).email("Invalid email"),
-  id_token: z.string().min(1, "Google verification required"),
+  email: z.string().min(1, "zod.user.emailRequired").max(256).email("zod.user.emailInvalid"),
+  id_token: z.string().min(1, "zod.user.idTokenRequired"),
 });
 
 export type UserSelfEmailInput = z.infer<typeof userSelfEmailSchema>;
@@ -135,6 +142,7 @@ export function defaultUserStoreRow(): UserStoreInput {
     phone_number: undefined,
     email: "",
     birth_date: undefined,
+    gender: undefined,
     meta: null,
     role: Role.HOLDER,
   };
@@ -162,6 +170,7 @@ export function defaultUserStoreFormRow(): UserStoreFormInput {
     phone_number: undefined,
     email: "",
     birth_date: undefined,
+    gender: undefined,
     meta_entries: [],
     role: Role.HOLDER,
   };

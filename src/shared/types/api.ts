@@ -1,5 +1,7 @@
 import type { Role } from "@shared/auth/role";
 
+export type Gender = "male" | "female" | "other";
+
 /**
  * Mirrors backend response.User from infrastructure/http/response/user.go
  */
@@ -10,6 +12,7 @@ export interface UserDTO {
   phone_number: string | null;
   email: string;
   birth_date: string | null;
+  gender: Gender | null;
   role: Role;
   meta: Record<string, unknown> | null;
   wallet_address: string;

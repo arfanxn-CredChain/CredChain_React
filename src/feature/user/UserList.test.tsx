@@ -34,6 +34,7 @@ beforeEach(async () => {
       phone_number: null,
       email: "admin@test.com",
       birth_date: null,
+      gender: null,
       role: Role.ADMIN,
       meta: null,
       wallet_address: "0x" + "0".repeat(40),
@@ -71,17 +72,17 @@ describe("UserList", () => {
     renderUserList();
 
     await waitFor(() => {
-      expect(screen.getByText(/4 entities/i)).toBeInTheDocument();
+      expect(screen.getByText(/4 users/i)).toBeInTheDocument();
     });
   });
 
-  it("shows the Register Entity CTA for admin role", async () => {
+  it("shows the Register User CTA for admin role", async () => {
     renderUserList();
 
-    expect(await screen.findByRole("link", { name: /register entity/i })).toBeInTheDocument();
+    expect(await screen.findByRole("link", { name: /register user/i })).toBeInTheDocument();
   });
 
-  it("hides Register Entity CTA for issuer role", async () => {
+  it("hides Register User CTA for issuer role", async () => {
     useStore.setState((s) => ({
       ...s,
       user: s.user ? { ...s.user, role: Role.ISSUER } : null,
@@ -90,7 +91,7 @@ describe("UserList", () => {
     renderUserList();
     await screen.findByText("User Directory");
 
-    expect(screen.queryByRole("link", { name: /register entity/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /register user/i })).not.toBeInTheDocument();
   });
 
   it("debounces the search input (does not crash on rapid typing)", async () => {
@@ -117,7 +118,7 @@ describe("UserList", () => {
     });
   });
 
-  it("clicking a sortable header updates the sort param in the URL", async () => {
+  it("clicking a sort option updates the URL", async () => {
     const user = userEvent.setup();
     renderUserList();
 
@@ -125,11 +126,13 @@ describe("UserList", () => {
       expect(screen.getByText("Platform Admin")).toBeInTheDocument();
     });
 
-    const nameHeader = screen.getByRole("columnheader", { name: /entity/i });
-    await user.click(nameHeader);
+    await user.click(screen.getByRole("button", { name: /sort/i }));
+    const item = await screen.findByRole("menuitem", { name: /name a→z/i });
+    await user.click(item);
 
     await waitFor(() => {
       expect(screen.getByTestId("location-search").textContent).toContain("sort=name");
+      expect(screen.getByTestId("location-search").textContent).toContain("order=asc");
     });
   });
 

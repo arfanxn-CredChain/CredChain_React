@@ -10,6 +10,7 @@ export function makeUser(overrides: Partial<UserDTO> = {}): UserDTO {
     phone_number: "+6281234567890",
     email: "test@credchain.demo",
     birth_date: null,
+    gender: null,
     role,
     meta: null,
     wallet_address: "0x" + "0".repeat(40),
