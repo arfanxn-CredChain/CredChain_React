@@ -78,3 +78,11 @@ export function mockUserNoPhone(overrides: Partial<UserDTO> = {}): UserDTO {
     ...overrides,
   });
 }
+
+export function mockUserWithGender(overrides: Partial<UserDTO> = {}): UserDTO {
+  return makeUser({
+    id: "usr_gender_1",
+    gender: "female",
+    ...overrides,
+  });
+}
