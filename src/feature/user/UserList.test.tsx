@@ -6,6 +6,7 @@ import { useStore } from "@app/store";
 import { Role } from "@shared/auth/role";
 import { i18n } from "@shared/i18n/config";
 import { TestProviders } from "@/test/TestProviders";
+import { mockUsers } from "@/test/fixtures";
 import { UserList } from "./UserList";
 
 function LocationSentinel() {
@@ -150,5 +151,70 @@ describe("UserList", () => {
     await user.click(menuButtons[0]);
     const editItem = await screen.findByRole("menuitem", { name: /edit/i });
     expect(editItem).toBeInTheDocument();
+  });
+
+  it("shows actions dropdown menu for each row", async () => {
+    renderUserList();
+    await waitFor(() =>
+      expect(screen.getAllByRole("button", { name: /actions/i }).length).toBeGreaterThan(0),
+    );
+  });
+
+  it("shows transfer super admin option when auth is super admin and target qualifies", async () => {
+    useStore.setState({
+      user: { ...mockUsers[0] },
+      isAuthenticated: true,
+    });
+
+    const user = userEvent.setup();
+    renderUserList();
+
+    await waitFor(() => expect(screen.getByText("Default Issuer")).toBeInTheDocument());
+
+    const menuButtons = screen.getAllByRole("button", { name: /actions/i });
+    await user.click(menuButtons[2]);
+
+    expect(await screen.findByText(/Transfer Super Admin/i)).toBeInTheDocument();
+  });
+
+  it("hides transfer super admin option when auth is admin (not super admin)", async () => {
+    useStore.setState({
+      user: { ...mockUsers[1] },
+      isAuthenticated: true,
+    });
+
+    const user = userEvent.setup();
+    renderUserList();
+
+    await waitFor(() => expect(screen.getByText("Default Issuer")).toBeInTheDocument());
+
+    const menuButtons = screen.getAllByRole("button", { name: /actions/i });
+    await user.click(menuButtons[2]);
+
+    await screen.findByRole("menuitem", { name: /edit/i });
+    expect(screen.queryByText(/Transfer Super Admin/i)).not.toBeInTheDocument();
+  });
+
+  it("hides transfer super admin option on own row (self)", async () => {
+    useStore.setState({
+      user: { ...mockUsers[0] },
+      isAuthenticated: true,
+    });
+
+    const user = userEvent.setup();
+    renderUserList();
+
+    await waitFor(() => expect(screen.getByText("Super Admin")).toBeInTheDocument());
+
+    const menuButtons = screen.getAllByRole("button", { name: /actions/i });
+    await user.click(menuButtons[0]);
+
+    await screen.findByRole("menuitem", { name: /edit/i });
+    expect(screen.queryByText(/Transfer Super Admin/i)).not.toBeInTheDocument();
+  });
+
+  it("renders gender column header", async () => {
+    renderUserList();
+    await waitFor(() => expect(screen.getByText(/Gender/i)).toBeInTheDocument());
   });
 });
