@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { Plus, Search, Filter, Pencil, UserCircle } from "lucide-react";
+import { Plus, Search, Filter, Pencil, UserCircle, MoreVertical } from "lucide-react";
 import { useUsers } from "./api/useUsers";
+import { useTransferSuperAdmin } from "./api/useTransferSuperAdmin";
 import { useStore } from "@app/store";
 import { Role, canAccessAny } from "@shared/auth/role";
 import { useDebouncedValue } from "@shared/hooks/useDebouncedValue";
 import { useUserListParams } from "./hooks/useUserListParams";
 import { cn } from "@shared/lib/cn";
+import { useConfirm } from "@ui/confirm-dialog";
 import type { UserDTO } from "@shared/types/api";
 
 import { PageHeader } from "@shared/components/PageHeader";
@@ -42,7 +44,7 @@ import {
 
 import { UserRoleBadge } from "./components/UserRoleBadge";
 import { UserStatusBadge } from "./components/UserStatusBadge";
-import { SortableTableHead } from "./components/SortableTableHead";
+import { SortMenu } from "./components/SortMenu";
 import { UserEditDrawer } from "./components/UserEditDrawer";
 import { truncateAddress } from "@shared/lib/format";
 
@@ -51,6 +53,8 @@ export function UserList() {
   const { params, setParam, setMany } = useUserListParams();
   const debouncedSearch = useDebouncedValue(params.search, 300);
   const [editingUser, setEditingUser] = useState<UserDTO | null>(null);
+  const transfer = useTransferSuperAdmin();
+  const { confirm, dialog } = useConfirm();
 
   const currentUser = useStore((s) => s.user);
   const canManageUsers = canAccessAny(currentUser?.role, [Role.ADMIN, Role.SUPER_ADMIN]);
@@ -65,25 +69,17 @@ export function UserList() {
   const totalPages = Math.max(1, Math.ceil(total / params.limit));
   const isEmpty = !isLoading && users.length === 0;
 
-  function handleSort(key: string) {
-    if (params.sort === key) {
-      setMany({ sort: key, order: params.order === "desc" ? "asc" : "desc" });
-    } else {
-      setMany({ sort: key, order: "desc" });
-    }
-  }
-
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <PageHeader
-        title="User Directory"
-        description="Manage system entities and their authorized roles."
+        title={t("user.list.title")}
+        description={t("user.list.description")}
         action={
           <RoleGate allowed={[Role.ADMIN, Role.SUPER_ADMIN]}>
             <Button asChild variant="gold">
               <Link to="/users/create">
                 <Plus className="h-5 w-5" />
-                Register Entity
+                {t("user.list.registerCta")}
               </Link>
             </Button>
           </RoleGate>
@@ -98,13 +94,18 @@ export function UserList() {
               inputMode="search"
               enterKeyHint="search"
               leadingIcon={Search}
-              placeholder="Search by name, email or role..."
+              placeholder={t("user.list.searchPlaceholder")}
               value={params.search}
               onChange={(e) => setParam("search", e.target.value)}
-              aria-label="Search users"
+              aria-label={t("user.list.searchPlaceholder")}
             />
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            <SortMenu
+              sort={params.sort}
+              order={params.order}
+              onChange={(s, o) => setMany({ sort: s, order: o })}
+            />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm">
@@ -133,16 +134,16 @@ export function UserList() {
 
         {isError ? (
           <div className="p-12 text-center text-error text-sm">
-            Failed to load users. Please try again.
+            {t("user.list.error")}
           </div>
         ) : isEmpty ? (
           <EmptyState
             icon={UserCircle}
-            title={debouncedSearch ? "No users match your search" : "No users yet"}
+            title={debouncedSearch ? t("user.list.empty.search.title") : t("user.list.empty.none.title")}
             description={
               debouncedSearch
-                ? `Try a different search term.`
-                : `Register the first entity to populate the directory.`
+                ? t("user.list.empty.search.body")
+                : t("user.list.empty.none.body")
             }
             className="border-0 shadow-none rounded-none"
           />
@@ -151,36 +152,13 @@ export function UserList() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <SortableTableHead
-                    label="Entity"
-                    sortKey="name"
-                    currentSort={params.sort}
-                    currentOrder={params.order}
-                    onSort={handleSort}
-                  />
-                  <SortableTableHead
-                    label="Role"
-                    sortKey="role"
-                    currentSort={params.sort}
-                    currentOrder={params.order}
-                    onSort={handleSort}
-                  />
-                  <SortableTableHead
-                    label={t("user.column.phone")}
-                    sortKey="phone_number"
-                    currentSort={params.sort}
-                    currentOrder={params.order}
-                    onSort={handleSort}
-                  />
-                  <SortableTableHead
-                    label="Wallet / Status"
-                    sortKey="created_at"
-                    currentSort={params.sort}
-                    currentOrder={params.order}
-                    onSort={handleSort}
-                  />
+                  <TableHead>{t("user.column.entity")}</TableHead>
+                  <TableHead>{t("user.column.role")}</TableHead>
+                  <TableHead>{t("user.column.gender")}</TableHead>
+                  <TableHead>{t("user.column.phone")}</TableHead>
+                  <TableHead>{t("user.column.walletStatus")}</TableHead>
                   <TableHead className="relative">
-                    <span className="sr-only">Actions</span>
+                    <span className="sr-only">{t("user.column.actions")}</span>
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -199,6 +177,9 @@ export function UserList() {
                         </TableCell>
                         <TableCell>
                           <Skeleton className="h-5 w-20" />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton className="h-4 w-16" />
                         </TableCell>
                         <TableCell>
                           <Skeleton className="h-4 w-28" />
@@ -222,9 +203,9 @@ export function UserList() {
                                   "text-sm font-bold text-navy max-w-[14rem] truncate",
                                   user.deleted_at && "line-through text-gray-400",
                                 )}
-                                title={user.name ?? "Unnamed"}
+                                title={user.name ?? t("user.edit.unnamed")}
                               >
-                                {user.name ?? "Unnamed"}
+                                {user.name ?? t("user.edit.unnamed")}
                               </div>
                               <div className="text-xs text-gray-500 font-medium mt-0.5">
                                 {user.email}
@@ -236,27 +217,75 @@ export function UserList() {
                           <UserRoleBadge role={user.role} />
                         </TableCell>
                         <TableCell>
+                          {user.gender ? (
+                            <span className="text-sm font-medium text-navy">
+                              {t(`user.field.gender.${user.gender}`)}
+                            </span>
+                          ) : (
+                            <span className="text-sm text-gray-400 italic">{t("common.notSet")}</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
                           {user.phone_number ? (
                             <span className="text-sm font-medium text-navy">{user.phone_number}</span>
-                          ) : null}
+                          ) : (
+                            <span className="text-sm text-gray-400 italic">{t("common.notSet")}</span>
+                          )}
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center text-xs font-mono text-gray-500 mb-1">
-                            {user.wallet_address ? truncateAddress(user.wallet_address) : "—"}
+                            {user.wallet_address ? truncateAddress(user.wallet_address) : (
+                              <span className="text-sm text-gray-400 italic font-sans">{t("common.notSet")}</span>
+                            )}
                           </div>
                           <UserStatusBadge deletedAt={user.deleted_at} />
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setEditingUser(user)}
-                            disabled={!!user.deleted_at}
-                            aria-label={`Edit ${user.name ?? user.email}`}
-                          >
-                            <Pencil className="h-4 w-4 mr-1" />
-                            Edit
-                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                aria-label={t("user.actions.menu")}
+                              >
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => setEditingUser(user)}
+                                disabled={!!user.deleted_at}
+                              >
+                                <Pencil className="h-4 w-4 mr-2" />
+                                {t("common.edit")}
+                              </DropdownMenuItem>
+                              {currentUser?.role === Role.SUPER_ADMIN &&
+                                currentUser.id !== user.id &&
+                                user.role !== Role.SUPER_ADMIN &&
+                                !user.deleted_at && (
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      void (async () => {
+                                        const ok = await confirm({
+                                          title: t("user.transfer.confirm.title", {
+                                            name: user.name ?? user.email,
+                                          }),
+                                          description: t("user.transfer.confirm.body", {
+                                            name: user.name ?? user.email,
+                                          }),
+                                          confirmLabel: t("user.transfer.confirm.action"),
+                                          cancelLabel: t("common.cancel"),
+                                          tone: "destructive",
+                                        });
+                                        if (ok) transfer.mutate(user.id);
+                                      })();
+                                    }}
+                                  >
+                                    {t("user.transfer.menuLabel")}
+                                  </DropdownMenuItem>
+                                )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -295,7 +324,7 @@ export function UserList() {
                         disabled={isLoading}
                         onClick={() => setParam("page", params.page - 1)}
                       >
-                        Previous
+                        {t("common.previous")}
                       </Button>
                     )}
                     {params.page < totalPages && (
@@ -305,7 +334,7 @@ export function UserList() {
                         disabled={isLoading}
                         onClick={() => setParam("page", params.page + 1)}
                       >
-                        Next
+                        {t("common.next")}
                       </Button>
                     )}
                   </div>
@@ -317,10 +346,11 @@ export function UserList() {
       </Card>
 
       <UserEditDrawer user={editingUser} onClose={() => setEditingUser(null)} />
+      {dialog}
 
       {!canManageUsers && (
         <p className="text-xs text-gray-400 text-center">
-          Role management requires Admin access.
+          {t("user.list.roleAdminNotice")}
         </p>
       )}
     </div>

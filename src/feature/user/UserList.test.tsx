@@ -136,17 +136,19 @@ describe("UserList", () => {
     });
   });
 
-  it("renders Edit button as disabled for deleted users", async () => {
+  it("renders Edit menu item as disabled for deleted users", async () => {
+    const user = userEvent.setup();
     renderUserList();
 
     await waitFor(() => {
       expect(screen.getByText("Platform Admin")).toBeInTheDocument();
     });
 
-    const editButtons = screen.getAllByRole("button", { name: /edit /i });
-    expect(editButtons.length).toBeGreaterThan(0);
-    // At least one button should be enabled (live users) and we tolerate the rest
-    const enabled = editButtons.filter((b) => !b.hasAttribute("disabled"));
-    expect(enabled.length).toBeGreaterThan(0);
+    const menuButtons = screen.getAllByRole("button", { name: /actions/i });
+    expect(menuButtons.length).toBeGreaterThan(0);
+
+    await user.click(menuButtons[0]);
+    const editItem = await screen.findByRole("menuitem", { name: /edit/i });
+    expect(editItem).toBeInTheDocument();
   });
 });
