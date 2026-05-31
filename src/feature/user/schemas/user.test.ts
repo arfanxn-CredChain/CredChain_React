@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { Role } from "@shared/auth/role";
 import {
+  genderSchema,
   userBatchStoreSchema,
   userSelfEmailSchema,
   userSelfProfileSchema,
   userStoreSchema,
+  userUpdateSchema,
 } from "./user";
 
 describe("userStoreSchema - phone validation (strictE164)", () => {
@@ -200,14 +202,25 @@ describe("userBatchStoreSchema", () => {
 });
 
 describe("userSelfProfileSchema", () => {
-  it("requires name", () => {
+  it("accepts empty object (phone is optional)", () => {
     const result = userSelfProfileSchema.safeParse({});
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts valid E.164 phone number", () => {
+    const result = userSelfProfileSchema.safeParse({ phone_number: "+6281234567890" });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects invalid phone format", () => {
+    const result = userSelfProfileSchema.safeParse({ phone_number: "08123456789" });
     expect(result.success).toBe(false);
   });
 
-  it("accepts minimal profile (name only)", () => {
-    const result = userSelfProfileSchema.safeParse({ name: "Jane" });
+  it("treats empty string phone as undefined", () => {
+    const result = userSelfProfileSchema.safeParse({ phone_number: "" });
     expect(result.success).toBe(true);
+    if (result.success) expect(result.data.phone_number).toBeUndefined();
   });
 });
 
@@ -223,5 +236,61 @@ describe("userSelfEmailSchema", () => {
       id_token: "google-id-token",
     });
     expect(result.success).toBe(true);
+  });
+});
+
+describe("genderSchema", () => {
+  it.each(["male", "female", "other"] as const)("accepts %s", (value) => {
+    expect(genderSchema.parse(value)).toBe(value);
+  });
+
+  it("rejects unknown values", () => {
+    expect(() => genderSchema.parse("unknown")).toThrow();
+  });
+
+  it("rejects empty string", () => {
+    expect(() => genderSchema.parse("")).toThrow();
+  });
+});
+
+describe("userStoreSchema gender field", () => {
+  const baseValid = {
+    name: "Test",
+    email: "test@example.com",
+    role: "holder" as const,
+  };
+
+  it("accepts gender: undefined", () => {
+    expect(userStoreSchema.safeParse(baseValid).success).toBe(true);
+  });
+
+  it("accepts gender: null", () => {
+    expect(userStoreSchema.safeParse({ ...baseValid, gender: null }).success).toBe(true);
+  });
+
+  it("accepts valid gender values", () => {
+    for (const g of ["male", "female", "other"] as const) {
+      expect(userStoreSchema.safeParse({ ...baseValid, gender: g }).success).toBe(true);
+    }
+  });
+
+  it("rejects invalid gender values", () => {
+    expect(userStoreSchema.safeParse({ ...baseValid, gender: "invalid" }).success).toBe(false);
+  });
+});
+
+describe("userUpdateSchema gender field", () => {
+  const baseValid = { id: "u1" };
+
+  it("accepts gender: null (clear)", () => {
+    expect(userUpdateSchema.safeParse({ ...baseValid, gender: null }).success).toBe(true);
+  });
+
+  it("accepts valid gender values", () => {
+    expect(userUpdateSchema.safeParse({ ...baseValid, gender: "male" }).success).toBe(true);
+  });
+
+  it("rejects invalid gender values", () => {
+    expect(userUpdateSchema.safeParse({ ...baseValid, gender: "x" }).success).toBe(false);
   });
 });
