@@ -27,7 +27,6 @@ export default defineConfig({
       include: [
         "src/shared/lib/jwt.ts",
         "src/shared/hooks/useNavSearch.ts",
-        "src/shared/components/RootRedirect.tsx",
         "src/feature/help/**/*.{ts,tsx}",
         "src/feature/about/**/*.{ts,tsx}",
         "src/shared/components/layout/nav-items.ts",

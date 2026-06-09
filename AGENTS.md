@@ -36,13 +36,15 @@ npm run check-locales         # verify en.json/id.json sync with backend locales
 
 | Var | Required | Default | Purpose |
 |---|---|---|---|
-| `VITE_GOOGLE_CLIENT_ID` | **yes** | — | fatal if missing |
+| `VITE_GOOGLE_CLIENT_ID` | **yes** | — | fatal if missing (thrown by `env.ts` at module load) |
 | `VITE_API_BASE_URL` | no | `/api` | base URL for axios |
-| `VITE_APP_ENV` | no | — | `development`/`staging`/`production` |
+| `VITE_API_PROXY` | no | `http://localhost:8080` | dev-server proxy target for `/api` (Vite only, not bundled) |
+| `VITE_APP_ENV` | no | `development` | `development` / `staging` / `production` |
+| `VITE_SUPPORT_EMAIL` | no | `support@credchain.app` | contact address shown on Help & About pages |
 
-Engine note: tested on Node 20.20.2; `package.json` does not pin engines.
+Engine note: tested on Node 20.x; `package.json` does not pin `engines`.
 
-No CI pipeline is configured.
+A `prepare` script wires `husky`; commits trigger `lint-staged` (Prettier on `*.{ts,tsx,css,json,md}`, ESLint `--fix` on `*.{ts,tsx}`). No CI pipeline is configured.
 
 ## Environment Setup
 
@@ -72,26 +74,33 @@ CredChain_React/
       providers.tsx            # QueryClient + I18n + GoogleOAuth + ErrorBoundary + OfflineBanner + Toaster
       router.tsx               # createBrowserRouter with lazyRoute() helper
       SessionHydrator.tsx      # validates session via GET /users/self, syncs i18n with Zustand locale
-      store/index.ts           # Zustand: auth slice + UI slice (persist middleware)
+      store/index.ts           # Zustand: auth + UI slices combined (persist middleware)
     feature/                   # one folder per business domain
-      auth/                    # Login + useGoogleLogin + useLogout
+      auth/                    # Login + api/ (useGoogleLogin, useLogout)
       user/                    # UserCreate, UserDetail, UserList, UserSelfEmail, UserSelfProfile
-                               # + api/ (11 hooks) + components/ + hooks/ + lib/ + schemas/
+                               # + api/ (11 hooks: useCreateUsers, useDeleteUsers, useRestoreUsers,
+                               #         useTransferSuperAdmin, useUpdateSelfEmail, useUpdateSelfProfile,
+                               #         useUpdateUserRoles, useUpdateUsers, useUser, useUsers, useUserSelf)
+                               # + components/ (CopyInlineButton, MetaEditor, RoleFilterMenu, SortMenu,
+                               #                UserCreateRow, UserEditDrawer, UserRoleBadge, UserStatusBadge)
+                               # + hooks/ (useUserListParams) + lib/ (meta) + schemas/ (user)
       credential/              # CredentialDetail, CredentialIssue, CredentialList, MyCredentials,
-                               # VerifyCredential + api/ (7 hooks) + components/ + schemas/
+                               # VerifyCredential + api/ (6 hooks + keys.ts) + components/ + schemas/
       dashboard/               # Dashboard + Settings
+      landing/                 # Landing (self-wraps SplitLayout; route: /)
       about/                   # About
       help/                    # Help
     shared/
       api/                     # client.ts + codes.ts + envelope.ts + query-client.ts
       auth/                    # role.ts + guards.tsx
       components/              # 14 shared components
-        ui/                    # 13 shadcn-style primitives (sole Radix import location)
-        layout/                # AuthLayout, DashboardLayout, PublicLayout, Sidebar, TopNav
+        ui/                    # 12 shadcn-style primitives (sole Radix import location)
+        layout/                # AdaptiveLayout, DashboardLayout, PublicLayout, SplitLayout,
+                               # Sidebar, TopNav, nav-items.ts
       hooks/                   # useDebouncedValue, useNavSearch, useOnline, useT
       i18n/                    # config.ts + en.json + id.json
       lib/                     # cn, env, format, forms, hash, jwt, notify
-      types/api.ts             # DTO mirrors
+      types/api.ts             # DTO mirrors (UserDTO, AuthResponseDTO, CredentialDTO, PaginatedResponse)
     styles/index.css           # Tailwind v4 @theme tokens + base + utilities
     test/                      # setup.ts, fixtures.ts, msw/{handlers.ts,server.ts}, TestProviders.tsx
   .env.example / .env.test     # .env.test committed, used by Vitest
@@ -206,29 +215,58 @@ Backend response codes (6-digit `AABBCC`) map to i18n keys via `CODE_TO_MESSAGE_
 
 ### Routing & Lazy Loading
 
-Every protected route is loaded via `lazyRoute()` helper in `app/router.tsx`. The helper wraps the component in `Suspense` (with `LoadingSpinner` fallback) and attaches `RouteErrorBoundary` automatically. This means **route components must be named exports** — the helper takes the export name as a string.
+Every route except `/login` is loaded via the `lazyRoute()` helper in `app/router.tsx`. The helper wraps the component in `Suspense` (with `LoadingSpinner` fallback) and attaches `RouteErrorBoundary` automatically. This means **route components must be named exports** — the helper takes the export name as a string.
 
 ```ts
 lazyRoute(() => import("@feature/user/UserList"), "UserList")
 ```
 
+`/login` is an **eager** import (`Login` is imported directly, not lazily) since it is the most common cold-start entry.
+
+**Route map** (path → component → guard):
+
+| Path | Component | Guard / min role | Shell |
+|---|---|---|---|
+| `/` | `Landing` | none | self-wraps `SplitLayout` |
+| `/login` | `Login` (eager) | `PublicRoute` (redirects if authed) | self-wraps `SplitLayout` |
+| `/credentials/verify/:credentialId` | `VerifyCredential` | none | `PublicLayout` |
+| `/help` | `Help` | none | `AdaptiveLayout` |
+| `/about` | `About` | none | `AdaptiveLayout` |
+| `/dashboard` | `Dashboard` | authenticated | `DashboardLayout` |
+| `/credentials/self` | `MyCredentials` | authenticated | `DashboardLayout` |
+| `/account/profile` | `UserSelfProfile` | authenticated | `DashboardLayout` |
+| `/account/email` | `UserSelfEmail` | authenticated | `DashboardLayout` |
+| `/users` | `UserList` | Issuer+ | `DashboardLayout` |
+| `/users/:id` | `UserDetail` | Issuer+ | `DashboardLayout` |
+| `/credentials` | `CredentialList` | Issuer+ | `DashboardLayout` |
+| `/credentials/issue` | `CredentialIssue` | Issuer+ | `DashboardLayout` |
+| `/credentials/:id` | `CredentialDetail` | Issuer+ | `DashboardLayout` |
+| `/users/create` | `UserCreate` | Admin+ | `DashboardLayout` |
+| `/settings` | `Settings` | Admin+ | `DashboardLayout` |
+| `*` | `NotFound` | none | — |
+
+`AdaptiveLayout` renders `DashboardLayout` when authenticated, `PublicLayout` otherwise. `SplitLayout` is the navy/light split-screen shared by Landing and Login.
+
 ### Authorization & Role Guards
 
-**Single source of role logic:** `@shared/auth/role.ts` exports `Role` enum, `ROLE_LEVEL` hierarchy, `canAccess(userRole, minRole)`, `canAccessAny(userRole, allowed[])`, `formatRole`.
+**Single source of role logic:** `@shared/auth/role.ts` exports `Role` (a string-valued const object), `ROLE_LEVEL` hierarchy, `canAccess(userRole, minRole)`, `canAccessAny(userRole, allowed[])`, `formatRole`.
 
 ```
-None(0)       - on-chain only, never persisted
-Holder(1)     - receives credentials
-Issuer(2)     - issues/revokes/verifies
-Admin(3)      - manages users
-SuperAdmin(4) - bootstrapped via Go CLI only
+Role.HOLDER     = "holder"     (level 1)  - receives credentials
+Role.ISSUER     = "issuer"     (level 2)  - issues/revokes/verifies
+Role.ADMIN      = "admin"      (level 3)  - manages users
+Role.SUPER_ADMIN= "super_admin"(level 4)  - bootstrapped via Go CLI only
 ```
+
+`None(0)` exists only in Solidity/Go (on-chain revocation target) — it is **not** part of the TS `Role` object since the frontend never persists or assigns it.
 
 **Guards** (`@shared/auth/guards.tsx`):
 
-- `ProtectedRoute` — redirects unauthenticated to `/login`, role-mismatched to fallback
-- `PublicRoute` — redirects authenticated away (login is public-only)
-- `RoleGate` — inline UI gating for show/hide based on role
+- `ProtectedRoute` — redirects unauthenticated to `/login` (with `state.from`); role-mismatched to `/credentials/self` (HOLDER) or `/dashboard`. Optional `allowedRoles?: Role[]`.
+- `PublicRoute` — redirects authenticated away to `state.from ?? /dashboard` (login is public-only)
+- `RoleGate` — inline UI gating for show/hide based on role, with optional `fallback`
+
+**Sidebar nav** (`@shared/components/layout/nav-items.ts`): `NAV_ITEMS` carry `minRole` (Issuer+ for dashboard/users/credentials, Admin+ for settings) and `exactRole` (HOLDER-only "My Credentials"). The `inSidebar` flag controls whether an item renders in the sidebar vs. only the global search / profile menu.
 
 ### Forms & Validation (RHF + Zod)
 
@@ -287,23 +325,25 @@ className={`base classes ${isActive ? "active" : ""} ${className}`}
 
 **Always use `notify`** from `@shared/lib/notify` for toasts. It auto-translates keys via i18n and applies consistent styling. Available: `notify.success`, `notify.error`, `notify.info`, `notify.warning`.
 
-**shadcn primitives** (in `@ui/*`):
+**shadcn primitives** (in `@ui/*` — 12 primitives, the sole Radix import location):
 
 - `Button` — variants: `primary` (navy), `gold`, `destructive`, `outline`, `ghost`, `link`, `dashed`. Sizes: `sm`, `md`, `lg`, `icon`, `icon-mobile`.
 - `Card` + `CardHeader` + `CardTitle` + `CardDescription` + `CardContent` + `CardFooter`
 - `Input` — accepts `leadingIcon` and `trailingAction` props
 - `Label` — Radix-based, supports peer-disabled
 - `Select` — full Radix Select with `SelectValue`
-- `Dialog` + `ConfirmDialog` + `useConfirm()` hook (NEVER use `window.confirm`)
+- `Dialog` + `ConfirmDialog` + `useConfirm()` hook (NEVER use `window.confirm`); `useConfirm()` returns `{ confirm, dialog }`
 - `DropdownMenu` — full Radix DropdownMenu with `destructive` item variant
 - `Table` + `TableHeader` + `TableBody` + `TableRow` + `TableHead` + `TableCell`
 - `Badge` — tones: navy, gold, error, green, gray
 - `Skeleton` — animate-pulse rounded gray box
-- `Toaster` — sonner integration with token-styled toasts
+- `Toaster` — sonner integration with token-styled toasts (hardcoded `theme="light"`)
 
-**Custom shared components** (`@shared/components/*`):
+> The `vaul` `Drawer` primitive is used by `feature/user/components/UserEditDrawer.tsx` (admin batch user edit). It lives in the feature, not in `@ui/`, and is the only content-drawer in the app — the mobile sidebar is NOT a `vaul`/`Sheet` drawer (see Error Handling / layout notes).
 
-`PageHeader`, `EyebrowLabel`, `MonoId`, `DecorBlob`, `EmptyState`, `StatusPill`, `LoadingSpinner` / `FullPageSpinner`, `LanguageSwitcher`, `OfflineBanner`, `NotFound`, `RouteErrorBoundary`, `ErrorBoundary` (`AppErrorBoundary`), `UserAvatar`, `RootRedirect`.
+**Custom shared components** (`@shared/components/*` — 14):
+
+`BackLink`, `DecorBlob`, `EmptyState`, `ErrorBoundary` (`AppErrorBoundary`), `EyebrowLabel`, `LanguageSwitcher`, `LoadingSpinner` / `FullPageSpinner`, `MonoId`, `NotFound`, `OfflineBanner`, `PageHeader`, `RouteErrorBoundary`, `StatusPill`, `UserAvatar`.
 
 ### Error Handling Layers
 
@@ -435,9 +475,20 @@ All env vars must be prefixed with `VITE_` to be exposed to the browser. Reading
 | Integration | Vitest + MSW | Feature flows with mocked `/api` |
 | E2E | Playwright | Auth flow, public routes, a11y smoke |
 
-**Current count:** 179 tests across 28 spec files (verified in current master).
+**Current count:** **244 unit/component tests across 25 spec files** under `src/`, plus **20 Playwright tests across 3 e2e specs** (`auth.spec.ts`, `public.spec.ts`, `a11y.spec.ts`).
 
-**Coverage thresholds** (in `vitest.config.ts`): 90% lines / 85% branches / 90% functions / 90% statements, **per-file**.
+**Coverage** (in `vitest.config.ts`): the `coverage` config uses a **selective `include` allowlist** (NOT global). Per-file thresholds of 90% lines / 85% branches / 90% functions / 90% statements apply only to the curated paths:
+
+```
+src/shared/lib/jwt.ts
+src/shared/hooks/useNavSearch.ts
+src/feature/help/**/*.{ts,tsx}
+src/feature/about/**/*.{ts,tsx}
+src/shared/components/layout/nav-items.ts
+src/shared/i18n/config.ts
+```
+
+This is intentional: not all of the codebase is covered to threshold yet. Add new paths to the allowlist as features stabilize. Globally-excluded: `src/shared/components/ui/**`, `src/test/**`, `src/main.tsx`, `src/app/router.tsx`, `**/*.test.{ts,tsx}`, `**/*.d.ts`, config files, `scripts/**`.
 
 **MSW handlers** in `src/test/msw/handlers.ts` mock all `/api/*` endpoints with envelope shape. Add new handlers when adding new API hooks.
 
@@ -453,25 +504,27 @@ When adding tests, prefer integration tests via MSW over heavy mocking. Schema t
 
 | Layer | Choice | Version |
 |---|---|---|
-| Language | TypeScript | ~5.9 strict + verbatimModuleSyntax |
-| Framework | React | ^19 |
-| Build | Vite | ^7 |
+| Language | TypeScript | ~5.9.3 strict + verbatimModuleSyntax |
+| Framework | React | ^19.2 |
+| Build | Vite | ^7.3 |
 | Styling | Tailwind CSS v4 | ^4.2 (`@theme` directive, no config file) |
-| UI primitives | shadcn/ui + Radix UI | latest |
-| Icons | lucide-react | latest (named imports only) |
-| Routing | React Router | ^7 (lazy via `lazyRoute()` helper) |
-| Server state | TanStack Query | ^5 |
-| HTTP | axios | ^1 (with interceptors) |
-| Client state | Zustand | ^5 (with persist middleware) |
-| Forms | React Hook Form | ^7 |
-| Validation | Zod | ^3 |
-| i18n | i18next + react-i18next | ^23 / ^14 |
+| UI primitives | shadcn/ui + Radix UI | various (see `package.json`) |
+| Icons | lucide-react | ^0.576 (named imports only) |
+| Routing | React Router | ^7.13 (lazy via `lazyRoute()` helper) |
+| Server state | TanStack Query | ^5.59 |
+| HTTP | axios | ^1.7 (with interceptors) |
+| Client state | Zustand | ^5.0 (with persist middleware) |
+| Forms | React Hook Form | ^7.53 |
+| Validation | Zod | ^3.23 |
+| i18n | i18next + react-i18next | ^23.16 / ^14.1 |
 | Auth | @react-oauth/google | ^0.12 |
-| Avatar | @dicebear/core + @dicebear/identicon | latest |
-| Toasts | sonner | ^1 (via `notify` helper) |
-| Class merge | clsx + tailwind-merge | latest (via `cn()`) |
-| Tests | Vitest 3 + Testing Library + MSW 2 | |
-| E2E | Playwright + @axe-core/playwright | ^1 / ^4 |
+| Avatar | @dicebear/core + @dicebear/identicon | ^9.4 |
+| Toasts | sonner | ^1.5 (via `notify` helper) |
+| Class merge | clsx + tailwind-merge | ^2 / ^3 (via `cn()`) |
+| Drawer | vaul | ^1.1 (used by `UserEditDrawer`; not for sidebar nav) |
+| Git hooks | husky + lint-staged | ^9 / ^15 |
+| Tests | Vitest ^3 + Testing Library ^16 + MSW ^2.4 | |
+| E2E | Playwright ^1.48 + @axe-core/playwright ^4.10 | |
 
 ## Cross-Repo Integration
 
@@ -506,6 +559,7 @@ Before pushing, run the repo's canonical verification command and confirm it pas
 ## Change Log
 
 - **2026-05-31 — Dark mode removed.** `ThemeProvider`, `ThemeToggle`, the `theme` slice in Zustand, the `:root.dark` CSS overrides, the `.text-fg` utility, and the no-flash inline script in `index.html` were all deleted. The app now renders only in light mode, faithful to `DESIGN_SYSTEM.md`. `text-navy` replaced every `text-fg` usage. `LanguageSwitcher`'s `variant="dark"` prop remains — it is a *background-aware* styling switch (for placement on the navy header/sidebar), not a theme switch.
+- **2026-06-09 — Docs resync to as-built.** AGENTS.md + DESIGN_SYSTEM.md reconciled with actual codebase. Major corrections: added `feature/landing/` (was undocumented); replaced `AuthLayout` references with `SplitLayout`/`AdaptiveLayout`; removed `RootRedirect` (deleted), added `BackLink`; shadcn count corrected to 12 primitives (not 13); test count updated to 244 + 20 E2E (was 179); coverage documented as selective allowlist (not global); env-var table extended with `VITE_API_PROXY` and `VITE_SUPPORT_EMAIL`; documented husky/lint-staged pre-commit flow; removed `ethers` from tech stack (unused dep). DESIGN_SYSTEM.md preserve design-philosophy sections intact.
 
 ## See Also
 

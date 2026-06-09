@@ -91,10 +91,10 @@ Backend contract (see ../CredChain_Golang/AGENTS.md):
 | Validation | Zod | ^3 | Mirrors Go Ozzo rules; type inference |
 | i18n | i18next + react-i18next | ^23 / ^14 | Mature, ICU-style, lazy bundles, matches go-i18n keys |
 | Auth (OAuth) | @react-oauth/google | ^0.12 | Google Sign-In button, ID token retrieval |
-| Toasts | sonner | ^1 | Headless, Tailwind-friendly |
-| Class utils | clsx + tailwind-merge | latest | cn() helper |
-| Web3 (optional) | ethers | ^6 | Client-side hash verification |
-| Tests | Vitest + Testing Library | ^2 / ^16 | Vite-native, Jest-compatible API |
+| Toasts | sonner | ^1.5 | Headless, Tailwind-friendly |
+| Class utils | clsx + tailwind-merge | ^2 / ^3 | cn() helper |
+| Drawer | vaul | ^1.1 | Content drawer (admin user edit); NOT used for sidebar nav |
+| Tests | Vitest + Testing Library | ^3 / ^16 | Vite-native, Jest-compatible API |
 | API mocking | MSW | ^2 | Service worker fetch interception |
 | E2E | Playwright | ^1 | Cross-browser, trace viewer |
 | Lint | ESLint + typescript-eslint | ^9 / ^8 | Same as demo |
@@ -105,9 +105,9 @@ Backend contract (see ../CredChain_Golang/AGENTS.md):
 
 The demo hand-rolls everything (selects, modals via window.confirm, no popovers). Production needs accessible select dropdowns, dialogs, command palettes, dropdown menus, toasts, tabs - building all of that from scratch is months of work and an accessibility liability. shadcn/ui gives us Radix primitives (WAI-ARIA compliant, keyboard navigation, focus traps) as source files in our repo that we restyle to our tokens. We own the code; we don't depend on a versioned package. This is the 2026 default for Tailwind apps.
 
-**Components to install via shadcn CLI:** button, input, select, dialog, dropdown-menu, popover, command, tabs, table, tooltip, toast (sonner-backed), form (RHF integration), checkbox, label, badge, skeleton, avatar, sheet (mobile sidebar).
+**Components installed in `src/shared/components/ui/` (12 primitives):** badge, button, card, confirm-dialog, dialog, dropdown-menu, input, label, select, skeleton, table, toaster.
 
-All shadcn components live in `src/shared/components/ui/` and are restyled to use our tokens (`navy`, `gold`, `error`) before any feature code consumes them.
+All shadcn components live in `src/shared/components/ui/` and are restyled to use our tokens (`navy`, `gold`, `error`) before any feature code consumes them. The `vaul` `Drawer` primitive is used outside `ui/` by `feature/user/components/UserEditDrawer.tsx` for the admin batch-edit flow; it is the only content drawer in the app and is **not** used for sidebar navigation (the mobile sidebar is hand-rolled — see §8.7).
 
 ---
 
@@ -120,99 +120,109 @@ Feature-driven, evolved from the demo:
 ```
 CredChain_React/
   public/
+  e2e/                  # Playwright specs (auth, public, a11y)
+  scripts/
+    check-locales-sync.mjs
   src/
     app/                  # cross-cutting app wiring
-      providers.tsx       # QueryClient, I18nProvider, GoogleOAuthProvider, Toaster, ErrorBoundary
-      router.tsx          # createBrowserRouter (lazy routes)
-      store/              # Zustand slices
-        auth-slice.ts     # current user, isAuthenticated
-        ui-slice.ts       # sidebar open, theme toggle (future)
-        index.ts          # combined useStore
-    feature/              # one folder per business domain
+      App.tsx              # mounts Providers → SessionHydrator → RouterProvider
+      providers.tsx        # QueryClient + I18n + GoogleOAuth + AppErrorBoundary + OfflineBanner + Toaster
+      router.tsx           # createBrowserRouter (lazy via lazyRoute() helper)
+      SessionHydrator.tsx  # GET /users/self on mount; syncs i18n with Zustand locale
+      store/
+        index.ts           # combined auth + UI slices in one file (with persist middleware)
+    feature/                 # one folder per business domain
       auth/
-        api/              # TanStack Query hooks
-        components/       # GoogleButton wrapper, AuthCard
-        schemas/          # Zod schemas
+        api/                 # useGoogleLogin, useLogout
         Login.tsx
         index.ts
       user/
-        api/              # useUsers, useUser, useCreateUsers, useUpdateUsers, useUpdateRoles, useDeleteUsers
-        components/       # UserRoleBadge, UserStatusPill, UserAvatar
-        schemas/          # mirrors Ozzo rules from Go
-        UserList.tsx
-        UserCreate.tsx    # batch form
-        UserDetail.tsx
-        UserSelfProfile.tsx
-        UserSelfEmail.tsx # Google reauth flow
-        index.ts
+        api/                 # 11 hooks + keys.ts (useUsers, useUser, useUserSelf,
+                             #   useCreateUsers, useUpdateUsers, useUpdateUserRoles,
+                             #   useUpdateSelfProfile, useUpdateSelfEmail,
+                             #   useDeleteUsers, useRestoreUsers, useTransferSuperAdmin)
+        components/          # CopyInlineButton, MetaEditor, RoleFilterMenu, SortMenu,
+                             # UserCreateRow, UserEditDrawer (vaul), UserRoleBadge, UserStatusBadge
+        hooks/               # useUserListParams
+        lib/                 # meta
+        schemas/             # user (Zod)
+        UserList.tsx / UserDetail.tsx / UserCreate.tsx
+        UserSelfProfile.tsx / UserSelfEmail.tsx
       credential/
-        api/
-        components/       # CredentialCard, CredentialStatusBadge
-        schemas/
-        CredentialList.tsx
-        CredentialDetail.tsx
-        CredentialIssue.tsx
-        MyCredentials.tsx
-        VerifyCredential.tsx
-        index.ts
+        api/                 # 6 hooks + keys.ts (useCredentials, useCredential,
+                             #   useMyCredentials, useIssueCredentials,
+                             #   useRevokeCredentials, useVerifyCredential)
+        components/          # CredentialCard, CredentialIssueRow, CredentialStatusBadge
+        schemas/             # credential (Zod)
+        CredentialList.tsx / CredentialDetail.tsx / CredentialIssue.tsx
+        MyCredentials.tsx / VerifyCredential.tsx
       dashboard/
-        components/       # MetricCard, ActivityFeed
         Dashboard.tsx
         Settings.tsx
+      landing/
+        Landing.tsx          # self-wraps SplitLayout, route: "/"
         index.ts
+      about/  About.tsx + index.ts
+      help/   Help.tsx + index.ts
     shared/
       api/
-        client.ts         # axios instance
-        interceptors.ts   # auth, envelope unwrap, refresh-on-401
-        envelope.ts       # ApiResponse<T>, ApiError types
-        codes.ts          # backend response codes -> i18n keys
-        query-client.ts   # TanStack QueryClient config
+        client.ts            # axios instance + interceptors (refresh dedup, X-Retry, 429 mapping)
+        codes.ts             # backend response codes -> i18n keys
+        envelope.ts          # ApiResponse<T>, ApiError, isApiError
+        query-client.ts      # TanStack QueryClient config
       auth/
-        role.ts           # Role enum + roleHierarchy + canAccess()
-        guards.tsx        # ProtectedRoute, PublicRoute, RoleGate
+        role.ts              # Role const object, ROLE_LEVEL, canAccess, canAccessAny, formatRole
+        guards.tsx           # ProtectedRoute, PublicRoute, RoleGate
       components/
-        ui/               # shadcn/ui sources (button.tsx, dialog.tsx, ...)
-        layout/           # AuthLayout, DashboardLayout, PublicLayout, Sidebar, TopNav
-        DataTable.tsx     # generic table
+        ui/                  # 12 shadcn primitives (sole Radix import location)
+                             # badge, button, card, confirm-dialog, dialog,
+                             # dropdown-menu, input, label, select, skeleton, table, toaster
+        layout/
+          AdaptiveLayout.tsx # renders DashboardLayout if authed, PublicLayout otherwise
+          DashboardLayout.tsx
+          PublicLayout.tsx
+          SplitLayout.tsx    # 50/50 navy+light; used by Landing + Login
+          Sidebar.tsx
+          TopNav.tsx
+          nav-items.ts       # NAV_ITEMS with minRole + exactRole + inSidebar flags
+        BackLink.tsx
+        DecorBlob.tsx
         EmptyState.tsx
-        ErrorBoundary.tsx
-        PageHeader.tsx
-        StatusPill.tsx
+        ErrorBoundary.tsx    # AppErrorBoundary
         EyebrowLabel.tsx
-        DecorBlob.tsx     # blurred radial flourish
-        MonoId.tsx        # truncated 0x... rendering
-        LoadingSpinner.tsx
-      hooks/              # cross-cutting hooks
+        LanguageSwitcher.tsx
+        LoadingSpinner.tsx   # + FullPageSpinner
+        MonoId.tsx
+        NotFound.tsx
+        OfflineBanner.tsx
+        PageHeader.tsx
+        RouteErrorBoundary.tsx
+        StatusPill.tsx
+        UserAvatar.tsx
+      hooks/                 # useDebouncedValue, useNavSearch, useOnline, useT
       i18n/
         config.ts
-        en.json           # mirrors backend locales/en.json
-        id.json           # mirrors backend locales/id.json
-      lib/                # pure utility functions (no React)
-        cn.ts             # clsx + tailwind-merge helper
-        format.ts         # date, address, hash truncation
-        env.ts            # typed env access
+        en.json              # mirrors backend locales/en.json
+        id.json              # mirrors backend locales/id.json
+      lib/                   # cn, env, format, forms, hash, jwt, notify
       types/
-        api.ts            # mirrors backend response.User, response.Auth
-        domain.ts         # Role, ResponseCode
+        api.ts               # UserDTO, AuthResponseDTO, CredentialDTO, PaginatedResponse, PaginationParams
     styles/
-      index.css           # Tailwind v4 entry + @theme tokens + base layer
+      index.css              # Tailwind v4 entry + @theme tokens + base + utilities
+    test/                    # setup.ts, fixtures.ts, msw/{handlers,server}.ts, TestProviders.tsx
     main.tsx
     vite-env.d.ts
-  .env.example
-  .env.local              # gitignored
-  components.json         # shadcn/ui config
+  .env.example / .env.test   # .env.test committed, used by Vitest
+  components.json            # shadcn/ui config
   eslint.config.js
   index.html
   package.json
   prettier.config.js
-  tsconfig.json
-  tsconfig.app.json
-  vite.config.ts
-  vitest.config.ts
-  playwright.config.ts
+  tsconfig.json + tsconfig.app.json + tsconfig.node.json
+  vite.config.ts / vitest.config.ts / playwright.config.ts
   README.md
-  AGENTS.md               # AI assistant instructions for THIS package
-  DESIGN_SYSTEM.md        # this file
+  AGENTS.md
+  DESIGN_SYSTEM.md           # this file
 ```
 
 ### 4.2 Module Boundary Rules
@@ -796,35 +806,47 @@ export function EmptyState({ icon: Icon, title, description, action }: {
 
 ### 7.9 Confirm Dialog (replaces window.confirm)
 
-The demo uses `window.confirm` which is jarring on mobile and can't be styled. Production must use shadcn `dialog` + a `useConfirm` hook:
+The demo uses `window.confirm` which is jarring on mobile and can't be styled. Production uses shadcn `dialog` + a `useConfirm` hook in `@ui/confirm-dialog`:
 
 ```tsx
-// shared/hooks/useConfirm.ts
+// shadcn/ui/confirm-dialog.tsx — useConfirm()
 export function useConfirm() {
   const [state, setState] = useState<{ open: boolean; resolve?: (v: boolean) => void; opts?: ConfirmOptions }>({ open: false });
 
   const confirm = (opts: ConfirmOptions) =>
     new Promise<boolean>((resolve) => setState({ open: true, resolve, opts }));
 
-  const Dialog = (
-    <AlertDialog open={state.open} onOpenChange={(o) => !o && state.resolve?.(false)}>
-      {/* ... renders state.opts.title/description/confirmLabel ... */}
-    </AlertDialog>
+  const dialog = (
+    <Dialog open={state.open} onOpenChange={(o) => !o && state.resolve?.(false)}>
+      {/* renders state.opts.title / description / confirmLabel / tone */}
+    </Dialog>
   );
 
-  return { confirm, Dialog };
+  return { confirm, dialog };
 }
 ```
 
-Usage:
+Usage — note `dialog` (lowercase) must be rendered alongside the trigger:
 
 ```tsx
-const { confirm, Dialog } = useConfirm();
+const { confirm, dialog } = useConfirm();
 const handleDelete = async () => {
-  if (await confirm({ title: "Delete user?", tone: "destructive" })) {
-    deleteUser.mutate(id);
-  }
+  const ok = await confirm({
+    title: t("user.delete.confirm.title"),
+    description: t("user.delete.confirm.body"),
+    confirmLabel: t("user.delete.confirm.action"),
+    cancelLabel: t("common.cancel"),
+    tone: "destructive",
+  });
+  if (ok) deleteUser.mutate(id);
 };
+
+return (
+  <>
+    <Button onClick={handleDelete}>Delete</Button>
+    {dialog}
+  </>
+);
 ```
 
 ---
@@ -835,10 +857,10 @@ const handleDelete = async () => {
 
 | Layout | Used by | Pattern |
 |---|---|---|
-| `PublicLayout` | Landing, public credential verification, Help/About (logged out) | Navy header with **gold brand mark** + gold underline, white card body, footer |
-| `AuthLayout` | Login | Split-screen (lg+): navy branding panel left, white form right; mobile collapses |
-| `DashboardLayout` | All authenticated routes | Fixed navy sidebar (w-72) with **gold brand mark cluster**, transparent top navbar (no static title — each page renders its own `PageHeader`), scrollable main |
-| `AdaptiveLayout` | `/help`, `/about` | Renders `DashboardLayout` if authenticated, `PublicLayout` otherwise |
+| `PublicLayout` | `/credentials/verify/:id` | Navy header with **gold brand mark** + gold underline, white card body, footer |
+| `SplitLayout` | `/` (Landing), `/login` | 50/50 split: navy brand panel left + light content right on desktop; navy band on top + content below on mobile. Language switcher floats top-right on desktop (light variant), inside the navy band on mobile (dark variant). |
+| `DashboardLayout` | All authenticated routes | Fixed navy sidebar (`w-72`) with **gold brand mark cluster**, transparent top navbar, scrollable main. Mobile: hand-rolled CSS-transform slide (`-translate-x-full` ↔ `translate-x-0`) with `bg-navy/80` click backdrop. |
+| `AdaptiveLayout` | `/help`, `/about` | Renders `DashboardLayout` if `isAuthenticated`, `PublicLayout` otherwise |
 
 ### 8.2 Container Widths
 
@@ -916,15 +938,22 @@ The icon color follows the active state via the `children` render prop (`isActiv
 
 ### 8.7 Mobile Drawer
 
-Replace the demo's hand-rolled drawer with shadcn `Sheet` (also Radix-based, with focus management and ESC support):
+**As-built:** the mobile sidebar is hand-rolled in `DashboardLayout.tsx`, not a shadcn `Sheet`. The `<aside>` is fixed-position and slides via CSS transform, toggled by a `sidebarOpen` state; a `bg-navy/80` backdrop (`sm:hidden`) closes it on click. `Sidebar` accepts an `onClose` prop that renders a close (`X`) button and dismisses the drawer on nav-item click.
 
 ```tsx
-<Sheet open={open} onOpenChange={setOpen}>
-  <SheetContent side="left" className="w-72 bg-navy p-0 border-0">
-    <Sidebar />
-  </SheetContent>
-</Sheet>
+// DashboardLayout.tsx (abbreviated)
+<aside
+  className={cn(
+    "fixed inset-y-0 left-0 z-50 w-72 transition-transform duration-300 shadow-2xl",
+    "sm:translate-x-0 sm:sticky sm:top-0 sm:h-screen sm:flex-shrink-0",
+    sidebarOpen ? "translate-x-0" : "-translate-x-full",
+  )}
+>
+  <Sidebar onClose={() => setSidebarOpen(false)} />
+</aside>
 ```
+
+> A shadcn `Sheet` was originally specced for this but never adopted — the hand-rolled transform is the live implementation. The `vaul` `Drawer` primitive *is* installed, but it is reserved for **content** drawers (e.g. `UserEditDrawer`, the admin batch-edit panel), not navigation.
 
 ### 8.8 Responsive Breakpoints
 
@@ -1147,46 +1176,45 @@ Never put server data in Zustand. Never put auth session in TanStack Query cache
 
 ### 9.2 Zustand Store
 
+The store is a **single file** (`app/store/index.ts`) combining an auth slice and a UI slice, wrapped in `persist`. Default locale is `"id"`. Only `user`, `isAuthenticated`, and `locale` are persisted (`partialize`) — never tokens, never `sidebarOpen`.
+
 ```ts
-// app/store/auth-slice.ts
-export interface AuthSlice {
+// app/store/index.ts (abbreviated)
+interface AuthSlice {
   user: UserDTO | null;
   isAuthenticated: boolean;
   setUser: (user: UserDTO) => void;
   clearUser: () => void;
 }
 
-export const createAuthSlice: StateCreator<AuthSlice> = (set) => ({
-  user: null,
-  isAuthenticated: false,
-  setUser: (user) => set({ user, isAuthenticated: true }),
-  clearUser: () => set({ user: null, isAuthenticated: false }),
-});
-```
-
-```ts
-// app/store/ui-slice.ts
-export interface UiSlice {
+interface UiSlice {
   sidebarOpen: boolean;
   locale: "en" | "id";
   setSidebarOpen: (open: boolean) => void;
+  toggleSidebar: () => void;
   setLocale: (locale: "en" | "id") => void;
 }
 
-export const createUiSlice: StateCreator<UiSlice> = (set) => ({
-  sidebarOpen: false,
-  locale: "en",
-  setSidebarOpen: (open) => set({ sidebarOpen: open }),
-  setLocale: (locale) => set({ locale }),
-});
-```
+export const useStore = create<AuthSlice & UiSlice>()(
+  persist(
+    (set) => ({
+      user: null,
+      isAuthenticated: false,
+      setUser: (user) => set({ user, isAuthenticated: true }),
+      clearUser: () => set({ user: null, isAuthenticated: false }),
 
-```ts
-// app/store/index.ts
-export const useStore = create<AuthSlice & UiSlice>()((...a) => ({
-  ...createAuthSlice(...a),
-  ...createUiSlice(...a),
-}));
+      sidebarOpen: false,
+      locale: "id",
+      setSidebarOpen: (open) => set({ sidebarOpen: open }),
+      toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
+      setLocale: (locale) => set({ locale }),
+    }),
+    {
+      name: "credchain-store",
+      partialize: (s) => ({ user: s.user, isAuthenticated: s.isAuthenticated, locale: s.locale }),
+    },
+  ),
+);
 ```
 
 ### 9.3 TanStack Query Conventions
@@ -1258,43 +1286,60 @@ export function useDeleteUsers() {
 ```ts
 // shared/api/client.ts
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? "/api",
-  withCredentials: true,  // sends httpOnly cookies
+  baseURL: env.apiBaseUrl,        // VITE_API_BASE_URL ?? "/api"
+  withCredentials: true,          // sends httpOnly cookies
+  timeout: 30_000,
   headers: { "Content-Type": "application/json" },
+  paramsSerializer: { indexes: null },  // repeated params without [] brackets (Gin-friendly)
 });
 ```
 
-### 10.2 Response Envelope
+The client also exposes `configureAuthHandler(fn)` and `configureLocaleResolver(fn)` setters so the auth-failure redirect and the `Accept-Language` value can be wired from `app/` without `shared/` importing from `app/` (keeps the boundary rule intact).
 
-Every backend response is `{ code, message, data? }`. Unwrap in a response interceptor:
+### 10.2 Response Envelope & Interceptors
+
+Every backend response is `{ code, message, data? }`. The request interceptor stamps `Accept-Language`; the response interceptor unwraps the envelope; the error interceptor handles silent refresh, 429, and `ApiError` wrapping:
 
 ```ts
-// shared/api/interceptors.ts
+// shared/api/client.ts (abbreviated)
+api.interceptors.request.use((config) => {
+  config.headers["Accept-Language"] = resolveLocale();  // from Zustand locale
+  return config;
+});
+
+let refreshInFlight: Promise<unknown> | null = null;
+
 api.interceptors.response.use(
-  (response) => {
-    // Unwrap envelope - return data directly
-    return response.data.data ?? response.data;
-  },
+  (response) => response.data?.data ?? response.data,  // unwrap envelope
   async (error: AxiosError<ApiErrorResponse>) => {
     const status = error.response?.status;
-    const code   = error.response?.data?.code;
+    const config = error.config;
 
-    // 401 + not already on /auth/refresh -> attempt silent refresh
-    if (status === 401 && !error.config?.url?.includes("/auth/refresh")) {
+    // 401 → single deduplicated silent refresh, then retry once with X-Retry: 1
+    const isAuthPath = /\/auth\/(refresh|google|logout)/.test(config?.url ?? "");
+    if (status === 401 && !isAuthPath && config?.headers?.["X-Retry"] !== "1") {
       try {
-        await api.post("/auth/refresh");
-        return api.request(error.config!);
+        refreshInFlight ??= api.post("/auth/refresh");
+        await refreshInFlight;
+        return api.request({ ...config, headers: { ...config!.headers, "X-Retry": "1" } });
       } catch {
-        useStore.getState().clearUser();
-        window.location.href = "/login";
+        onAuthFailure();          // clears Zustand + navigates to /login
         return Promise.reject(error);
+      } finally {
+        refreshInFlight = null;
       }
     }
 
-    // Translate backend code to i18n message
-    const messageKey = codeToMessageKey(code);
-    return Promise.reject(new ApiError(status, code, messageKey, error));
-  }
+    // 429 → rate-limit message keys (with/without Retry-After)
+    if (status === 429) {
+      const retryAfter = error.response?.headers["retry-after"];
+      const key = retryAfter ? "system.rate_limited_with_retry" : "system.rate_limited";
+      return Promise.reject(new ApiError(status, error.response?.data?.code, key, error));
+    }
+
+    const messageKey = codeToMessageKey(error.response?.data?.code);
+    return Promise.reject(new ApiError(status, error.response?.data?.code, messageKey, error));
+  },
 );
 ```
 
@@ -1384,17 +1429,16 @@ export interface PaginationParams {
 
 ### 11.1 Token Storage Strategy
 
-**httpOnly cookies set by backend** - immune to XSS token theft, CSRF mitigated via SameSite=Strict.
+**httpOnly cookies set by backend** — immune to XSS token theft, CSRF mitigated via `SameSite=Strict`. This is **implemented** on both sides as of the current backend (`CredChain_Golang`, see its `AGENTS.md`):
 
-Backend changes required (coordinate with `CredChain_Golang`):
-- `/api/auth/google` response sets two `Set-Cookie` headers:
-  - `access_token` (HttpOnly, Secure, SameSite=Strict, Max-Age = JWT exp)
-  - `refresh_token` (HttpOnly, Secure, SameSite=Strict, Max-Age = refresh exp)
-- `/api/auth/refresh` rotates both cookies on success
-- `/api/auth/logout` clears both cookies
-- CORS must allow credentials: `Access-Control-Allow-Credentials: true`
+- `/api/auth/google` returns the user envelope and sets two `Set-Cookie` headers:
+  - `access_token` (HttpOnly, Secure, `Path=/api`, `SameSite=Strict`)
+  - `refresh_token` (HttpOnly, Secure, `Path=/api/auth`, `SameSite=Strict`)
+- `/api/auth/refresh` rotates both cookies on success.
+- `/api/auth/logout` clears both cookies.
+- CORS is configured with `Access-Control-Allow-Credentials: true` and an explicit origin (never `*`); the Go router panics at startup if `GIN_CORS_ALLOW_ORIGINS=*` while credentials are enabled.
 
-Frontend never reads or writes tokens. Axios sends them automatically via `withCredentials: true`.
+The frontend never reads or writes tokens. Axios sends them automatically via `withCredentials: true`. The token fields in `/api/auth/google` and `/api/auth/refresh` response bodies (`access_token`, `refresh_token`, `*_expires_in`) are still part of the wire format (`response.Auth` mirrored as `AuthResponseDTO`) but ignored in the cookie strategy.
 
 ### 11.2 Google OAuth Flow
 
@@ -2745,6 +2789,8 @@ Keep `Last updated` at the top current. Reviewers should reject PRs that introdu
 |---|---|---|
 | v1.0 | 2026-05-29 | Initial draft. Sections 1-22 + Appendix A. |
 | v1.1 | 2026-05-29 | Typography migrated from system-ui to Fraunces + DM Sans + JetBrains Mono. Added Section 6.5 Visual Language Principles. Added Section 8.9 Responsive Design (touch targets, safe areas, mobile keyboards, reduced motion, container queries, tablet, print, orientation, dark mode hooks). |
+| v1.2 | 2026-05-31 | Dark mode removed from spec to match codebase (light-only). |
+| v1.3 | 2026-06-09 | As-built reconciliation pass. Design philosophy (§5 tokens, §6 typography, §6.5 visual language, §8.9 responsive) preserved verbatim — those still describe the intended design faithfully. Architectural sections updated to match codebase: §3 tech versions synced and `ethers` row removed; §3 install list replaced with the 12 actual primitives; §4.1 folder structure rewritten as as-built (single `store/index.ts`, `feature/landing/`, `AdaptiveLayout` + `SplitLayout`, no `AuthLayout`/`interceptors.ts`/`useConfirm.ts`); §7.9 `useConfirm` rewritten to match the real `{confirm, dialog}` shape in `@ui/confirm-dialog`; §8.1 layout shells table updated; **§8.7 mobile drawer rewritten** (hand-rolled CSS-transform `<aside>`, never adopted shadcn `Sheet`; `vaul` reserved for content drawers); §9.2 store consolidated to single-file shape with `partialize` + Indonesian default; §10.1/§10.2 axios example updated with `paramsSerializer`, `Accept-Language`, `refreshInFlight` dedup, `X-Retry: 1`, and 429 handling; §11.1 token strategy moved from "backend coordination required" to "implemented" (Go side ships cookies). |
 
 ---
 
