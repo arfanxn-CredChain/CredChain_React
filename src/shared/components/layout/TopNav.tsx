@@ -124,7 +124,7 @@ export function TopNav({ onMenuClick }: TopNavProps) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
-                  className="flex items-center gap-3 rounded-xl p-1 focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none"
+                  className="group flex items-center gap-3 rounded-xl p-1 focus-visible:outline-none"
                   aria-label="User menu"
                 >
                   <div className="hidden text-right sm:block">
@@ -139,7 +139,7 @@ export function TopNav({ onMenuClick }: TopNavProps) {
                     <UserAvatar
                       user={user}
                       size="md"
-                      className="ring-2 ring-surface sm:ring-gray-200"
+                      className="ring-2 ring-surface transition-shadow group-focus-visible:ring-gold sm:ring-gray-200"
                     />
                   )}
                 </button>
