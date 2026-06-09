@@ -92,7 +92,9 @@ export function About() {
               <Mail className="h-5 w-5 text-gold" aria-hidden="true" />
             </div>
             <div className="min-w-0">
-              <p className="font-bold text-navy">{t("about.contact.title")}</p>
+              <p className="font-display text-lg font-semibold text-navy tracking-tight">
+                {t("about.contact.title")}
+              </p>
               <p className="text-sm text-gray-500 mt-1">{t("about.contact.body")}</p>
               <EyebrowLabel className="mt-3" tone="muted" as="p">
                 {t("about.contact.label")}
