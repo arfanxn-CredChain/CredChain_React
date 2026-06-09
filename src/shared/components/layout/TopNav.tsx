@@ -135,7 +135,13 @@ export function TopNav({ onMenuClick }: TopNavProps) {
                       {user?.role ? formatRole(user.role) : ""}
                     </div>
                   </div>
-                  {user && <UserAvatar user={user} size="md" />}
+                  {user && (
+                    <UserAvatar
+                      user={user}
+                      size="md"
+                      className="ring-2 ring-surface ring-offset-2 ring-offset-navy sm:ring-gray-200 sm:ring-offset-base"
+                    />
+                  )}
                 </button>
               </DropdownMenuTrigger>
 
