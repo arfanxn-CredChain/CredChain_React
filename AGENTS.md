@@ -34,13 +34,13 @@ npm run check-locales         # verify en.json/id.json sync with backend locales
 
 **Required env vars** (validated at startup in `src/shared/lib/env.ts`):
 
-| Var | Required | Default | Purpose |
-|---|---|---|---|
-| `VITE_GOOGLE_CLIENT_ID` | **yes** | — | fatal if missing (thrown by `env.ts` at module load) |
-| `VITE_API_BASE_URL` | no | `/api` | base URL for axios |
-| `VITE_API_PROXY` | no | `http://localhost:8080` | dev-server proxy target for `/api` (Vite only, not bundled) |
-| `VITE_APP_ENV` | no | `development` | `development` / `staging` / `production` |
-| `VITE_SUPPORT_EMAIL` | no | `support@credchain.app` | contact address shown on Help & About pages |
+| Var                     | Required | Default                 | Purpose                                                     |
+| ----------------------- | -------- | ----------------------- | ----------------------------------------------------------- |
+| `VITE_GOOGLE_CLIENT_ID` | **yes**  | —                       | fatal if missing (thrown by `env.ts` at module load)        |
+| `VITE_API_BASE_URL`     | no       | `/api`                  | base URL for axios                                          |
+| `VITE_API_PROXY`        | no       | `http://localhost:8080` | dev-server proxy target for `/api` (Vite only, not bundled) |
+| `VITE_APP_ENV`          | no       | `development`           | `development` / `staging` / `production`                    |
+| `VITE_SUPPORT_EMAIL`    | no       | `support@credchain.app` | contact address shown on Help & About pages                 |
 
 Engine note: tested on Node 20.x; `package.json` does not pin `engines`.
 
@@ -129,13 +129,13 @@ CredChain_React/
 
 Configured in `tsconfig.app.json` + `vite.config.ts` + `vitest.config.ts`:
 
-| Alias | Resolves to |
-|---|---|
-| `@/*` | `src/*` |
-| `@app/*` | `src/app/*` |
-| `@feature/*` | `src/feature/*` |
-| `@shared/*` | `src/shared/*` |
-| `@ui/*` | `src/shared/components/ui/*` |
+| Alias        | Resolves to                  |
+| ------------ | ---------------------------- |
+| `@/*`        | `src/*`                      |
+| `@app/*`     | `src/app/*`                  |
+| `@feature/*` | `src/feature/*`              |
+| `@shared/*`  | `src/shared/*`               |
+| `@ui/*`      | `src/shared/components/ui/*` |
 
 ### Design System Tokens
 
@@ -166,18 +166,18 @@ See `DESIGN_SYSTEM.md` Section 6.5 for the full visual language principles (anti
 
 **Two-layer model — never mix:**
 
-| Layer | Tool | What lives here |
-|---|---|---|
-| Server state | TanStack Query | All API data: users, credentials, paginated lists |
-| Client state | Zustand `useStore` | Current user session, UI (sidebar, locale) |
+| Layer        | Tool               | What lives here                                   |
+| ------------ | ------------------ | ------------------------------------------------- |
+| Server state | TanStack Query     | All API data: users, credentials, paginated lists |
+| Client state | Zustand `useStore` | Current user session, UI (sidebar, locale)        |
 
 `useStore` is persisted to localStorage via `persist` middleware. Only `user`, `isAuthenticated`, and `locale` are persisted. **Tokens are never persisted** (httpOnly cookies handle them).
 
 Query key conventions (in `feature/*/api/keys.ts`):
 
 ```ts
-userKeys = { all, list, detail, self }
-credentialKeys = { all, list, detail, mine }
+userKeys = { all, list, detail, self };
+credentialKeys = { all, list, detail, mine };
 ```
 
 All mutations invalidate the `all()` key on success.
@@ -218,32 +218,32 @@ Backend response codes (6-digit `AABBCC`) map to i18n keys via `CODE_TO_MESSAGE_
 Every route except `/login` is loaded via the `lazyRoute()` helper in `app/router.tsx`. The helper wraps the component in `Suspense` (with `LoadingSpinner` fallback) and attaches `RouteErrorBoundary` automatically. This means **route components must be named exports** — the helper takes the export name as a string.
 
 ```ts
-lazyRoute(() => import("@feature/user/UserList"), "UserList")
+lazyRoute(() => import("@feature/user/UserList"), "UserList");
 ```
 
 `/login` is an **eager** import (`Login` is imported directly, not lazily) since it is the most common cold-start entry.
 
 **Route map** (path → component → guard):
 
-| Path | Component | Guard / min role | Shell |
-|---|---|---|---|
-| `/` | `Landing` | none | self-wraps `SplitLayout` |
-| `/login` | `Login` (eager) | `PublicRoute` (redirects if authed) | self-wraps `SplitLayout` |
-| `/credentials/verify/:credentialId` | `VerifyCredential` | none | `PublicLayout` |
-| `/help` | `Help` | none | `AdaptiveLayout` |
-| `/about` | `About` | none | `AdaptiveLayout` |
-| `/dashboard` | `Dashboard` | authenticated | `DashboardLayout` |
-| `/credentials/self` | `MyCredentials` | authenticated | `DashboardLayout` |
-| `/account/profile` | `UserSelfProfile` | authenticated | `DashboardLayout` |
-| `/account/email` | `UserSelfEmail` | authenticated | `DashboardLayout` |
-| `/users` | `UserList` | Issuer+ | `DashboardLayout` |
-| `/users/:id` | `UserDetail` | Issuer+ | `DashboardLayout` |
-| `/credentials` | `CredentialList` | Issuer+ | `DashboardLayout` |
-| `/credentials/issue` | `CredentialIssue` | Issuer+ | `DashboardLayout` |
-| `/credentials/:id` | `CredentialDetail` | Issuer+ | `DashboardLayout` |
-| `/users/create` | `UserCreate` | Admin+ | `DashboardLayout` |
-| `/settings` | `Settings` | Admin+ | `DashboardLayout` |
-| `*` | `NotFound` | none | — |
+| Path                                | Component          | Guard / min role                    | Shell                    |
+| ----------------------------------- | ------------------ | ----------------------------------- | ------------------------ |
+| `/`                                 | `Landing`          | none                                | self-wraps `SplitLayout` |
+| `/login`                            | `Login` (eager)    | `PublicRoute` (redirects if authed) | self-wraps `SplitLayout` |
+| `/credentials/verify/:credentialId` | `VerifyCredential` | none                                | `PublicLayout`           |
+| `/help`                             | `Help`             | none                                | `AdaptiveLayout`         |
+| `/about`                            | `About`            | none                                | `AdaptiveLayout`         |
+| `/dashboard`                        | `Dashboard`        | authenticated                       | `DashboardLayout`        |
+| `/credentials/self`                 | `MyCredentials`    | authenticated                       | `DashboardLayout`        |
+| `/account/profile`                  | `UserSelfProfile`  | authenticated                       | `DashboardLayout`        |
+| `/account/email`                    | `UserSelfEmail`    | authenticated                       | `DashboardLayout`        |
+| `/users`                            | `UserList`         | Issuer+                             | `DashboardLayout`        |
+| `/users/:id`                        | `UserDetail`       | Issuer+                             | `DashboardLayout`        |
+| `/credentials`                      | `CredentialList`   | Issuer+                             | `DashboardLayout`        |
+| `/credentials/issue`                | `CredentialIssue`  | Issuer+                             | `DashboardLayout`        |
+| `/credentials/:id`                  | `CredentialDetail` | Issuer+                             | `DashboardLayout`        |
+| `/users/create`                     | `UserCreate`       | Admin+                              | `DashboardLayout`        |
+| `/settings`                         | `Settings`         | Admin+                              | `DashboardLayout`        |
+| `*`                                 | `NotFound`         | none                                | —                        |
 
 `AdaptiveLayout` renders `DashboardLayout` when authenticated, `PublicLayout` otherwise. `SplitLayout` is the navy/light split-screen shared by Landing and Login.
 
@@ -296,7 +296,7 @@ onError: (error) => {
   } else if (isApiError(error)) {
     notify.error(error.messageKey);
   }
-}
+};
 ```
 
 ### Internationalization & Locale Sync
@@ -333,7 +333,7 @@ className={`base classes ${isActive ? "active" : ""} ${className}`}
 - `Label` — Radix-based, supports peer-disabled
 - `Select` — full Radix Select with `SelectValue`
 - `Dialog` + `ConfirmDialog` + `useConfirm()` hook (NEVER use `window.confirm`); `useConfirm()` returns `{ confirm, dialog }`
-- `DropdownMenu` — full Radix DropdownMenu with `destructive` item variant
+- `DropdownMenu` — full Radix DropdownMenu with `destructive` item variant. Use `modal={false}` for chrome-mounted menus (TopNav profile, LanguageSwitcher) to avoid scroll-lock-induced layout shift on open/close.
 - `Table` + `TableHeader` + `TableBody` + `TableRow` + `TableHead` + `TableCell`
 - `Badge` — tones: navy, gold, error, green, gray
 - `Skeleton` — animate-pulse rounded gray box
@@ -441,6 +441,7 @@ Step-by-step checklist for adding a new domain feature (e.g., `feature/audit-log
 - Reading `import.meta.env` directly — use typed `env` from `@shared/lib/env`
 - Manual `toast.success(...)` — use `notify.success(key)` so messages go through i18n
 - Concatenated classNames via template strings — use `cn()` so tailwind-merge dedupes
+- `safe-area-top` on the same element as `py-*` — `safe-area-top` overrides `padding-top` (CSS utilities-layer source order). Apply it to a dedicated spacer `<div>` when combined with vertical padding.
 - `console.log` in committed code (ESLint warns; only `console.warn`/`error` allowed)
 
 ### Backend Coordination Items
@@ -456,11 +457,11 @@ Documented in `DESIGN_SYSTEM.md` §22.2. These require Go-team agreement before 
 
 ## Configuration / Env Vars
 
-| Var | Required | Default | Purpose |
-|---|---|---|---|
-| `VITE_GOOGLE_CLIENT_ID` | **yes** | — | Google OAuth client ID; fatal if missing |
-| `VITE_API_BASE_URL` | no | `/api` | base URL for axios |
-| `VITE_APP_ENV` | no | — | `development` / `staging` / `production` |
+| Var                     | Required | Default | Purpose                                  |
+| ----------------------- | -------- | ------- | ---------------------------------------- |
+| `VITE_GOOGLE_CLIENT_ID` | **yes**  | —       | Google OAuth client ID; fatal if missing |
+| `VITE_API_BASE_URL`     | no       | `/api`  | base URL for axios                       |
+| `VITE_APP_ENV`          | no       | —       | `development` / `staging` / `production` |
 
 All env vars must be prefixed with `VITE_` to be exposed to the browser. Reading `import.meta.env` directly is prohibited — always use the typed `env` export from `@shared/lib/env.ts`.
 
@@ -468,12 +469,12 @@ All env vars must be prefixed with `VITE_` to be exposed to the browser. Reading
 
 **Layers:**
 
-| Layer | Tool | Coverage |
-|---|---|---|
-| Unit | Vitest | Pure functions: `cn`, `role`, `format`, `hash`, Zod schemas |
-| Component | Vitest + RTL | Render, interactions, form validation |
-| Integration | Vitest + MSW | Feature flows with mocked `/api` |
-| E2E | Playwright | Auth flow, public routes, a11y smoke |
+| Layer       | Tool         | Coverage                                                    |
+| ----------- | ------------ | ----------------------------------------------------------- |
+| Unit        | Vitest       | Pure functions: `cn`, `role`, `format`, `hash`, Zod schemas |
+| Component   | Vitest + RTL | Render, interactions, form validation                       |
+| Integration | Vitest + MSW | Feature flows with mocked `/api`                            |
+| E2E         | Playwright   | Auth flow, public routes, a11y smoke                        |
 
 **Current count:** **249 unit/component tests across 26 spec files** under `src/`, plus **20 Playwright tests across 3 e2e specs** (`auth.spec.ts`, `public.spec.ts`, `a11y.spec.ts`).
 
@@ -502,29 +503,29 @@ When adding tests, prefer integration tests via MSW over heavy mocking. Schema t
 
 ## Tech Stack
 
-| Layer | Choice | Version |
-|---|---|---|
-| Language | TypeScript | ~5.9.3 strict + verbatimModuleSyntax |
-| Framework | React | ^19.2 |
-| Build | Vite | ^7.3 |
-| Styling | Tailwind CSS v4 | ^4.2 (`@theme` directive, no config file) |
-| UI primitives | shadcn/ui + Radix UI | various (see `package.json`) |
-| Icons | lucide-react | ^0.576 (named imports only) |
-| Routing | React Router | ^7.13 (lazy via `lazyRoute()` helper) |
-| Server state | TanStack Query | ^5.59 |
-| HTTP | axios | ^1.7 (with interceptors) |
-| Client state | Zustand | ^5.0 (with persist middleware) |
-| Forms | React Hook Form | ^7.53 |
-| Validation | Zod | ^3.23 |
-| i18n | i18next + react-i18next | ^23.16 / ^14.1 |
-| Auth | @react-oauth/google | ^0.12 |
-| Avatar | @dicebear/core + @dicebear/identicon | ^9.4 |
-| Toasts | sonner | ^1.5 (via `notify` helper) |
-| Class merge | clsx + tailwind-merge | ^2 / ^3 (via `cn()`) |
-| Drawer | vaul | ^1.1 (used by `UserEditDrawer`; not for sidebar nav) |
-| Git hooks | husky + lint-staged | ^9 / ^15 |
-| Tests | Vitest ^3 + Testing Library ^16 + MSW ^2.4 | |
-| E2E | Playwright ^1.48 + @axe-core/playwright ^4.10 | |
+| Layer         | Choice                                        | Version                                              |
+| ------------- | --------------------------------------------- | ---------------------------------------------------- |
+| Language      | TypeScript                                    | ~5.9.3 strict + verbatimModuleSyntax                 |
+| Framework     | React                                         | ^19.2                                                |
+| Build         | Vite                                          | ^7.3                                                 |
+| Styling       | Tailwind CSS v4                               | ^4.2 (`@theme` directive, no config file)            |
+| UI primitives | shadcn/ui + Radix UI                          | various (see `package.json`)                         |
+| Icons         | lucide-react                                  | ^0.576 (named imports only)                          |
+| Routing       | React Router                                  | ^7.13 (lazy via `lazyRoute()` helper)                |
+| Server state  | TanStack Query                                | ^5.59                                                |
+| HTTP          | axios                                         | ^1.7 (with interceptors)                             |
+| Client state  | Zustand                                       | ^5.0 (with persist middleware)                       |
+| Forms         | React Hook Form                               | ^7.53                                                |
+| Validation    | Zod                                           | ^3.23                                                |
+| i18n          | i18next + react-i18next                       | ^23.16 / ^14.1                                       |
+| Auth          | @react-oauth/google                           | ^0.12                                                |
+| Avatar        | @dicebear/core + @dicebear/identicon          | ^9.4                                                 |
+| Toasts        | sonner                                        | ^1.5 (via `notify` helper)                           |
+| Class merge   | clsx + tailwind-merge                         | ^2 / ^3 (via `cn()`)                                 |
+| Drawer        | vaul                                          | ^1.1 (used by `UserEditDrawer`; not for sidebar nav) |
+| Git hooks     | husky + lint-staged                           | ^9 / ^15                                             |
+| Tests         | Vitest ^3 + Testing Library ^16 + MSW ^2.4    |                                                      |
+| E2E           | Playwright ^1.48 + @axe-core/playwright ^4.10 |                                                      |
 
 ## Cross-Repo Integration
 
@@ -558,10 +559,11 @@ Before pushing, run the repo's canonical verification command and confirm it pas
 
 ## Change Log
 
-- **2026-05-31 — Dark mode removed.** `ThemeProvider`, `ThemeToggle`, the `theme` slice in Zustand, the `:root.dark` CSS overrides, the `.text-fg` utility, and the no-flash inline script in `index.html` were all deleted. The app now renders only in light mode, faithful to `DESIGN_SYSTEM.md`. `text-navy` replaced every `text-fg` usage. `LanguageSwitcher`'s `variant="dark"` prop remains — it is a *background-aware* styling switch (for placement on the navy header/sidebar), not a theme switch.
+- **2026-05-31 — Dark mode removed.** `ThemeProvider`, `ThemeToggle`, the `theme` slice in Zustand, the `:root.dark` CSS overrides, the `.text-fg` utility, and the no-flash inline script in `index.html` were all deleted. The app now renders only in light mode, faithful to `DESIGN_SYSTEM.md`. `text-navy` replaced every `text-fg` usage. `LanguageSwitcher`'s `variant="dark"` prop remains — it is a _background-aware_ styling switch (for placement on the navy header/sidebar), not a theme switch.
 - **2026-06-09 — About card title typography consistency.** Contact card title now uses `font-display` (Fraunces) matching all other card titles on the page. Was the only `font-bold`-only title (DM Sans) on the page. No test changes.
 - **2026-06-09 — Add landing page CTA to About.** New explore card at bottom of About page with gold pill button linking to `/`. Added i18n keys `about.explore.title/body/action` (en + id). Added test asserting landing link renders with correct href.
 - **2026-06-09 — BackLink wiring across pages.** `BackLink` (browser-history back with role-aware fallback to `/dashboard` or `/`) now used on Help, About, Login, Profile, and Update Email pages. Replaced inline `<Link to="/">` / `t("common.backToHome")` with `<BackLink />`. Added `common.back` i18n key ("Back" / "Kembali"), removed `common.backToHome`. Added `BackLink.test.tsx` (4 tests) covering history-back, auth fallback, and unauth fallback.
+- **2026-06-09 — Navbar + dropdown polish.** Fixed TopNav vertical centering (separated `safe-area-top` from flex row's `py-*` to avoid CSS utilities-layer cascade override). DashboardLayout `main` now uses `overflow-y-scroll [scrollbar-gutter:stable]` so route-switches with different content heights no longer reflow the navbar. Profile dropdown set to `modal={false}` to avoid scroll-lock layout shifts; trigger button uses `focus-visible:[outline:none]` to defeat the global `:focus-visible` gold outline; focus indicator moved onto the avatar itself via `group-focus-visible:ring-gold` (clean circular ring, keyboard-only). Avatar gets adaptive ring (`ring-surface` on mobile navy header, `ring-gray-200` on desktop light header). Removed the gold `<DecorBlob>` from the mobile navy band in `SplitLayout` (was clipped by `overflow-hidden` and the safe-area gap on notched iOS). Tinted all dropdown shadows `shadow-navy/20` (was `shadow-gray-200/50` which appeared as a white smudge on dark backgrounds).
 - **2026-06-09 — Docs resync to as-built.** AGENTS.md + DESIGN_SYSTEM.md reconciled with actual codebase. Major corrections: added `feature/landing/` (was undocumented); replaced `AuthLayout` references with `SplitLayout`/`AdaptiveLayout`; removed `RootRedirect` (deleted), added `BackLink`; shadcn count corrected to 12 primitives (not 13); test count updated to 244 + 20 E2E (was 179); coverage documented as selective allowlist (not global); env-var table extended with `VITE_API_PROXY` and `VITE_SUPPORT_EMAIL`; documented husky/lint-staged pre-commit flow; removed `ethers` from tech stack (unused dep). DESIGN_SYSTEM.md preserve design-philosophy sections intact.
 
 ## See Also

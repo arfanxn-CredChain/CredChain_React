@@ -2,7 +2,7 @@
 
 > For AI assistants and engineers building CredChain_React/. This document is the single source of truth for the production frontend. It supersedes CredChain_React_Demo/ (reference only - do not import from it).
 
-Status: Draft v1.2 | Last updated: 2026-05-31 | Related: ../AGENTS.md, ../CredChain_Golang/
+Status: Draft v1.2 | Last updated: 2026-06-09 | Related: ../AGENTS.md, ../CredChain_Golang/
 
 ---
 
@@ -50,20 +50,22 @@ The aesthetic is locked: premium decentralized credential platform - navy + gold
 
 CredChain is a decentralized credential platform. The role hierarchy (same in Go backend and Solidity contracts):
 
-| Role | Level | On-chain | Capabilities |
-|---|---|---|---|
-| SuperAdmin | 4 | yes | Manages Admins; only one; bootstrapped via Go CLI only |
-| Admin | 3 | yes | Manages users, settings; can promote to Issuer |
-| Issuer | 2 | yes | Issues, revokes, verifies credentials |
-| Holder | 1 | yes | Receives credentials, manages own profile |
-| None | 0 | yes | On-chain revocation target only - never persisted in DB |
+| Role       | Level | On-chain | Capabilities                                            |
+| ---------- | ----- | -------- | ------------------------------------------------------- |
+| SuperAdmin | 4     | yes      | Manages Admins; only one; bootstrapped via Go CLI only  |
+| Admin      | 3     | yes      | Manages users, settings; can promote to Issuer          |
+| Issuer     | 2     | yes      | Issues, revokes, verifies credentials                   |
+| Holder     | 1     | yes      | Receives credentials, manages own profile               |
+| None       | 0     | yes      | On-chain revocation target only - never persisted in DB |
 
 Frontend surfaces:
+
 - Public: credential public verification page (no auth required)
 - Auth: Google OAuth login only (no email/password)
 - Dashboard: role-aware shell with sidebar; gates Admin/Issuer/Holder views
 
 Backend contract (see ../CredChain_Golang/AGENTS.md):
+
 - All routes under /api
 - Response envelope: { code: number, message: string, data?: T }
 - 6-digit response codes (AABBCC): category 10/20/30/40, feature, status
@@ -75,31 +77,31 @@ Backend contract (see ../CredChain_Golang/AGENTS.md):
 
 ## 3. Tech Stack
 
-| Layer | Choice | Version | Rationale |
-|---|---|---|---|
-| Language | TypeScript | ~5.9 | Strict mode; end-to-end type safety with Zod |
-| Framework | React | ^19 | Demo already on 19; ecosystem alignment |
-| Build | Vite | ^7 | Fast HMR, native ESM, Tailwind v4 plugin |
-| Styling | Tailwind CSS v4 | ^4.2 | @theme directive, no tailwind.config.js |
-| UI primitives | shadcn/ui + Radix UI | latest | Copy-paste source on Radix; owned in-repo, accessible by default |
-| Icons | lucide-react | latest | Single icon source; matches demo |
-| Routing | React Router | ^7 | Data router with lazy routes |
-| Server state | TanStack Query | ^5 | Caching, refetch, optimistic updates, mutations |
-| HTTP client | axios | ^1 | Interceptors for auth + envelope unwrapping |
-| Client state | Zustand | ^5 | Auth, UI, ephemeral state |
-| Forms | React Hook Form | ^7 | Performance; batch/dynamic forms |
-| Validation | Zod | ^3 | Mirrors Go Ozzo rules; type inference |
-| i18n | i18next + react-i18next | ^23 / ^14 | Mature, ICU-style, lazy bundles, matches go-i18n keys |
-| Auth (OAuth) | @react-oauth/google | ^0.12 | Google Sign-In button, ID token retrieval |
-| Toasts | sonner | ^1.5 | Headless, Tailwind-friendly |
-| Class utils | clsx + tailwind-merge | ^2 / ^3 | cn() helper |
-| Drawer | vaul | ^1.1 | Content drawer (admin user edit); NOT used for sidebar nav |
-| Tests | Vitest + Testing Library | ^3 / ^16 | Vite-native, Jest-compatible API |
-| API mocking | MSW | ^2 | Service worker fetch interception |
-| E2E | Playwright | ^1 | Cross-browser, trace viewer |
-| Lint | ESLint + typescript-eslint | ^9 / ^8 | Same as demo |
-| Format | Prettier + prettier-plugin-tailwindcss | ^3 / ^0.6 | Auto-sort Tailwind classes |
-| Git hooks | husky + lint-staged | ^9 / ^15 | Pre-commit format/lint |
+| Layer         | Choice                                 | Version   | Rationale                                                        |
+| ------------- | -------------------------------------- | --------- | ---------------------------------------------------------------- |
+| Language      | TypeScript                             | ~5.9      | Strict mode; end-to-end type safety with Zod                     |
+| Framework     | React                                  | ^19       | Demo already on 19; ecosystem alignment                          |
+| Build         | Vite                                   | ^7        | Fast HMR, native ESM, Tailwind v4 plugin                         |
+| Styling       | Tailwind CSS v4                        | ^4.2      | @theme directive, no tailwind.config.js                          |
+| UI primitives | shadcn/ui + Radix UI                   | latest    | Copy-paste source on Radix; owned in-repo, accessible by default |
+| Icons         | lucide-react                           | latest    | Single icon source; matches demo                                 |
+| Routing       | React Router                           | ^7        | Data router with lazy routes                                     |
+| Server state  | TanStack Query                         | ^5        | Caching, refetch, optimistic updates, mutations                  |
+| HTTP client   | axios                                  | ^1        | Interceptors for auth + envelope unwrapping                      |
+| Client state  | Zustand                                | ^5        | Auth, UI, ephemeral state                                        |
+| Forms         | React Hook Form                        | ^7        | Performance; batch/dynamic forms                                 |
+| Validation    | Zod                                    | ^3        | Mirrors Go Ozzo rules; type inference                            |
+| i18n          | i18next + react-i18next                | ^23 / ^14 | Mature, ICU-style, lazy bundles, matches go-i18n keys            |
+| Auth (OAuth)  | @react-oauth/google                    | ^0.12     | Google Sign-In button, ID token retrieval                        |
+| Toasts        | sonner                                 | ^1.5      | Headless, Tailwind-friendly                                      |
+| Class utils   | clsx + tailwind-merge                  | ^2 / ^3   | cn() helper                                                      |
+| Drawer        | vaul                                   | ^1.1      | Content drawer (admin user edit); NOT used for sidebar nav       |
+| Tests         | Vitest + Testing Library               | ^3 / ^16  | Vite-native, Jest-compatible API                                 |
+| API mocking   | MSW                                    | ^2        | Service worker fetch interception                                |
+| E2E           | Playwright                             | ^1        | Cross-browser, trace viewer                                      |
+| Lint          | ESLint + typescript-eslint             | ^9 / ^8   | Same as demo                                                     |
+| Format        | Prettier + prettier-plugin-tailwindcss | ^3 / ^0.6 | Auto-sort Tailwind classes                                       |
+| Git hooks     | husky + lint-staged                    | ^9 / ^15  | Pre-commit format/lint                                           |
 
 ### Why shadcn/ui over hand-rolled
 
@@ -251,6 +253,7 @@ Define in `tsconfig.app.json` and `vite.config.ts`:
 ```
 
 Import order (enforced by ESLint `import/order`):
+
 1. node/react builtins
 2. third-party packages
 3. `@app/*`
@@ -271,109 +274,109 @@ All tokens live in `src/styles/index.css` under `@theme`. No hex codes in compon
 
 @theme {
   /* === BRAND COLORS === */
-  --color-navy:    #0F172A;  /* primary brand, text, sidebar */
-  --color-gold:    #C9A227;  /* accent, premium CTAs, focus ring */
-  --color-base:    #F8FAFC;  /* app background */
-  --color-surface: #FFFFFF;  /* card / elevated surface */
-  --color-error:   #B91C1C;  /* destructive, revoked state */
+  --color-navy: #0f172a; /* primary brand, text, sidebar */
+  --color-gold: #c9a227; /* accent, premium CTAs, focus ring */
+  --color-base: #f8fafc; /* app background */
+  --color-surface: #ffffff; /* card / elevated surface */
+  --color-error: #b91c1c; /* destructive, revoked state */
 
   /* === EXTENDED NEUTRALS === */
-  --color-gray-50:  #F8FAFC;
-  --color-gray-100: #F1F5F9;
-  --color-gray-200: #E2E8F0;
-  --color-gray-300: #CBD5E1;
-  --color-gray-400: #94A3B8;
-  --color-gray-500: #64748B;
+  --color-gray-50: #f8fafc;
+  --color-gray-100: #f1f5f9;
+  --color-gray-200: #e2e8f0;
+  --color-gray-300: #cbd5e1;
+  --color-gray-400: #94a3b8;
+  --color-gray-500: #64748b;
   --color-gray-600: #475569;
   --color-gray-700: #334155;
-  --color-gray-800: #1E293B;
-  --color-gray-900: #0F172A;
+  --color-gray-800: #1e293b;
+  --color-gray-900: #0f172a;
 
   /* === SEMANTIC ALIASES (used by shadcn/ui) === */
-  --color-primary:              var(--color-navy);
-  --color-primary-foreground:   var(--color-surface);
-  --color-secondary:            var(--color-gold);
+  --color-primary: var(--color-navy);
+  --color-primary-foreground: var(--color-surface);
+  --color-secondary: var(--color-gold);
   --color-secondary-foreground: var(--color-navy);
-  --color-destructive:          var(--color-error);
+  --color-destructive: var(--color-error);
   --color-destructive-foreground: var(--color-surface);
-  --color-muted:                var(--color-gray-100);
-  --color-muted-foreground:     var(--color-gray-500);
-  --color-accent:               var(--color-gray-100);
-  --color-accent-foreground:    var(--color-gray-800);
-  --color-border:               var(--color-gray-200);
-  --color-input:                var(--color-gray-200);
-  --color-ring:                 var(--color-gold);
-  --color-background:           var(--color-base);
-  --color-popover:              var(--color-surface);
-  --color-popover-foreground:   var(--color-gray-900);
-  --color-card:                 var(--color-surface);
-  --color-card-foreground:      var(--color-gray-900);
+  --color-muted: var(--color-gray-100);
+  --color-muted-foreground: var(--color-gray-500);
+  --color-accent: var(--color-gray-100);
+  --color-accent-foreground: var(--color-gray-800);
+  --color-border: var(--color-gray-200);
+  --color-input: var(--color-gray-200);
+  --color-ring: var(--color-gold);
+  --color-background: var(--color-base);
+  --color-popover: var(--color-surface);
+  --color-popover-foreground: var(--color-gray-900);
+  --color-card: var(--color-surface);
+  --color-card-foreground: var(--color-gray-900);
 
   /* === STATUS COLORS === */
-  --color-success: #10B981;  /* emerald-500 */
-  --color-info:    #3B82F6;  /* blue-500 */
-  --color-warning: #F59E0B;  /* amber-500 */
+  --color-success: #10b981; /* emerald-500 */
+  --color-info: #3b82f6; /* blue-500 */
+  --color-warning: #f59e0b; /* amber-500 */
 
   /* === BORDER RADIUS === */
-  --radius-xs:   0.125rem;  /* 2px  - tiny badges */
-  --radius-sm:   0.25rem;   /* 4px  - small elements */
-  --radius-md:   0.375rem;  /* 6px  - default shadcn */
-  --radius-lg:   0.5rem;    /* 8px  */
-  --radius-xl:   0.75rem;   /* 12px - inputs, buttons */
-  --radius-2xl:  1rem;      /* 16px - cards, panels */
-  --radius-3xl:  1.5rem;    /* 24px - mobile header */
-  --radius-full: 9999px;    /* pills, avatars */
+  --radius-xs: 0.125rem; /* 2px  - tiny badges */
+  --radius-sm: 0.25rem; /* 4px  - small elements */
+  --radius-md: 0.375rem; /* 6px  - default shadcn */
+  --radius-lg: 0.5rem; /* 8px  */
+  --radius-xl: 0.75rem; /* 12px - inputs, buttons */
+  --radius-2xl: 1rem; /* 16px - cards, panels */
+  --radius-3xl: 1.5rem; /* 24px - mobile header */
+  --radius-full: 9999px; /* pills, avatars */
 
   /* === FONT FAMILY === */
-  --font-sans:    "DM Sans", system-ui, sans-serif;
+  --font-sans: "DM Sans", system-ui, sans-serif;
   --font-display: "Fraunces", Georgia, serif;
-  --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
   /* === SIDEBAR === */
-  --sidebar-width: 18rem;   /* 288px = w-72 */
+  --sidebar-width: 18rem; /* 288px = w-72 */
 }
 
 /* === BASE LAYER === */
 body {
-  @apply bg-base text-navy font-sans antialiased;
+  @apply bg-base font-sans text-navy antialiased;
 }
 ```
 
 ### 5.1 Color Usage Rules
 
-| Context | Token to use |
-|---|---|
-| Page background | `bg-base` |
-| Card / panel background | `bg-surface` |
-| Primary CTA background | `bg-navy` |
-| Premium / positive CTA | `bg-gold` |
-| Destructive action | `bg-error` |
-| Body text | `text-navy` |
-| Muted / helper text | `text-gray-500` |
-| Eyebrow / meta labels | `text-gray-400` |
-| Mono identifiers | `text-gray-500` (or `text-gray-600`) |
-| Card border | `border-gray-100` |
-| Input border | `border-gray-200` |
-| Focus ring | `ring-gold` (via `focus:ring-2 focus:ring-gold`) |
-| Sidebar background | `bg-navy` |
-| Sidebar text | `text-gray-300` (inactive), `text-surface` (active) |
-| Brand mark (shield icon + wordmark) | `text-gold` — always, on every chrome (Sidebar, PublicLayout, mobile TopNav) |
-| DashboardLayout desktop top area | transparent over page background; no static title — each page renders its own `PageHeader` |
-| TopNav search input (resting) | `bg-gray-50 text-navy placeholder-gray-400 border-gray-200 rounded-full` |
-| TopNav search input (focus) | `bg-white ring-2 ring-gold border-transparent` |
+| Context                             | Token to use                                                                               |
+| ----------------------------------- | ------------------------------------------------------------------------------------------ |
+| Page background                     | `bg-base`                                                                                  |
+| Card / panel background             | `bg-surface`                                                                               |
+| Primary CTA background              | `bg-navy`                                                                                  |
+| Premium / positive CTA              | `bg-gold`                                                                                  |
+| Destructive action                  | `bg-error`                                                                                 |
+| Body text                           | `text-navy`                                                                                |
+| Muted / helper text                 | `text-gray-500`                                                                            |
+| Eyebrow / meta labels               | `text-gray-400`                                                                            |
+| Mono identifiers                    | `text-gray-500` (or `text-gray-600`)                                                       |
+| Card border                         | `border-gray-100`                                                                          |
+| Input border                        | `border-gray-200`                                                                          |
+| Focus ring                          | `ring-gold` (via `focus:ring-2 focus:ring-gold`)                                           |
+| Sidebar background                  | `bg-navy`                                                                                  |
+| Sidebar text                        | `text-gray-300` (inactive), `text-surface` (active)                                        |
+| Brand mark (shield icon + wordmark) | `text-gold` — always, on every chrome (Sidebar, PublicLayout, mobile TopNav)               |
+| DashboardLayout desktop top area    | transparent over page background; no static title — each page renders its own `PageHeader` |
+| TopNav search input (resting)       | `bg-gray-50 text-navy placeholder-gray-400 border-gray-200 rounded-full`                   |
+| TopNav search input (focus)         | `bg-white ring-2 ring-gold border-transparent`                                             |
 
 ### 5.2 Role-Color Mapping
 
 Used consistently in badges, pills, and icon blocks:
 
-| Role | Background | Text |
-|---|---|---|
-| super_admin | `bg-error/10` | `text-error` |
-| admin | `bg-navy/10` | `text-navy` |
-| issuer | `bg-gold/20` | `text-navy` |
-| holder | `bg-gray-100` | `text-gray-600` |
-| active status | `bg-green-100` | `text-green-700` |
-| revoked / suspended | `bg-error/10` | `text-error` |
+| Role                | Background     | Text             |
+| ------------------- | -------------- | ---------------- |
+| super_admin         | `bg-error/10`  | `text-error`     |
+| admin               | `bg-navy/10`   | `text-navy`      |
+| issuer              | `bg-gold/20`   | `text-navy`      |
+| holder              | `bg-gray-100`  | `text-gray-600`  |
+| active status       | `bg-green-100` | `text-green-700` |
+| revoked / suspended | `bg-error/10`  | `text-error`     |
 
 ### 5.3 Tinted Shadow Convention
 
@@ -384,6 +387,8 @@ bg-gold  -> shadow-lg shadow-gold/20
 bg-navy  -> shadow-md shadow-navy/20
 bg-error -> shadow-lg shadow-error/20
 ```
+
+**Floating surfaces (popovers, dropdowns, tooltips):** Use `shadow-xl shadow-navy/20`. The navy tint blends into dark backgrounds (where a gray-tinted shadow reads as a white smudge) and gives a subtle premium elevation on light backgrounds. Codified in `dropdown-menu.tsx` for `DropdownMenuContent` and `DropdownMenuSubContent`.
 
 ---
 
@@ -396,20 +401,20 @@ The design commits to a **distinctive editorial pairing**: `Fraunces` (optical s
 Load in `index.html` with `font-display: swap` and preconnect for performance:
 
 ```html
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
   href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800;9..144,900&family=JetBrains+Mono:wght@400;500;600&display=swap"
   rel="stylesheet"
->
+/>
 ```
 
 Apply via `@theme` tokens (Section 5) so Tailwind `font-sans`, `font-display`, `font-mono` utilities resolve correctly. Body defaults to `font-sans`:
 
 ```css
 body {
-  @apply bg-base text-navy font-sans antialiased;
-  font-feature-settings: "ss01", "ss02", "cv11";  /* DM Sans stylistic alternates */
+  @apply bg-base font-sans text-navy antialiased;
+  font-feature-settings: "ss01", "ss02", "cv11"; /* DM Sans stylistic alternates */
 }
 ```
 
@@ -419,21 +424,22 @@ Fraunces uses optical sizing (`opsz`) — at large display sizes (28px+) it rend
 
 > For the design philosophy behind these choices, see Section 6.5 Visual Language Principles.
 
-| Tier | Tailwind | Use case |
-|---|---|---|
-| Hero | `font-display text-4xl md:text-5xl font-extrabold tracking-tight` | Auth landing, public verification page |
-| Page title (H2) | `font-display text-2xl md:text-3xl font-bold text-navy tracking-tight` | All page titles |
-| Section (H3) | `font-display text-xl font-semibold text-navy tracking-tight` | Card section headers |
-| Card title | `font-sans text-lg font-bold text-navy` | Credential cards, settings |
-| Stat value | `font-display text-4xl font-extrabold tracking-tight` | Dashboard metrics |
-| Body | `font-sans text-sm text-navy` | Default body |
-| Label | `font-sans text-sm font-semibold text-gray-700` | Form labels |
-| Eyebrow | `font-sans text-xs font-bold uppercase tracking-wider text-gray-400` | Meta labels above values |
-| Status pill | `font-sans text-xs font-bold uppercase tracking-wider` | Badge text |
-| Helper | `font-sans text-xs text-gray-500` | Subtitles, muted helper text |
-| Mono | `font-mono text-xs` | Hashes, IDs, addresses |
+| Tier            | Tailwind                                                               | Use case                               |
+| --------------- | ---------------------------------------------------------------------- | -------------------------------------- |
+| Hero            | `font-display text-4xl md:text-5xl font-extrabold tracking-tight`      | Auth landing, public verification page |
+| Page title (H2) | `font-display text-2xl md:text-3xl font-bold text-navy tracking-tight` | All page titles                        |
+| Section (H3)    | `font-display text-xl font-semibold text-navy tracking-tight`          | Card section headers                   |
+| Card title      | `font-sans text-lg font-bold text-navy`                                | Credential cards, settings             |
+| Stat value      | `font-display text-4xl font-extrabold tracking-tight`                  | Dashboard metrics                      |
+| Body            | `font-sans text-sm text-navy`                                          | Default body                           |
+| Label           | `font-sans text-sm font-semibold text-gray-700`                        | Form labels                            |
+| Eyebrow         | `font-sans text-xs font-bold uppercase tracking-wider text-gray-400`   | Meta labels above values               |
+| Status pill     | `font-sans text-xs font-bold uppercase tracking-wider`                 | Badge text                             |
+| Helper          | `font-sans text-xs text-gray-500`                                      | Subtitles, muted helper text           |
+| Mono            | `font-mono text-xs`                                                    | Hashes, IDs, addresses                 |
 
 **Pairing rules:**
+
 - Display font (`font-display` / Fraunces) is reserved for **headings, hero text, and prominent stat values only**. Never use it for body, labels, or buttons.
 - Body font (`font-sans` / DM Sans) carries everything else — buttons, inputs, labels, helper text, body paragraphs.
 - Mono (`font-mono` / JetBrains Mono) is exclusively for cryptographic identifiers, addresses, and hash values.
@@ -454,16 +460,19 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, description, action, back }: PageHeaderProps) {
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
       <div className="flex items-center gap-4">
         {back && (
-          <button onClick={back} className="p-2 text-gray-400 hover:text-navy hover:bg-white rounded-full transition-colors">
-            <ArrowLeft className="w-6 h-6" />
+          <button
+            onClick={back}
+            className="rounded-full p-2 text-gray-400 transition-colors hover:bg-white hover:text-navy"
+          >
+            <ArrowLeft className="h-6 w-6" />
           </button>
         )}
         <div>
-          <h2 className="font-display text-2xl font-bold text-navy tracking-tight">{title}</h2>
-          {description && <p className="text-sm text-gray-500 mt-1">{description}</p>}
+          <h2 className="font-display text-2xl font-bold tracking-tight text-navy">{title}</h2>
+          {description && <p className="mt-1 text-sm text-gray-500">{description}</p>}
         </div>
       </div>
       {action && <div>{action}</div>}
@@ -478,15 +487,16 @@ The demo uses this pattern 30+ times - extract it:
 
 ```tsx
 // shared/components/EyebrowLabel.tsx
-export function EyebrowLabel({ children, tone = "muted" }: {
+export function EyebrowLabel({
+  children,
+  tone = "muted",
+}: {
   children: React.ReactNode;
   tone?: "muted" | "navy";
 }) {
   const colorClass = tone === "navy" ? "text-navy" : "text-gray-400";
   return (
-    <dt className={`text-xs font-bold ${colorClass} uppercase tracking-wider mb-1`}>
-      {children}
-    </dt>
+    <dt className={`text-xs font-bold ${colorClass} mb-1 tracking-wider uppercase`}>{children}</dt>
   );
 }
 ```
@@ -495,20 +505,22 @@ export function EyebrowLabel({ children, tone = "muted" }: {
 
 ```tsx
 // shared/components/MonoId.tsx
-export function MonoId({ value, mode = "truncate", className }: {
+export function MonoId({
+  value,
+  mode = "truncate",
+  className,
+}: {
   value: string;
   mode?: "truncate" | "address" | "full";
   className?: string;
 }) {
   const display =
-    mode === "full" ? value :
-    mode === "address" ? `${value.slice(0, 10)}...${value.slice(-4)}` :
-    `${value.slice(0, 16)}...`;
-  return (
-    <span className={`font-mono text-xs text-gray-500 ${className ?? ""}`}>
-      {display}
-    </span>
-  );
+    mode === "full"
+      ? value
+      : mode === "address"
+        ? `${value.slice(0, 10)}...${value.slice(-4)}`
+        : `${value.slice(0, 16)}...`;
+  return <span className={`font-mono text-xs text-gray-500 ${className ?? ""}`}>{display}</span>;
 }
 ```
 
@@ -552,14 +564,14 @@ These signal AI-generated UI and are explicitly prohibited:
 
 Density choice depends on screen purpose:
 
-| Surface | Density | Treatment |
-|---|---|---|
-| Auth / hero | Generous whitespace | `py-12` to `py-20`, large display type, single blob |
-| Public verification | Medium | Editorial layout, focus on the claim being verified |
-| Dashboard overview | Medium-high | Stat cards at `h-40`, controlled grid, room to breathe |
-| List / table views | High | `py-4` rows, `text-sm`, scannable density |
-| Form views | Medium | `py-3` inputs, `space-y-6` between sections, never cramped |
-| Detail views | Medium | Two-column on desktop, eyebrow + value pattern |
+| Surface             | Density             | Treatment                                                  |
+| ------------------- | ------------------- | ---------------------------------------------------------- |
+| Auth / hero         | Generous whitespace | `py-12` to `py-20`, large display type, single blob        |
+| Public verification | Medium              | Editorial layout, focus on the claim being verified        |
+| Dashboard overview  | Medium-high         | Stat cards at `h-40`, controlled grid, room to breathe     |
+| List / table views  | High                | `py-4` rows, `text-sm`, scannable density                  |
+| Form views          | Medium              | `py-3` inputs, `space-y-6` between sections, never cramped |
+| Detail views        | Medium              | Two-column on desktop, eyebrow + value pattern             |
 
 **Rule:** Never let a list view feel like a hero, and never let a hero feel like a database admin tool.
 
@@ -608,7 +620,7 @@ Codify in shadcn `card.tsx`:
 export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("bg-surface rounded-2xl shadow-sm border border-gray-100", className)}
+      className={cn("rounded-2xl border border-gray-100 bg-surface shadow-sm", className)}
       {...props}
     />
   );
@@ -629,22 +641,24 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary:    "bg-navy text-surface shadow-md shadow-navy/20 hover:bg-navy/90 focus:ring-navy",
-        gold:       "bg-gold text-navy shadow-md shadow-gold/20 hover:bg-gold/90 focus:ring-gold",
-        destructive:"bg-error text-surface shadow-md shadow-error/20 hover:bg-error/90 focus:ring-error",
-        outline:    "border border-gray-200 bg-surface text-navy hover:bg-gray-50 focus:ring-navy",
-        ghost:      "text-navy hover:bg-gray-100 focus:ring-navy",
-        dashed:     "border-2 border-dashed border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 hover:border-gray-300",
+        primary: "bg-navy text-surface shadow-md shadow-navy/20 hover:bg-navy/90 focus:ring-navy",
+        gold: "bg-gold text-navy shadow-md shadow-gold/20 hover:bg-gold/90 focus:ring-gold",
+        destructive:
+          "bg-error text-surface shadow-md shadow-error/20 hover:bg-error/90 focus:ring-error",
+        outline: "border border-gray-200 bg-surface text-navy hover:bg-gray-50 focus:ring-navy",
+        ghost: "text-navy hover:bg-gray-100 focus:ring-navy",
+        dashed:
+          "border-2 border-dashed border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 hover:border-gray-300",
       },
       size: {
-        sm:  "px-3 py-1.5 text-xs",
-        md:  "px-4 py-2 text-sm",
-        lg:  "px-6 py-3 text-sm",
+        sm: "px-3 py-1.5 text-xs",
+        md: "px-4 py-2 text-sm",
+        lg: "px-6 py-3 text-sm",
         icon: "p-2",
       },
     },
     defaultVariants: { variant: "primary", size: "md" },
-  }
+  },
 );
 ```
 
@@ -653,7 +667,7 @@ Usage with trailing icon hover-slide:
 ```tsx
 <Button>
   Sign in to Dashboard
-  <ArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+  <ArrowRight className="ml-2 h-4 w-4 transform transition-transform group-hover:translate-x-1" />
 </Button>
 ```
 
@@ -671,28 +685,28 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ leadingIcon: Icon, trailingAction, className, ...props }, ref) => (
     <div className="relative">
       {Icon && (
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
           <Icon className="h-5 w-5 text-gray-400" />
         </div>
       )}
       <input
         ref={ref}
         className={cn(
-          "block w-full py-3 pr-3 border border-gray-200 rounded-xl shadow-sm",
+          "block w-full rounded-xl border border-gray-200 py-3 pr-3 shadow-sm",
           "bg-gray-50 text-navy placeholder-gray-400",
-          "focus:outline-none focus:ring-2 focus:ring-navy focus:border-transparent focus:bg-white",
+          "focus:border-transparent focus:bg-white focus:ring-2 focus:ring-navy focus:outline-none",
           "transition-all sm:text-sm",
           Icon ? "pl-10" : "pl-4",
           trailingAction ? "pr-10" : "",
-          className
+          className,
         )}
         {...props}
       />
       {trailingAction && (
-        <div className="absolute inset-y-0 right-0 pr-3 flex items-center">{trailingAction}</div>
+        <div className="absolute inset-y-0 right-0 flex items-center pr-3">{trailingAction}</div>
       )}
     </div>
-  )
+  ),
 );
 ```
 
@@ -701,24 +715,30 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 ```tsx
 // shared/components/StatusPill.tsx
 const toneClasses = {
-  navy:   "bg-navy/10 text-navy",
-  gold:   "bg-gold/20 text-navy",
-  error:  "bg-error/10 text-error",
-  green:  "bg-green-100 text-green-700",
-  gray:   "bg-gray-100 text-gray-600",
+  navy: "bg-navy/10 text-navy",
+  gold: "bg-gold/20 text-navy",
+  error: "bg-error/10 text-error",
+  green: "bg-green-100 text-green-700",
+  gray: "bg-gray-100 text-gray-600",
 };
 
-export function StatusPill({ tone, children, icon: Icon }: {
+export function StatusPill({
+  tone,
+  children,
+  icon: Icon,
+}: {
   tone: keyof typeof toneClasses;
   children: React.ReactNode;
   icon?: LucideIcon;
 }) {
   return (
-    <span className={cn(
-      "inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider",
-      toneClasses[tone]
-    )}>
-      {Icon && <Icon className="w-3 h-3 mr-1" />}
+    <span
+      className={cn(
+        "inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-bold tracking-wider uppercase",
+        toneClasses[tone],
+      )}
+    >
+      {Icon && <Icon className="mr-1 h-3 w-3" />}
       {children}
     </span>
   );
@@ -729,28 +749,45 @@ export function StatusPill({ tone, children, icon: Icon }: {
 
 ```tsx
 // shared/components/DecorBlob.tsx
-export function DecorBlob({ tone = "gold", position = "top-right", size = "lg" }: {
+export function DecorBlob({
+  tone = "gold",
+  position = "top-right",
+  size = "lg",
+}: {
   tone?: "gold" | "navy" | "blue" | "error";
   position?: "top-right" | "top-left" | "bottom-right" | "bottom-left";
   size?: "md" | "lg" | "xl";
 }) {
   const toneClass = {
-    gold:  "bg-gold/10",
-    navy:  "bg-navy/10",
-    blue:  "bg-blue-500/10",
+    gold: "bg-gold/10",
+    navy: "bg-navy/10",
+    blue: "bg-blue-500/10",
     error: "bg-error/10",
   }[tone];
 
   const positionClass = {
-    "top-right":    "top-0 right-0 -translate-y-12 translate-x-12",
-    "top-left":     "top-0 left-0 -translate-y-12 -translate-x-12",
+    "top-right": "top-0 right-0 -translate-y-12 translate-x-12",
+    "top-left": "top-0 left-0 -translate-y-12 -translate-x-12",
     "bottom-right": "bottom-0 right-0 translate-y-24 translate-x-12",
-    "bottom-left":  "bottom-0 left-0 translate-y-24 -translate-x-12",
+    "bottom-left": "bottom-0 left-0 translate-y-24 -translate-x-12",
   }[position];
 
-  const sizeClass = { md: "w-32 h-32 blur-2xl", lg: "w-64 h-64 blur-3xl", xl: "w-96 h-96 blur-3xl" }[size];
+  const sizeClass = {
+    md: "w-32 h-32 blur-2xl",
+    lg: "w-64 h-64 blur-3xl",
+    xl: "w-96 h-96 blur-3xl",
+  }[size];
 
-  return <div className={cn("absolute pointer-events-none rounded-full", toneClass, positionClass, sizeClass)} />;
+  return (
+    <div
+      className={cn(
+        "pointer-events-none absolute rounded-full",
+        toneClass,
+        positionClass,
+        sizeClass,
+      )}
+    />
+  );
 }
 ```
 
@@ -759,14 +796,18 @@ export function DecorBlob({ tone = "gold", position = "top-right", size = "lg" }
 Used in dashboard activity feeds, credential cards, role indicators:
 
 ```tsx
-export function TintedIcon({ icon: Icon, tone = "navy", size = "md" }: {
+export function TintedIcon({
+  icon: Icon,
+  tone = "navy",
+  size = "md",
+}: {
   icon: LucideIcon;
   tone?: "navy" | "gold" | "error" | "green";
   size?: "sm" | "md" | "lg";
 }) {
   const toneMap = {
-    navy:  "bg-navy/5 text-navy",
-    gold:  "bg-gold/10 text-navy",
+    navy: "bg-navy/5 text-navy",
+    gold: "bg-gold/10 text-navy",
     error: "bg-error/10 text-error",
     green: "bg-green-100 text-green-600",
   };
@@ -787,17 +828,22 @@ export function TintedIcon({ icon: Icon, tone = "navy", size = "md" }: {
 
 ```tsx
 // shared/components/EmptyState.tsx
-export function EmptyState({ icon: Icon, title, description, action }: {
+export function EmptyState({
+  icon: Icon,
+  title,
+  description,
+  action,
+}: {
   icon: LucideIcon;
   title: string;
   description?: string;
   action?: React.ReactNode;
 }) {
   return (
-    <div className="bg-surface rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
-      <Icon className="mx-auto h-12 w-12 text-gray-300 mb-4" />
-      <h3 className="text-lg font-bold text-navy mb-2">{title}</h3>
-      {description && <p className="text-sm text-gray-500 mb-6">{description}</p>}
+    <div className="rounded-2xl border border-gray-100 bg-surface p-12 text-center shadow-sm">
+      <Icon className="mx-auto mb-4 h-12 w-12 text-gray-300" />
+      <h3 className="mb-2 text-lg font-bold text-navy">{title}</h3>
+      {description && <p className="mb-6 text-sm text-gray-500">{description}</p>}
       {action}
     </div>
   );
@@ -811,7 +857,11 @@ The demo uses `window.confirm` which is jarring on mobile and can't be styled. P
 ```tsx
 // shadcn/ui/confirm-dialog.tsx — useConfirm()
 export function useConfirm() {
-  const [state, setState] = useState<{ open: boolean; resolve?: (v: boolean) => void; opts?: ConfirmOptions }>({ open: false });
+  const [state, setState] = useState<{
+    open: boolean;
+    resolve?: (v: boolean) => void;
+    opts?: ConfirmOptions;
+  }>({ open: false });
 
   const confirm = (opts: ConfirmOptions) =>
     new Promise<boolean>((resolve) => setState({ open: true, resolve, opts }));
@@ -855,68 +905,68 @@ return (
 
 ### 8.1 Three Layout Shells
 
-| Layout | Used by | Pattern |
-|---|---|---|
-| `PublicLayout` | `/credentials/verify/:id` | Navy header with **gold brand mark** + gold underline, white card body, footer |
-| `SplitLayout` | `/` (Landing), `/login` | 50/50 split: navy brand panel left + light content right on desktop; navy band on top + content below on mobile. Language switcher floats top-right on desktop (light variant), inside the navy band on mobile (dark variant). |
-| `DashboardLayout` | All authenticated routes | Fixed navy sidebar (`w-72`) with **gold brand mark cluster**, transparent top navbar, scrollable main. Mobile: hand-rolled CSS-transform slide (`-translate-x-full` ↔ `translate-x-0`) with `bg-navy/80` click backdrop. |
-| `AdaptiveLayout` | `/help`, `/about` | Renders `DashboardLayout` if `isAuthenticated`, `PublicLayout` otherwise |
+| Layout            | Used by                   | Pattern                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ----------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PublicLayout`    | `/credentials/verify/:id` | Navy header with **gold brand mark** + gold underline, white card body, footer                                                                                                                                                                                                                                                                                                                             |
+| `SplitLayout`     | `/` (Landing), `/login`   | 50/50 split: navy brand panel left + light content right on desktop; navy band on top + content below on mobile. Desktop navy panel carries gold + blue `<DecorBlob>`s; the mobile navy band has none (too cramped — was clipped by `overflow-hidden` and the safe-area gap on notched iOS). Language switcher floats top-right on desktop (light variant), inside the navy band on mobile (dark variant). |
+| `DashboardLayout` | All authenticated routes  | Fixed navy sidebar (`w-72`) with **gold brand mark cluster**, transparent top navbar, scrollable `main` (`overflow-y-scroll [scrollbar-gutter:stable]` so route-switches with differing content heights don't reflow the navbar). Mobile: hand-rolled CSS-transform slide (`-translate-x-full` ↔ `translate-x-0`) with `bg-navy/80` click backdrop.                                                        |
+| `AdaptiveLayout`  | `/help`, `/about`         | Renders `DashboardLayout` if `isAuthenticated`, `PublicLayout` otherwise                                                                                                                                                                                                                                                                                                                                   |
 
 ### 8.2 Container Widths
 
-| Width | Tailwind | Use case |
-|---|---|---|
-| Form / detail | `max-w-md` | Auth card |
-| Detail view | `max-w-3xl` | UserDetail, single-record screens |
-| Settings | `max-w-4xl` | Settings, verification |
-| Verification | `max-w-3xl` to `max-w-4xl` | VerifyCredential (public) |
-| Batch forms | `max-w-6xl` | UserCreate, CredentialIssue |
-| Lists / tables | `max-w-7xl` | UserList, CredentialList |
+| Width          | Tailwind                   | Use case                          |
+| -------------- | -------------------------- | --------------------------------- |
+| Form / detail  | `max-w-md`                 | Auth card                         |
+| Detail view    | `max-w-3xl`                | UserDetail, single-record screens |
+| Settings       | `max-w-4xl`                | Settings, verification            |
+| Verification   | `max-w-3xl` to `max-w-4xl` | VerifyCredential (public)         |
+| Batch forms    | `max-w-6xl`                | UserCreate, CredentialIssue       |
+| Lists / tables | `max-w-7xl`                | UserList, CredentialList          |
 
 All containers center via `mx-auto`.
 
 ### 8.3 Vertical Rhythm
 
-| Class | Use |
-|---|---|
-| `space-y-6` | Page-level rhythm (default) |
-| `space-y-4` | Sub-section spacing |
+| Class       | Use                           |
+| ----------- | ----------------------------- |
+| `space-y-6` | Page-level rhythm (default)   |
+| `space-y-4` | Sub-section spacing           |
 | `space-y-8` | Generous form section spacing |
-| `space-y-1` | Label + input pair |
-| `space-y-2` | Tight clusters |
+| `space-y-1` | Label + input pair            |
+| `space-y-2` | Tight clusters                |
 
 ### 8.4 Card Padding
 
-| Use | Padding |
-|---|---|
-| Standard card | `p-6` |
-| Prominent form | `p-6 sm:p-8` or `p-6 sm:p-10` |
-| Compact pill row | `p-4 sm:p-6` |
+| Use              | Padding                       |
+| ---------------- | ----------------------------- |
+| Standard card    | `p-6`                         |
+| Prominent form   | `p-6 sm:p-8` or `p-6 sm:p-10` |
+| Compact pill row | `p-4 sm:p-6`                  |
 
 ### 8.5 Grid Patterns
 
-| Pattern | Tailwind |
-|---|---|
-| Stat cards (4-up) | `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6` |
-| Credential cards (3-up) | `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6` |
-| Dashboard split | `grid grid-cols-1 lg:grid-cols-3 gap-6` (main: `lg:col-span-2`) |
-| Form fields (3-up) | `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6` |
-| Form fields (2-up) | `grid grid-cols-1 md:grid-cols-2 gap-6` |
+| Pattern                 | Tailwind                                                        |
+| ----------------------- | --------------------------------------------------------------- |
+| Stat cards (4-up)       | `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6`          |
+| Credential cards (3-up) | `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6`          |
+| Dashboard split         | `grid grid-cols-1 lg:grid-cols-3 gap-6` (main: `lg:col-span-2`) |
+| Form fields (3-up)      | `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6`          |
+| Form fields (2-up)      | `grid grid-cols-1 md:grid-cols-2 gap-6`                         |
 
 ### 8.6 Sidebar Pattern
 
 ```tsx
 // shared/components/layout/Sidebar.tsx
-<aside className={cn(
-  "fixed inset-y-0 left-0 z-50 w-72 bg-navy text-gray-300 transition-transform duration-300 sm:translate-x-0 sm:static sm:flex-shrink-0 flex flex-col shadow-2xl",
-  open ? "translate-x-0" : "-translate-x-full"
-)}>
+<aside
+  className={cn(
+    "fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-navy text-gray-300 shadow-2xl transition-transform duration-300 sm:static sm:flex-shrink-0 sm:translate-x-0",
+    open ? "translate-x-0" : "-translate-x-full",
+  )}
+>
   {/* Logo cluster — both icon and wordmark in gold */}
   <div className="flex flex-col items-center pt-10 pb-8">
-    <ShieldCheck className="h-12 w-12 text-gold mb-2" aria-hidden="true" />
-    <span className="font-display text-2xl font-bold tracking-tight text-gold">
-      CredChain
-    </span>
+    <ShieldCheck className="mb-2 h-12 w-12 text-gold" aria-hidden="true" />
+    <span className="font-display text-2xl font-bold tracking-tight text-gold">CredChain</span>
   </div>
   {/* Nav items - role-filtered via canAccess() helper */}
   {/* Mt-auto logout button */}
@@ -944,8 +994,8 @@ The icon color follows the active state via the `children` render prop (`isActiv
 // DashboardLayout.tsx (abbreviated)
 <aside
   className={cn(
-    "fixed inset-y-0 left-0 z-50 w-72 transition-transform duration-300 shadow-2xl",
-    "sm:translate-x-0 sm:sticky sm:top-0 sm:h-screen sm:flex-shrink-0",
+    "fixed inset-y-0 left-0 z-50 w-72 shadow-2xl transition-transform duration-300",
+    "sm:sticky sm:top-0 sm:h-screen sm:flex-shrink-0 sm:translate-x-0",
     sidebarOpen ? "translate-x-0" : "-translate-x-full",
   )}
 >
@@ -953,7 +1003,7 @@ The icon color follows the active state via the `children` render prop (`isActiv
 </aside>
 ```
 
-> A shadcn `Sheet` was originally specced for this but never adopted — the hand-rolled transform is the live implementation. The `vaul` `Drawer` primitive *is* installed, but it is reserved for **content** drawers (e.g. `UserEditDrawer`, the admin batch-edit panel), not navigation.
+> A shadcn `Sheet` was originally specced for this but never adopted — the hand-rolled transform is the live implementation. The `vaul` `Drawer` primitive _is_ installed, but it is reserved for **content** drawers (e.g. `UserEditDrawer`, the admin batch-edit panel), not navigation.
 
 ### 8.8 Responsive Breakpoints
 
@@ -961,12 +1011,12 @@ The icon color follows the active state via the `children` render prop (`isActiv
 
 Mobile-first using Tailwind defaults:
 
-| Breakpoint | Min width | Used for |
-|---|---|---|
-| `sm:` | 640px | Tables visible, side-by-side rows |
-| `md:` | 768px | 2-column grids, search bar visibility |
-| `lg:` | 1024px | Sidebar visible, split auth, 4-up grids |
-| `xl:` | 1280px | (rarely used) ultra-wide refinements |
+| Breakpoint | Min width | Used for                                |
+| ---------- | --------- | --------------------------------------- |
+| `sm:`      | 640px     | Tables visible, side-by-side rows       |
+| `md:`      | 768px     | 2-column grids, search bar visibility   |
+| `lg:`      | 1024px    | Sidebar visible, split auth, 4-up grids |
+| `xl:`      | 1280px    | (rarely used) ultra-wide refinements    |
 
 ### 8.9 Responsive Design
 
@@ -989,7 +1039,7 @@ All component styles default to mobile. Add complexity at larger breakpoints, ne
 In `index.html`, support iOS safe areas:
 
 ```html
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 ```
 
 `viewport-fit=cover` enables `env(safe-area-inset-*)` to expose notch/home-indicator insets.
@@ -998,12 +1048,12 @@ In `index.html`, support iOS safe areas:
 
 Every interactive element on touch devices must be at minimum **44x44px** (Apple HIG) and ideally **48x48px** (Material). Tailwind sizing for buttons:
 
-| Use case | Class | Resulting size |
-|---|---|---|
-| Primary CTA | `px-6 py-3 text-sm` | 48px tall |
-| Secondary | `px-4 py-2 text-sm` | 40px - tablet/desktop only |
-| Icon button (mobile) | `p-3` (12px on each side, 24px icon) | 48px square |
-| Icon button (desktop) | `p-2` (8px on each side, 24px icon) | 40px square |
+| Use case              | Class                                | Resulting size             |
+| --------------------- | ------------------------------------ | -------------------------- |
+| Primary CTA           | `px-6 py-3 text-sm`                  | 48px tall                  |
+| Secondary             | `px-4 py-2 text-sm`                  | 40px - tablet/desktop only |
+| Icon button (mobile)  | `p-3` (12px on each side, 24px icon) | 48px square                |
+| Icon button (desktop) | `p-2` (8px on each side, 24px icon)  | 40px square                |
 
 Sidebar nav items already meet target with `px-4 py-3`. Form inputs at `py-3` produce 48px - keep that on mobile, never compress to `py-2`.
 
@@ -1012,17 +1062,27 @@ Sidebar nav items already meet target with `px-4 py-3`. Form inputs at `py-3` pr
 Apply to elements that touch the viewport edges on iOS:
 
 ```css
-.safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
-.safe-area-top    { padding-top:    env(safe-area-inset-top); }
-.safe-area-x      { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+.safe-area-x {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
 ```
 
 Apply to:
+
 - `PublicLayout` footer
 - `DashboardLayout` mobile top nav (when navy bar reaches edge)
 - Mobile sidebar `Sheet` content
 - Bottom-sheet dialogs (when added)
 - Toast container (sonner provides this, but verify on iOS)
+
+**Cascade gotcha:** `safe-area-top` (and `-bottom`/`-x`) sets `padding-top: env(safe-area-inset-top)` directly. When co-located with Tailwind's `py-*` utilities on the same element, `safe-area-top` overrides the `padding-top` from `py-*` (CSS utilities-layer source order), leaving the element with `padding-top: 0` on devices without a notch. Apply `safe-area-top` to a dedicated zero-height spacer `<div>` _inside_ the element instead of co-locating it with `py-*`. Pattern in use: `TopNav.tsx`.
 
 #### Mobile Keyboard Hints
 
@@ -1044,7 +1104,9 @@ Respect `prefers-reduced-motion`. The decorative blob is the most aggressive ani
 
 ```css
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
@@ -1070,7 +1132,9 @@ Use for components that should respond to **their parent container's width**, no
 }
 
 @container card (min-width: 320px) {
-  .credential-card .meta { display: flex; }
+  .credential-card .meta {
+    display: flex;
+  }
 }
 ```
 
@@ -1080,15 +1144,15 @@ In Tailwind v4 via the `@container` plugin or `[@container]` arbitrary variants.
 
 The `md:` to `lg:` range needs explicit decisions:
 
-| Element | md (tablet portrait) | lg (tablet landscape / desktop) |
-|---|---|---|
-| Sidebar | Mobile drawer (Sheet) | Fixed `w-72` |
-| Navigation | Hamburger menu | Fixed sidebar |
-| Stat cards | 2-up grid | 4-up grid |
-| Credential cards | 2-up | 3-up |
-| Form fields | 2-up where logical | 3-up where logical |
-| Auth screen | Stacked | Split-screen |
-| Detail views | Single column | Two-column with side panel |
+| Element          | md (tablet portrait)  | lg (tablet landscape / desktop) |
+| ---------------- | --------------------- | ------------------------------- |
+| Sidebar          | Mobile drawer (Sheet) | Fixed `w-72`                    |
+| Navigation       | Hamburger menu        | Fixed sidebar                   |
+| Stat cards       | 2-up grid             | 4-up grid                       |
+| Credential cards | 2-up                  | 3-up                            |
+| Form fields      | 2-up where logical    | 3-up where logical              |
+| Auth screen      | Stacked               | Split-screen                    |
+| Detail views     | Single column         | Two-column with side panel      |
 
 #### Print Styles
 
@@ -1096,12 +1160,29 @@ The public credential verification page must print cleanly (employers, registrar
 
 ```css
 @media print {
-  .no-print { display: none; }
-  .print-only { display: block; }
-  body { background: white; color: black; }
-  .navy-card { background: white; color: black; border: 2px solid black; }
-  a::after { content: " (" attr(href) ")"; font-size: 0.875em; color: #666; }
-  .credential-hash { word-break: break-all; }
+  .no-print {
+    display: none;
+  }
+  .print-only {
+    display: block;
+  }
+  body {
+    background: white;
+    color: black;
+  }
+  .navy-card {
+    background: white;
+    color: black;
+    border: 2px solid black;
+  }
+  a::after {
+    content: " (" attr(href) ")";
+    font-size: 0.875em;
+    color: #666;
+  }
+  .credential-hash {
+    word-break: break-all;
+  }
 }
 ```
 
@@ -1113,7 +1194,7 @@ Apply `.print-only` to: a print header with verification timestamp + URL.
 Mobile auth screen in landscape can feel cramped. Consider:
 
 ```tsx
-<div className="min-h-screen flex flex-col landscape:flex-row">
+<div className="flex min-h-screen flex-col landscape:flex-row">
   {/* Branding panel: top in portrait, left in landscape */}
 </div>
 ```
@@ -1122,14 +1203,14 @@ Not every screen needs orientation handling - reserve for full-screen experience
 
 #### Mobile UX Patterns
 
-| Pattern | When to use | Implementation |
-|---|---|---|
-| Side sheet | Navigation (mobile sidebar) | shadcn `Sheet side="left"` |
-| Bottom sheet | Actions / filters / detail preview | shadcn `Drawer` (Vaul-based) |
-| Full-screen dialog | Multi-step flows on mobile | shadcn `Dialog` with `h-screen` override at `sm:max-w-none` |
-| Pull-to-refresh | List views on mobile only | Defer to Phase 2 unless requested |
-| Swipe-to-delete | Soft-delete in user/credential lists | Defer to Phase 2 |
-| Long-press menu | Context actions on cards | Defer to Phase 2; right-click handles desktop |
+| Pattern            | When to use                          | Implementation                                              |
+| ------------------ | ------------------------------------ | ----------------------------------------------------------- |
+| Side sheet         | Navigation (mobile sidebar)          | shadcn `Sheet side="left"`                                  |
+| Bottom sheet       | Actions / filters / detail preview   | shadcn `Drawer` (Vaul-based)                                |
+| Full-screen dialog | Multi-step flows on mobile           | shadcn `Dialog` with `h-screen` override at `sm:max-w-none` |
+| Pull-to-refresh    | List views on mobile only            | Defer to Phase 2 unless requested                           |
+| Swipe-to-delete    | Soft-delete in user/credential lists | Defer to Phase 2                                            |
+| Long-press menu    | Context actions on cards             | Defer to Phase 2; right-click handles desktop               |
 
 #### Dark Mode Hooks (Phase 2)
 
@@ -1138,9 +1219,9 @@ The token structure already supports dark mode. When prioritized, add to `styles
 ```css
 @layer base {
   :root.dark {
-    --color-base:    #0F172A;
-    --color-surface: #1E293B;
-    --color-navy:    #F8FAFC;  /* invert: text becomes light */
+    --color-base: #0f172a;
+    --color-surface: #1e293b;
+    --color-navy: #f8fafc; /* invert: text becomes light */
     /* ... rest of overrides ... */
   }
 }
@@ -1167,10 +1248,10 @@ Before shipping any new screen:
 
 ### 9.1 Two-Layer Model
 
-| Layer | Tool | What lives here |
-|---|---|---|
-| Server state | TanStack Query | All API data: users, credentials, auth responses |
-| Client state | Zustand | Current user session, UI state (sidebar open, locale) |
+| Layer        | Tool           | What lives here                                       |
+| ------------ | -------------- | ----------------------------------------------------- |
+| Server state | TanStack Query | All API data: users, credentials, auth responses      |
+| Client state | Zustand        | Current user session, UI state (sidebar open, locale) |
 
 Never put server data in Zustand. Never put auth session in TanStack Query cache.
 
@@ -1224,8 +1305,8 @@ export const useStore = create<AuthSlice & UiSlice>()(
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5,   // 5 min
-      gcTime:    1000 * 60 * 10,  // 10 min
+      staleTime: 1000 * 60 * 5, // 5 min
+      gcTime: 1000 * 60 * 10, // 10 min
       retry: (failureCount, error) => {
         if (isApiError(error) && error.status === 401) return false;
         if (isApiError(error) && error.status === 403) return false;
@@ -1246,17 +1327,17 @@ Query key conventions:
 
 ```ts
 export const userKeys = {
-  all:    () => ["users"] as const,
-  list:   (params?: UserListParams) => ["users", "list", params] as const,
+  all: () => ["users"] as const,
+  list: (params?: UserListParams) => ["users", "list", params] as const,
   detail: (id: string) => ["users", "detail", id] as const,
-  self:   () => ["users", "self"] as const,
+  self: () => ["users", "self"] as const,
 };
 
 export const credentialKeys = {
-  all:    () => ["credentials"] as const,
-  list:   (params?: CredentialListParams) => ["credentials", "list", params] as const,
+  all: () => ["credentials"] as const,
+  list: (params?: CredentialListParams) => ["credentials", "list", params] as const,
   detail: (id: string) => ["credentials", "detail", id] as const,
-  mine:   () => ["credentials", "mine"] as const,
+  mine: () => ["credentials", "mine"] as const,
 };
 ```
 
@@ -1286,11 +1367,11 @@ export function useDeleteUsers() {
 ```ts
 // shared/api/client.ts
 export const api = axios.create({
-  baseURL: env.apiBaseUrl,        // VITE_API_BASE_URL ?? "/api"
-  withCredentials: true,          // sends httpOnly cookies
+  baseURL: env.apiBaseUrl, // VITE_API_BASE_URL ?? "/api"
+  withCredentials: true, // sends httpOnly cookies
   timeout: 30_000,
   headers: { "Content-Type": "application/json" },
-  paramsSerializer: { indexes: null },  // repeated params without [] brackets (Gin-friendly)
+  paramsSerializer: { indexes: null }, // repeated params without [] brackets (Gin-friendly)
 });
 ```
 
@@ -1303,14 +1384,14 @@ Every backend response is `{ code, message, data? }`. The request interceptor st
 ```ts
 // shared/api/client.ts (abbreviated)
 api.interceptors.request.use((config) => {
-  config.headers["Accept-Language"] = resolveLocale();  // from Zustand locale
+  config.headers["Accept-Language"] = resolveLocale(); // from Zustand locale
   return config;
 });
 
 let refreshInFlight: Promise<unknown> | null = null;
 
 api.interceptors.response.use(
-  (response) => response.data?.data ?? response.data,  // unwrap envelope
+  (response) => response.data?.data ?? response.data, // unwrap envelope
   async (error: AxiosError<ApiErrorResponse>) => {
     const status = error.response?.status;
     const config = error.config;
@@ -1323,7 +1404,7 @@ api.interceptors.response.use(
         await refreshInFlight;
         return api.request({ ...config, headers: { ...config!.headers, "X-Retry": "1" } });
       } catch {
-        onAuthFailure();          // clears Zustand + navigates to /login
+        onAuthFailure(); // clears Zustand + navigates to /login
         return Promise.reject(error);
       } finally {
         refreshInFlight = null;
@@ -1478,8 +1559,7 @@ export function useGoogleLogin() {
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: (payload: { id_token: string }) =>
-      api.post<AuthResponse>("/auth/google", payload),
+    mutationFn: (payload: { id_token: string }) => api.post<AuthResponse>("/auth/google", payload),
     onSuccess: (data) => {
       // data.access_token / data.refresh_token are NOT used here -
       // backend already set httpOnly cookies. We only persist user.
@@ -1545,7 +1625,9 @@ The backend's `PUT /api/users/self/email` requires a fresh Google ID token:
 
 ```tsx
 // feature/user/UserSelfEmail.tsx
-const { google } = useGoogleOneTapLogin({ /* ... */ });
+const { google } = useGoogleOneTapLogin({
+  /* ... */
+});
 const updateEmail = useMutation({
   mutationFn: (payload: { email: string; id_token: string }) =>
     api.put("/users/self/email", payload),
@@ -1571,16 +1653,16 @@ Extract from the demo's duplicated logic into a single utility:
 // shared/auth/role.ts
 export const Role = {
   SUPER_ADMIN: "super_admin",
-  ADMIN:       "admin",
-  ISSUER:      "issuer",
-  HOLDER:      "holder",
+  ADMIN: "admin",
+  ISSUER: "issuer",
+  HOLDER: "holder",
 } as const;
 export type Role = (typeof Role)[keyof typeof Role];
 
 export const ROLE_LEVEL: Record<Role, number> = {
-  [Role.HOLDER]:      1,
-  [Role.ISSUER]:      2,
-  [Role.ADMIN]:       3,
+  [Role.HOLDER]: 1,
+  [Role.ISSUER]: 2,
+  [Role.ADMIN]: 3,
   [Role.SUPER_ADMIN]: 4,
 };
 
@@ -1623,7 +1705,11 @@ export function PublicRoute() {
   return isAuthenticated ? <Navigate to={from} replace /> : <Outlet />;
 }
 
-export function RoleGate({ allowed, children, fallback = null }: {
+export function RoleGate({
+  allowed,
+  children,
+  fallback = null,
+}: {
   allowed: Role[];
   children: React.ReactNode;
   fallback?: React.ReactNode;
@@ -1643,44 +1729,55 @@ export const router = createBrowserRouter([
   {
     element: <PublicLayout />,
     children: [
-      { path: "/credentials/verify/:credentialId", lazy: () => import("@feature/credential/VerifyCredential") },
+      {
+        path: "/credentials/verify/:credentialId",
+        lazy: () => import("@feature/credential/VerifyCredential"),
+      },
     ],
   },
   {
     element: <PublicRoute />,
-    children: [{
-      element: <AuthLayout />,
-      children: [
-        { path: "/login", lazy: () => import("@feature/auth/Login") },
-      ],
-    }],
+    children: [
+      {
+        element: <AuthLayout />,
+        children: [{ path: "/login", lazy: () => import("@feature/auth/Login") }],
+      },
+    ],
   },
   {
     element: <ProtectedRoute />,
-    children: [{
-      element: <DashboardLayout />,
-      children: [
-        { path: "/dashboard", lazy: () => import("@feature/dashboard/Dashboard") },
-        { path: "/credentials/self", lazy: () => import("@feature/credential/MyCredentials") },
-        {
-          element: <ProtectedRoute allowedRoles={[Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]} />,
-          children: [
-            { path: "/users",     lazy: () => import("@feature/user/UserList") },
-            { path: "/users/:id", lazy: () => import("@feature/user/UserDetail") },
-            { path: "/credentials",        lazy: () => import("@feature/credential/CredentialList") },
-            { path: "/credentials/issue",  lazy: () => import("@feature/credential/CredentialIssue") },
-            { path: "/credentials/:id",    lazy: () => import("@feature/credential/CredentialDetail") },
-          ],
-        },
-        {
-          element: <ProtectedRoute allowedRoles={[Role.ADMIN, Role.SUPER_ADMIN]} />,
-          children: [
-            { path: "/users/create", lazy: () => import("@feature/user/UserCreate") },
-            { path: "/settings",     lazy: () => import("@feature/dashboard/Settings") },
-          ],
-        },
-      ],
-    }],
+    children: [
+      {
+        element: <DashboardLayout />,
+        children: [
+          { path: "/dashboard", lazy: () => import("@feature/dashboard/Dashboard") },
+          { path: "/credentials/self", lazy: () => import("@feature/credential/MyCredentials") },
+          {
+            element: <ProtectedRoute allowedRoles={[Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]} />,
+            children: [
+              { path: "/users", lazy: () => import("@feature/user/UserList") },
+              { path: "/users/:id", lazy: () => import("@feature/user/UserDetail") },
+              { path: "/credentials", lazy: () => import("@feature/credential/CredentialList") },
+              {
+                path: "/credentials/issue",
+                lazy: () => import("@feature/credential/CredentialIssue"),
+              },
+              {
+                path: "/credentials/:id",
+                lazy: () => import("@feature/credential/CredentialDetail"),
+              },
+            ],
+          },
+          {
+            element: <ProtectedRoute allowedRoles={[Role.ADMIN, Role.SUPER_ADMIN]} />,
+            children: [
+              { path: "/users/create", lazy: () => import("@feature/user/UserCreate") },
+              { path: "/settings", lazy: () => import("@feature/dashboard/Settings") },
+            ],
+          },
+        ],
+      },
+    ],
   },
   { path: "*", element: <NotFound /> },
 ]);
@@ -1692,7 +1789,9 @@ Use `RoleGate` for inline UI gating (e.g., showing/hiding action buttons):
 
 ```tsx
 <RoleGate allowed={[Role.ADMIN, Role.SUPER_ADMIN]}>
-  <Button variant="destructive" onClick={handleDelete}>Delete</Button>
+  <Button variant="destructive" onClick={handleDelete}>
+    Delete
+  </Button>
 </RoleGate>
 ```
 
@@ -1711,13 +1810,16 @@ import { z } from "zod";
 const strictE164 = /^\+[1-9]\d{6,14}$/;
 
 export const userStoreSchema = z.object({
-  name:          z.string().min(1).max(256),
-  number:        z.string().max(256).optional(),
-  phone_number:  z.string().regex(strictE164).max(19).optional(),
-  email:         z.string().email().max(256),
-  birth_date:    z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  meta:          z.record(z.unknown()).optional(),
-  role:          z.enum([Role.HOLDER, Role.ISSUER, Role.ADMIN]),
+  name: z.string().min(1).max(256),
+  number: z.string().max(256).optional(),
+  phone_number: z.string().regex(strictE164).max(19).optional(),
+  email: z.string().email().max(256),
+  birth_date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  meta: z.record(z.unknown()).optional(),
+  role: z.enum([Role.HOLDER, Role.ISSUER, Role.ADMIN]),
 });
 
 export type UserStoreInput = z.infer<typeof userStoreSchema>;
@@ -1770,7 +1872,12 @@ shadcn `form.tsx` provides `<FormField>` + `<FormControl>` + `<FormMessage>`. Wr
 
 ```tsx
 export function TextField<T extends FieldValues>({
-  control, name, label, leadingIcon, placeholder, type = "text",
+  control,
+  name,
+  label,
+  leadingIcon,
+  placeholder,
+  type = "text",
 }: {
   control: Control<T>;
   name: FieldPath<T>;
@@ -1918,14 +2025,14 @@ api.interceptors.request.use((config) => {
 
 Locked decisions for `id.json` — do not revert without a design review:
 
-| Key | English | Indonesian | Rationale |
-|---|---|---|---|
-| `nav.overview` | Overview | **Dasbor** | "Ikhtisar" is too archaic for a product dashboard context |
-| `nav.users` | Users | Pengguna | Standard Indonesian for users |
-| `nav.credentials` | Credentials | Kredensial | Direct loanword, widely understood |
-| `nav.settings` | Settings | Pengaturan | Standard Indonesian |
-| `dashboard.welcome` | Welcome, {{name}} | Selamat datang, {{name}} | Formal greeting, appropriate for a professional platform |
-| `user.list.count_one/other` | {{count}} user/users | {{count}} pengguna | "Entitas" was rejected — too abstract for end users |
+| Key                         | English              | Indonesian               | Rationale                                                 |
+| --------------------------- | -------------------- | ------------------------ | --------------------------------------------------------- |
+| `nav.overview`              | Overview             | **Dasbor**               | "Ikhtisar" is too archaic for a product dashboard context |
+| `nav.users`                 | Users                | Pengguna                 | Standard Indonesian for users                             |
+| `nav.credentials`           | Credentials          | Kredensial               | Direct loanword, widely understood                        |
+| `nav.settings`              | Settings             | Pengaturan               | Standard Indonesian                                       |
+| `dashboard.welcome`         | Welcome, {{name}}    | Selamat datang, {{name}} | Formal greeting, appropriate for a professional platform  |
+| `user.list.count_one/other` | {{count}} user/users | {{count}} pengguna       | "Entitas" was rejected — too abstract for end users       |
 
 **Default locale is Indonesian (`id`).** The persisted locale is read from localStorage before i18next initializes, so users never see a flash of English on first load.
 
@@ -1937,15 +2044,15 @@ Locked decisions for `id.json` — do not revert without a design review:
 
 ### 15.1 Error Surfaces
 
-| Error type | UI surface | Resolution |
-|---|---|---|
-| Validation (`code 400001`) | Inline form field error | Fix input |
-| Auth (`status 401`) | Silent refresh + redirect | Auto |
-| Forbidden (`status 403`) | Toast + route fallback | Sign in as different user |
-| Not Found (`status 404`) | Empty state on page | Navigate back |
-| Server (5xx) | Toast | Retry button |
-| Network | Toast | Retry button |
-| Boundary crash | Full-page ErrorBoundary | Reload |
+| Error type                 | UI surface                | Resolution                |
+| -------------------------- | ------------------------- | ------------------------- |
+| Validation (`code 400001`) | Inline form field error   | Fix input                 |
+| Auth (`status 401`)        | Silent refresh + redirect | Auto                      |
+| Forbidden (`status 403`)   | Toast + route fallback    | Sign in as different user |
+| Not Found (`status 404`)   | Empty state on page       | Navigate back             |
+| Server (5xx)               | Toast                     | Retry button              |
+| Network                    | Toast                     | Retry button              |
+| Boundary crash             | Full-page ErrorBoundary   | Reload                    |
 
 ### 15.2 ErrorBoundary
 
@@ -1959,11 +2066,11 @@ export function AppErrorBoundary({ children }: { children: React.ReactNode }) {
   return (
     <REB
       fallbackRender={({ error, resetErrorBoundary }) => (
-        <div className="min-h-screen flex items-center justify-center p-6">
-          <Card className="p-8 max-w-md text-center">
-            <ShieldAlert className="mx-auto h-12 w-12 text-error mb-4" />
-            <h2 className="text-2xl font-bold text-navy mb-2">Something broke</h2>
-            <p className="text-sm text-gray-500 mb-6">{error.message}</p>
+        <div className="flex min-h-screen items-center justify-center p-6">
+          <Card className="max-w-md p-8 text-center">
+            <ShieldAlert className="mx-auto mb-4 h-12 w-12 text-error" />
+            <h2 className="mb-2 text-2xl font-bold text-navy">Something broke</h2>
+            <p className="mb-6 text-sm text-gray-500">{error.message}</p>
             <Button onClick={resetErrorBoundary}>Try again</Button>
           </Card>
         </div>
@@ -1983,12 +2090,9 @@ export function AppErrorBoundary({ children }: { children: React.ReactNode }) {
 import { toast } from "sonner";
 
 export const notify = {
-  success: (key: string, opts?: { description?: string }) =>
-    toast.success(i18n.t(key), opts),
-  error: (key: string, opts?: { description?: string }) =>
-    toast.error(i18n.t(key), opts),
-  info: (key: string, opts?: { description?: string }) =>
-    toast.info(i18n.t(key), opts),
+  success: (key: string, opts?: { description?: string }) => toast.success(i18n.t(key), opts),
+  error: (key: string, opts?: { description?: string }) => toast.error(i18n.t(key), opts),
+  info: (key: string, opts?: { description?: string }) => toast.info(i18n.t(key), opts),
 };
 ```
 
@@ -2007,7 +2111,7 @@ shadcn `<FormMessage />` automatically reads from RHF state. Backend validation 
 // shared/lib/forms.ts
 export function setServerErrors<T extends FieldValues>(
   form: UseFormReturn<T>,
-  errors: Record<string, string>
+  errors: Record<string, string>,
 ) {
   Object.entries(errors).forEach(([path, key]) => {
     form.setError(path as Path<T>, {
@@ -2035,14 +2139,14 @@ export function setServerErrors<T extends FieldValues>(
 
 ### 16.2 Pattern Compliance
 
-| Element | shadcn coverage | Manual work |
-|---|---|---|
-| Dialog / AlertDialog | Focus trap, ESC, return focus | Set `aria-describedby` for body |
-| DropdownMenu | Keyboard nav, ARIA | Provide accessible trigger label |
-| Select | Combobox semantics | Pair with `<Label>` |
-| Tabs | Roving tabindex | Use `<TabsList>` + `<TabsTrigger>` |
-| Toast (sonner) | `aria-live="polite"` | Avoid critical-only-color states |
-| Tooltip | `aria-describedby` | Avoid as the only label |
+| Element              | shadcn coverage               | Manual work                        |
+| -------------------- | ----------------------------- | ---------------------------------- |
+| Dialog / AlertDialog | Focus trap, ESC, return focus | Set `aria-describedby` for body    |
+| DropdownMenu         | Keyboard nav, ARIA            | Provide accessible trigger label   |
+| Select               | Combobox semantics            | Pair with `<Label>`                |
+| Tabs                 | Roving tabindex               | Use `<TabsList>` + `<TabsTrigger>` |
+| Toast (sonner)       | `aria-live="polite"`          | Avoid critical-only-color states   |
+| Tooltip              | `aria-describedby`            | Avoid as the only label            |
 
 ### 16.3 Focus Ring
 
@@ -2050,7 +2154,9 @@ Never disable. Use `focus-visible:` so mouse users don't see rings, keyboard use
 
 ```css
 @layer base {
-  :focus { outline: none; }
+  :focus {
+    outline: none;
+  }
   :focus-visible {
     outline: 2px solid var(--color-gold);
     outline-offset: 2px;
@@ -2063,7 +2169,7 @@ Never disable. Use `focus-visible:` so mouse users don't see rings, keyboard use
 ```tsx
 <a
   href="#main"
-  className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 bg-navy text-surface px-4 py-2 rounded-xl"
+  className="sr-only rounded-xl bg-navy px-4 py-2 text-surface focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50"
 >
   Skip to main content
 </a>
@@ -2098,12 +2204,12 @@ test("login page has no a11y violations", async ({ page }) => {
 
 ### 17.1 Test Layers
 
-| Layer | Tool | What to test |
-|---|---|---|
-| Unit | Vitest | Pure functions: cn(), role utils, format, Zod schemas |
-| Component | Vitest + RTL | Rendering, user interactions, form validation |
-| Integration | Vitest + MSW | Feature flows with mocked API |
-| E2E | Playwright | Critical paths against real backend (staging) |
+| Layer       | Tool         | What to test                                          |
+| ----------- | ------------ | ----------------------------------------------------- |
+| Unit        | Vitest       | Pure functions: cn(), role utils, format, Zod schemas |
+| Component   | Vitest + RTL | Rendering, user interactions, form validation         |
+| Integration | Vitest + MSW | Feature flows with mocked API                         |
+| E2E         | Playwright   | Critical paths against real backend (staging)         |
 
 ### 17.2 Vitest Config
 
@@ -2146,17 +2252,19 @@ import { mockUsers, mockCredentials } from "../fixtures";
 
 export const handlers = [
   http.get("/api/users", () =>
-    HttpResponse.json({ code: 100200, message: "OK", data: { data: mockUsers, total: mockUsers.length, page: 1, page_size: 10 } })
+    HttpResponse.json({
+      code: 100200,
+      message: "OK",
+      data: { data: mockUsers, total: mockUsers.length, page: 1, page_size: 10 },
+    }),
   ),
   http.get("/api/users/self", () =>
-    HttpResponse.json({ code: 100200, message: "OK", data: mockUsers[0] })
+    HttpResponse.json({ code: 100200, message: "OK", data: mockUsers[0] }),
   ),
   http.post("/api/auth/google", () =>
-    HttpResponse.json({ code: 100100, message: "OK", data: { user: mockUsers[0] } })
+    HttpResponse.json({ code: 100100, message: "OK", data: { user: mockUsers[0] } }),
   ),
-  http.post("/api/auth/logout", () =>
-    HttpResponse.json({ code: 100000, message: "OK" })
-  ),
+  http.post("/api/auth/logout", () => HttpResponse.json({ code: 100000, message: "OK" })),
 ];
 ```
 
@@ -2192,10 +2300,10 @@ test("filters users by search term", async () => {
 // src/test/TestProviders.tsx
 export function TestProviders({ children }: { children: React.ReactNode }) {
   return (
-    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
-      <I18nextProvider i18n={testI18n}>
-        {children}
-      </I18nextProvider>
+    <QueryClientProvider
+      client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
+    >
+      <I18nextProvider i18n={testI18n}>{children}</I18nextProvider>
     </QueryClientProvider>
   );
 }
@@ -2208,13 +2316,21 @@ export function TestProviders({ children }: { children: React.ReactNode }) {
 import { userStoreSchema } from "./user";
 
 test("rejects invalid phone", () => {
-  const result = userStoreSchema.safeParse({ email: "a@b.com", role: "holder", phone_number: "08123" });
+  const result = userStoreSchema.safeParse({
+    email: "a@b.com",
+    role: "holder",
+    phone_number: "08123",
+  });
   expect(result.success).toBe(false);
   expect(result.error?.issues[0].path).toContain("phone_number");
 });
 
 test("accepts valid E164 phone", () => {
-  const result = userStoreSchema.safeParse({ email: "a@b.com", role: "holder", phone_number: "+6281234567890" });
+  const result = userStoreSchema.safeParse({
+    email: "a@b.com",
+    role: "holder",
+    phone_number: "+6281234567890",
+  });
   expect(result.success).toBe(true);
 });
 ```
@@ -2231,7 +2347,7 @@ export default defineConfig({
   },
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
-    { name: "mobile",   use: { ...devices["Pixel 5"] } },
+    { name: "mobile", use: { ...devices["Pixel 5"] } },
   ],
 });
 ```
@@ -2265,11 +2381,11 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      "@":        path.resolve(__dirname, "./src"),
-      "@app":     path.resolve(__dirname, "./src/app"),
+      "@": path.resolve(__dirname, "./src"),
+      "@app": path.resolve(__dirname, "./src/app"),
       "@feature": path.resolve(__dirname, "./src/feature"),
-      "@shared":  path.resolve(__dirname, "./src/shared"),
-      "@ui":      path.resolve(__dirname, "./src/shared/components/ui"),
+      "@shared": path.resolve(__dirname, "./src/shared"),
+      "@ui": path.resolve(__dirname, "./src/shared/components/ui"),
     },
   },
   build: {
@@ -2278,10 +2394,10 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          "react-vendor":   ["react", "react-dom", "react-router-dom"],
-          "query-vendor":   ["@tanstack/react-query", "axios"],
-          "form-vendor":    ["react-hook-form", "@hookform/resolvers", "zod"],
-          "ui-vendor":      ["lucide-react", "sonner", "clsx", "tailwind-merge"],
+          "react-vendor": ["react", "react-dom", "react-router-dom"],
+          "query-vendor": ["@tanstack/react-query", "axios"],
+          "form-vendor": ["react-hook-form", "@hookform/resolvers", "zod"],
+          "ui-vendor": ["lucide-react", "sonner", "clsx", "tailwind-merge"],
         },
       },
     },
@@ -2318,11 +2434,11 @@ import * as Icons from "lucide-react";
 
 ### 18.5 Bundle Budget
 
-| Chunk | Target |
-|---|---|
+| Chunk                        | Target      |
+| ---------------------------- | ----------- |
 | Initial (login + auth shell) | < 150 kB gz |
-| Per-route chunk | < 50 kB gz |
-| Total app | < 500 kB gz |
+| Per-route chunk              | < 50 kB gz  |
+| Total app                    | < 500 kB gz |
 
 Monitor via `npx vite-bundle-visualizer` or `rollup-plugin-visualizer`.
 
@@ -2339,17 +2455,17 @@ Monitor via `npx vite-bundle-visualizer` or `rollup-plugin-visualizer`.
 
 ### 19.1 Naming
 
-| Kind | Convention | Example |
-|---|---|---|
-| Component file | `PascalCase.tsx` | `UserList.tsx` |
-| Hook file | `camelCase.ts` starting with `use` | `useGoogleLogin.ts` |
-| Util file | `kebab-case.ts` | `format-date.ts` |
-| Type file | `kebab-case.ts` | `api-types.ts` |
-| Component | PascalCase named export | `export function UserList()` |
-| Hook | `useX` named export | `export function useUsers()` |
-| Type / interface | PascalCase | `interface UserDTO` |
-| Constant | `SCREAMING_SNAKE_CASE` | `const MAX_BATCH_SIZE = 100` |
-| Function | `camelCase` | `function formatHash()` |
+| Kind             | Convention                         | Example                      |
+| ---------------- | ---------------------------------- | ---------------------------- |
+| Component file   | `PascalCase.tsx`                   | `UserList.tsx`               |
+| Hook file        | `camelCase.ts` starting with `use` | `useGoogleLogin.ts`          |
+| Util file        | `kebab-case.ts`                    | `format-date.ts`             |
+| Type file        | `kebab-case.ts`                    | `api-types.ts`               |
+| Component        | PascalCase named export            | `export function UserList()` |
+| Hook             | `useX` named export                | `export function useUsers()` |
+| Type / interface | PascalCase                         | `interface UserDTO`          |
+| Constant         | `SCREAMING_SNAKE_CASE`             | `const MAX_BATCH_SIZE = 100` |
+| Function         | `camelCase`                        | `function formatHash()`      |
 
 ### 19.2 Exports
 
@@ -2475,33 +2591,33 @@ export default {
 
 ### 20.1 What Carries Over
 
-| From demo | To production |
-|---|---|
-| Color tokens (navy, gold, base, surface, error) | Same (extended in @theme) |
-| Component recipes (card, CTA, input, pill, eyebrow) | Reified as named components |
-| Layout shells (3 layouts) | Same shape, hardened with shadcn primitives |
-| Routing structure | Same paths, lazy-loaded, single role-utility |
-| Role hierarchy logic | Single source: `shared/auth/role.ts` |
-| Feature folders | Same |
-| `lucide-react` icons | Same |
-| Form structures (batch user create, batch credential issue) | Same UX, RHF + Zod-driven |
+| From demo                                                   | To production                                |
+| ----------------------------------------------------------- | -------------------------------------------- |
+| Color tokens (navy, gold, base, surface, error)             | Same (extended in @theme)                    |
+| Component recipes (card, CTA, input, pill, eyebrow)         | Reified as named components                  |
+| Layout shells (3 layouts)                                   | Same shape, hardened with shadcn primitives  |
+| Routing structure                                           | Same paths, lazy-loaded, single role-utility |
+| Role hierarchy logic                                        | Single source: `shared/auth/role.ts`         |
+| Feature folders                                             | Same                                         |
+| `lucide-react` icons                                        | Same                                         |
+| Form structures (batch user create, batch credential issue) | Same UX, RHF + Zod-driven                    |
 
 ### 20.2 What Gets Replaced
 
-| Demo | Production |
-|---|---|
-| Mock Zustand store with seed data | TanStack Query against real `/api` |
-| Hand-rolled `<select>` | shadcn `<Select>` |
-| `window.confirm` | shadcn `<AlertDialog>` + `useConfirm` |
-| Plain `useState` forms | RHF + Zod |
-| Demo account dropdown | Google OAuth button |
-| `password123` readonly input | Removed entirely |
-| Hardcoded `bg-[#F4F7F6]` | Token-based |
-| Duplicated `roleHierarchy` map | `shared/auth/role.ts` |
-| `App.css` (Vite scaffold) | Deleted |
-| Empty `shared/{api,component,hook,util}` folders | Populated per Section 4 |
-| Inline `clsx` everywhere | `cn()` helper (`shared/lib/cn.ts`) |
-| Raw `bg-blue-100 text-blue-800` role badge | Token-based via `<StatusPill tone="navy">` |
+| Demo                                             | Production                                 |
+| ------------------------------------------------ | ------------------------------------------ |
+| Mock Zustand store with seed data                | TanStack Query against real `/api`         |
+| Hand-rolled `<select>`                           | shadcn `<Select>`                          |
+| `window.confirm`                                 | shadcn `<AlertDialog>` + `useConfirm`      |
+| Plain `useState` forms                           | RHF + Zod                                  |
+| Demo account dropdown                            | Google OAuth button                        |
+| `password123` readonly input                     | Removed entirely                           |
+| Hardcoded `bg-[#F4F7F6]`                         | Token-based                                |
+| Duplicated `roleHierarchy` map                   | `shared/auth/role.ts`                      |
+| `App.css` (Vite scaffold)                        | Deleted                                    |
+| Empty `shared/{api,component,hook,util}` folders | Populated per Section 4                    |
+| Inline `clsx` everywhere                         | `cn()` helper (`shared/lib/cn.ts`)         |
+| Raw `bg-blue-100 text-blue-800` role badge       | Token-based via `<StatusPill tone="navy">` |
 
 ### 20.3 What Gets Deleted
 
@@ -2516,16 +2632,16 @@ export default {
 
 The demo's DTO doesn't match the real backend. Production must use:
 
-| Demo field | Backend field |
-|---|---|
-| `firstName`, `lastName` | `name` (single string) |
-| `phone` | `phone_number` (E.164 format) |
-| `walletAddress` | Backend manages, not exposed in create |
-| `status` | (not in backend response) |
-| (none) | `number` (employee/student ID) |
-| (none) | `birth_date` (YYYY-MM-DD) |
-| (none) | `meta` (arbitrary JSON object) |
-| (none) | `deleted_at` (soft delete) |
+| Demo field              | Backend field                          |
+| ----------------------- | -------------------------------------- |
+| `firstName`, `lastName` | `name` (single string)                 |
+| `phone`                 | `phone_number` (E.164 format)          |
+| `walletAddress`         | Backend manages, not exposed in create |
+| `status`                | (not in backend response)              |
+| (none)                  | `number` (employee/student ID)         |
+| (none)                  | `birth_date` (YYYY-MM-DD)              |
+| (none)                  | `meta` (arbitrary JSON object)         |
+| (none)                  | `deleted_at` (soft delete)             |
 
 Mirror `response.User` from `infrastructure/http/response/user.go` exactly:
 
@@ -2537,11 +2653,11 @@ export interface UserDTO {
   number: string | null;
   phone_number: string | null;
   email: string;
-  birth_date: string | null;  // YYYY-MM-DD
+  birth_date: string | null; // YYYY-MM-DD
   role: Role;
   meta: Record<string, unknown> | null;
-  wallet_address: string;     // 0x...
-  created_at: string;         // ISO 8601
+  wallet_address: string; // 0x...
+  created_at: string; // ISO 8601
   updated_at: string;
   deleted_at: string | null;
 }
@@ -2728,16 +2844,16 @@ For each violation, show the line and the correct fix.
 
 ### 22.1 Decided
 
-| Decision | Choice | Rationale |
-|---|---|---|
-| Doc location | `CredChain_React/DESIGN_SYSTEM.md` | Co-located with package; Go and Solidity repos can xref |
-| UI primitives | shadcn/ui + Radix UI | Owned in-repo, accessible by default, 2026 default for Tailwind |
-| Server state | TanStack Query + axios | Industry standard, handles caching/refetch/mutations |
-| Forms | React Hook Form + Zod | Best DX for batch/dynamic forms, Zod mirrors Ozzo |
-| Token storage | httpOnly cookies (backend-set) | XSS-immune, SameSite=Strict for CSRF |
-| i18n | i18next + react-i18next | Mature, ICU-style, matches backend go-i18n keys |
-| Demo migration | Hard - greenfield | Demo DTOs do not match real backend |
-| AI prompts | Section 21 | Component, feature, backend integration, audit prompts |
+| Decision       | Choice                             | Rationale                                                       |
+| -------------- | ---------------------------------- | --------------------------------------------------------------- |
+| Doc location   | `CredChain_React/DESIGN_SYSTEM.md` | Co-located with package; Go and Solidity repos can xref         |
+| UI primitives  | shadcn/ui + Radix UI               | Owned in-repo, accessible by default, 2026 default for Tailwind |
+| Server state   | TanStack Query + axios             | Industry standard, handles caching/refetch/mutations            |
+| Forms          | React Hook Form + Zod              | Best DX for batch/dynamic forms, Zod mirrors Ozzo               |
+| Token storage  | httpOnly cookies (backend-set)     | XSS-immune, SameSite=Strict for CSRF                            |
+| i18n           | i18next + react-i18next            | Mature, ICU-style, matches backend go-i18n keys                 |
+| Demo migration | Hard - greenfield                  | Demo DTOs do not match real backend                             |
+| AI prompts     | Section 21                         | Component, feature, backend integration, audit prompts          |
 
 ### 22.2 Open Questions for Backend
 
@@ -2785,12 +2901,12 @@ Keep `Last updated` at the top current. Reviewers should reject PRs that introdu
 
 #### Changelog
 
-| Version | Date | Changes |
-|---|---|---|
-| v1.0 | 2026-05-29 | Initial draft. Sections 1-22 + Appendix A. |
-| v1.1 | 2026-05-29 | Typography migrated from system-ui to Fraunces + DM Sans + JetBrains Mono. Added Section 6.5 Visual Language Principles. Added Section 8.9 Responsive Design (touch targets, safe areas, mobile keyboards, reduced motion, container queries, tablet, print, orientation, dark mode hooks). |
-| v1.2 | 2026-05-31 | Dark mode removed from spec to match codebase (light-only). |
-| v1.3 | 2026-06-09 | As-built reconciliation pass. Design philosophy (§5 tokens, §6 typography, §6.5 visual language, §8.9 responsive) preserved verbatim — those still describe the intended design faithfully. Architectural sections updated to match codebase: §3 tech versions synced and `ethers` row removed; §3 install list replaced with the 12 actual primitives; §4.1 folder structure rewritten as as-built (single `store/index.ts`, `feature/landing/`, `AdaptiveLayout` + `SplitLayout`, no `AuthLayout`/`interceptors.ts`/`useConfirm.ts`); §7.9 `useConfirm` rewritten to match the real `{confirm, dialog}` shape in `@ui/confirm-dialog`; §8.1 layout shells table updated; **§8.7 mobile drawer rewritten** (hand-rolled CSS-transform `<aside>`, never adopted shadcn `Sheet`; `vaul` reserved for content drawers); §9.2 store consolidated to single-file shape with `partialize` + Indonesian default; §10.1/§10.2 axios example updated with `paramsSerializer`, `Accept-Language`, `refreshInFlight` dedup, `X-Retry: 1`, and 429 handling; §11.1 token strategy moved from "backend coordination required" to "implemented" (Go side ships cookies). |
+| Version | Date       | Changes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| v1.0    | 2026-05-29 | Initial draft. Sections 1-22 + Appendix A.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| v1.1    | 2026-05-29 | Typography migrated from system-ui to Fraunces + DM Sans + JetBrains Mono. Added Section 6.5 Visual Language Principles. Added Section 8.9 Responsive Design (touch targets, safe areas, mobile keyboards, reduced motion, container queries, tablet, print, orientation, dark mode hooks).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| v1.2    | 2026-05-31 | Dark mode removed from spec to match codebase (light-only).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| v1.3    | 2026-06-09 | As-built reconciliation pass. Design philosophy (§5 tokens, §6 typography, §6.5 visual language, §8.9 responsive) preserved verbatim — those still describe the intended design faithfully. Architectural sections updated to match codebase: §3 tech versions synced and `ethers` row removed; §3 install list replaced with the 12 actual primitives; §4.1 folder structure rewritten as as-built (single `store/index.ts`, `feature/landing/`, `AdaptiveLayout` + `SplitLayout`, no `AuthLayout`/`interceptors.ts`/`useConfirm.ts`); §7.9 `useConfirm` rewritten to match the real `{confirm, dialog}` shape in `@ui/confirm-dialog`; §8.1 layout shells table updated; **§8.7 mobile drawer rewritten** (hand-rolled CSS-transform `<aside>`, never adopted shadcn `Sheet`; `vaul` reserved for content drawers); §9.2 store consolidated to single-file shape with `partialize` + Indonesian default; §10.1/§10.2 axios example updated with `paramsSerializer`, `Accept-Language`, `refreshInFlight` dedup, `X-Retry: 1`, and 429 handling; §11.1 token strategy moved from "backend coordination required" to "implemented" (Go side ships cookies). |
 
 ---
 
@@ -2840,4 +2956,4 @@ VERTICAL RHYTHM
 
 ---
 
-*End of design system specification.*
+_End of design system specification._
