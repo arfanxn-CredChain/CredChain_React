@@ -31,21 +31,21 @@ export function CredentialIssueRow({ index, form, holders, onRemove }: Credentia
   const type = form.watch(`credentials.${index}.type`);
 
   return (
-    <div className="flex flex-col gap-6 bg-gray-50/50 p-6 rounded-xl border border-gray-100 transition-all focus-within:border-gold/50 focus-within:bg-white relative">
+    <div className="flex flex-col gap-4 sm:gap-6 bg-gray-50/50 p-4 sm:p-6 rounded-xl border border-gray-100 transition-all focus-within:border-gold/50 focus-within:bg-white relative">
       {onRemove && (
         <Button
           type="button"
           variant="ghost"
           size="icon"
           onClick={onRemove}
-          className="absolute top-4 right-4 text-gray-400 hover:text-error hover:bg-error/10"
+          className="absolute top-3 right-3 sm:top-4 sm:right-4 h-8 w-8 sm:h-9 sm:w-9 text-gray-400 hover:text-error hover:bg-error/10"
           aria-label={`Remove row ${index + 1}`}
         >
           <Trash2 className="h-4 w-4" />
         </Button>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full pr-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 w-full pr-12">
         <Field label="Recipient (holder)" error={errors?.holder_id?.message}>
           <Select
             value={holderId}

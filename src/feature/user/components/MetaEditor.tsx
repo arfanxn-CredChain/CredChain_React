@@ -37,8 +37,8 @@ export function MetaEditor<T extends FieldValues>({
           const keyError = errors?.[idx]?.key?.message;
           const valueError = errors?.[idx]?.value?.message;
           return (
-            <div key={field.id} className="flex items-start gap-2">
-              <div className="flex-1">
+            <div key={field.id} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] items-start gap-2">
+              <div>
                 <Input
                   placeholder={t("meta.keyPlaceholder")}
                   aria-label={t("meta.keyAriaLabel", { n: idx + 1 })}
@@ -50,7 +50,7 @@ export function MetaEditor<T extends FieldValues>({
                   </p>
                 )}
               </div>
-              <div className="flex-1">
+              <div>
                 <Input
                   placeholder={t("meta.valuePlaceholder")}
                   aria-label={t("meta.valueAriaLabel", { n: idx + 1 })}

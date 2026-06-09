@@ -37,21 +37,21 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
   ];
 
   return (
-    <div className="flex flex-col gap-6 bg-gray-50/50 p-6 rounded-xl border border-gray-100 transition-all focus-within:border-gold/50 focus-within:bg-white relative">
+    <div className="flex flex-col gap-4 sm:gap-6 bg-gray-50/50 p-4 sm:p-6 rounded-xl border border-gray-100 transition-all focus-within:border-gold/50 focus-within:bg-white relative">
       {onRemove && (
         <Button
           type="button"
           variant="ghost"
           size="icon"
           onClick={onRemove}
-          className="absolute top-4 right-4 text-gray-400 hover:text-error hover:bg-error/10"
+          className="absolute top-3 right-3 sm:top-4 sm:right-4 h-8 w-8 sm:h-9 sm:w-9 text-gray-400 hover:text-error hover:bg-error/10"
           aria-label={t("userCreate.removeAriaLabel", { n: index + 1 })}
         >
           <Trash2 className="h-4 w-4" />
         </Button>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full pr-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 w-full pr-12">
         <FormField
           label={t("user.edit.fullName")}
           error={errors?.name?.message}
@@ -178,7 +178,7 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
         </FormField>
       </div>
 
-      <details className="mt-4">
+      <details className="mt-2 sm:mt-4">
         <summary className="cursor-pointer text-sm font-medium text-gray-500 hover:text-navy py-2 list-none">
           + {t("userCreate.customFields.toggle")}
         </summary>

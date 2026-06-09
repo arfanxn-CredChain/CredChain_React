@@ -54,7 +54,7 @@ export function CredentialDetail() {
         </Card>
       ) : (
         <>
-          <Card className="p-6 sm:p-8 flex items-start justify-between gap-4">
+          <Card className="p-6 sm:p-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <EyebrowLabel>Status</EyebrowLabel>
               <CredentialStatusBadge revoked={cred.revoked} />

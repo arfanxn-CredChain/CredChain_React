@@ -18,9 +18,9 @@ export function PageHeader({ title, description, action, onBack }: PageHeaderPro
             size="icon"
             onClick={onBack}
             aria-label="Go back"
-            className="text-gray-400 hover:text-navy hover:bg-white rounded-full"
+            className="h-8 w-8 shrink-0 sm:h-10 sm:w-10 text-gray-400 hover:text-navy hover:bg-white rounded-full"
           >
-            <ArrowLeft className="w-6 h-6" />
+            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           </Button>
         )}
         <div>

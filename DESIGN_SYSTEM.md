@@ -455,31 +455,38 @@ interface PageHeaderProps {
   title: string;
   description?: string;
   action?: React.ReactNode;
-  back?: () => void;
+  onBack?: () => void;
 }
 
-export function PageHeader({ title, description, action, back }: PageHeaderProps) {
+export function PageHeader({ title, description, action, onBack }: PageHeaderProps) {
   return (
     <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
       <div className="flex items-center gap-4">
-        {back && (
-          <button
-            onClick={back}
-            className="rounded-full p-2 text-gray-400 transition-colors hover:bg-white hover:text-navy"
+        {onBack && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onBack}
+            aria-label="Go back"
+            className="h-8 w-8 shrink-0 sm:h-10 sm:w-10 text-gray-400 hover:text-navy hover:bg-white rounded-full"
           >
-            <ArrowLeft className="h-6 w-6" />
-          </button>
+            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+          </Button>
         )}
         <div>
-          <h2 className="font-display text-2xl font-bold tracking-tight text-navy">{title}</h2>
+          <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-navy">
+            {title}
+          </h2>
           {description && <p className="mt-1 text-sm text-gray-500">{description}</p>}
         </div>
       </div>
-      {action && <div>{action}</div>}
+      {action && <div className="w-full sm:w-auto">{action}</div>}
     </div>
   );
 }
 ```
+
+**Responsive icon-button rule.** Shared headers that host icon-only controls (back, close, overflow) scale their hit-area with the viewport: `h-8 w-8` on mobile, `h-10 w-10` at `sm+`, with the inner icon stepping `w-4 → w-5`. This keeps touch targets proportional to the surrounding type ramp on phones and tablets, instead of dominating the header at fixed `h-10 w-10`. Apply the same pattern to other shared icon buttons placed alongside title text.
 
 ### 6.3 Eyebrow Label Component
 
