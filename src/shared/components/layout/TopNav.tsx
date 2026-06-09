@@ -139,7 +139,7 @@ export function TopNav({ onMenuClick }: TopNavProps) {
                     <UserAvatar
                       user={user}
                       size="md"
-                      className="ring-2 ring-surface ring-offset-2 ring-offset-navy sm:ring-gray-200 sm:ring-offset-base"
+                      className="ring-2 ring-surface sm:ring-gray-200"
                     />
                   )}
                 </button>
