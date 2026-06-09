@@ -1,4 +1,5 @@
 import type { UseFormReturn } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { Calendar, FileText, Hash, Link as LinkIcon, Trash2, Type } from "lucide-react";
 import type { UserDTO } from "@shared/types/api";
 import { Button } from "@ui/button";
@@ -149,6 +150,7 @@ interface FieldProps {
 }
 
 function Field({ label, hint, error, optional, children }: FieldProps) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-1">
       <Label>
@@ -158,7 +160,7 @@ function Field({ label, hint, error, optional, children }: FieldProps) {
       {children}
       {error ? (
         <p className={cn("text-xs text-error mt-1")} role="alert">
-          {error}
+          {t(error)}
         </p>
       ) : hint ? (
         <p className="text-xs text-gray-400 mt-1">{hint}</p>

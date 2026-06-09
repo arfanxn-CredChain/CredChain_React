@@ -1,12 +1,11 @@
 import { Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
-import { AuthLayout } from "@shared/components/layout/AuthLayout";
 import { PublicLayout } from "@shared/components/layout/PublicLayout";
 import { DashboardLayout } from "@shared/components/layout/DashboardLayout";
+import { AdaptiveLayout } from "@shared/components/layout/AdaptiveLayout";
 import { ProtectedRoute, PublicRoute } from "@shared/auth/guards";
 import { Role } from "@shared/auth/role";
 import { Login } from "@feature/auth/Login";
-import { RootRedirect } from "@shared/components/RootRedirect";
 import { NotFound } from "@shared/components/NotFound";
 import { RouteErrorBoundary } from "@shared/components/RouteErrorBoundary";
 import { LoadingSpinner } from "@shared/components/LoadingSpinner";
@@ -42,9 +41,13 @@ function lazyRoute<T extends Record<string, React.ComponentType>>(
 }
 
 export const router = createBrowserRouter([
-  { path: "/", element: <RootRedirect /> },
+  // Landing — self-wraps in SplitLayout
+  {
+    path: "/",
+    ...lazyRoute(() => import("@feature/landing/Landing"), "Landing"),
+  },
 
-  // Public routes (no auth)
+  // Public routes (no auth required) — uses PublicLayout chrome
   {
     element: <PublicLayout />,
     children: [
@@ -52,26 +55,22 @@ export const router = createBrowserRouter([
         path: "/credentials/verify/:credentialId",
         ...lazyRoute(() => import("@feature/credential/VerifyCredential"), "VerifyCredential"),
       },
-      {
-        path: "/help",
-        ...lazyRoute(() => import("@feature/help/Help"), "Help"),
-      },
-      {
-        path: "/about",
-        ...lazyRoute(() => import("@feature/about/About"), "About"),
-      },
     ],
   },
 
-  // Auth routes (redirect if already logged in)
+  // Adaptive routes — DashboardLayout when authenticated, PublicLayout otherwise
+  {
+    element: <AdaptiveLayout />,
+    children: [
+      { path: "/help", ...lazyRoute(() => import("@feature/help/Help"), "Help") },
+      { path: "/about", ...lazyRoute(() => import("@feature/about/About"), "About") },
+    ],
+  },
+
+  // Auth routes (redirect if already logged in) — Login self-wraps in SplitLayout
   {
     element: <PublicRoute />,
-    children: [
-      {
-        element: <AuthLayout />,
-        children: [{ path: "/login", element: <Login /> }],
-      },
-    ],
+    children: [{ path: "/login", element: <Login /> }],
   },
 
   // Protected routes

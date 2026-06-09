@@ -17,9 +17,9 @@ describe("Help", () => {
   it("renders all four FAQ group headings", () => {
     render(<Help />, { wrapper: TestProviders });
     expect(screen.getByText(/getting started/i)).toBeInTheDocument();
-    expect(screen.getByText(/credentials/i)).toBeInTheDocument();
-    expect(screen.getByText(/account/i)).toBeInTheDocument();
-    expect(screen.getByText(/privacy/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/credentials/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/account & roles/i)).toBeInTheDocument();
+    expect(screen.getByText(/privacy & security/i)).toBeInTheDocument();
   });
 
   it("FAQ items are collapsed by default", () => {

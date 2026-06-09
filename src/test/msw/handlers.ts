@@ -107,6 +107,10 @@ export const handlers = [
     envelope(300600, "Super admin role transferred successfully.", null),
   ),
 
+  http.delete("*/api/users/batch", () =>
+    envelope(300400, "User(s) deleted successfully.", { deleted_count: 1 }),
+  ),
+
   http.get("*/api/credentials", () =>
     envelope(100300, "OK", {
       items: mockCredentials,

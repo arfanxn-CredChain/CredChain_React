@@ -18,8 +18,46 @@ describe("useUserListParams", () => {
       sort: "created_at",
       order: "desc",
       deleted: "all",
-      limit: 25,
+      role: "all",
+      limit: 10,
     });
+  });
+
+  it("parses role from URL", () => {
+    const { result } = renderHook(() => useUserListParams(), {
+      wrapper: wrap(["/users?role=admin"]),
+    });
+    expect(result.current.params.role).toBe("admin");
+  });
+
+  it("invalid role defaults to all", () => {
+    const { result } = renderHook(() => useUserListParams(), {
+      wrapper: wrap(["/users?role=bogus"]),
+    });
+    expect(result.current.params.role).toBe("all");
+  });
+
+  it("changing role resets page to 1", () => {
+    const { result } = renderHook(() => useUserListParams(), {
+      wrapper: wrap(["/users?page=4"]),
+    });
+    act(() => result.current.setParam("role", "admin"));
+    expect(result.current.params.page).toBe(1);
+    expect(result.current.params.role).toBe("admin");
+  });
+
+  it("parses limit 20 from URL", () => {
+    const { result } = renderHook(() => useUserListParams(), {
+      wrapper: wrap(["/users?limit=20"]),
+    });
+    expect(result.current.params.limit).toBe(20);
+  });
+
+  it("disallowed limit value falls back to default", () => {
+    const { result } = renderHook(() => useUserListParams(), {
+      wrapper: wrap(["/users?limit=25"]),
+    });
+    expect(result.current.params.limit).toBe(10);
   });
 
   it("parses page from URL", () => {

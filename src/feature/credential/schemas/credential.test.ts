@@ -131,3 +131,58 @@ describe("credentialVerifySchema", () => {
     expect(result.success).toBe(false);
   });
 });
+
+describe("credentialIssueRowSchema empty-string handling", () => {
+  const validRow = {
+    holder_id: "usr_1",
+    type: "AcademicDegree",
+    title: "BSc",
+    uri: "ipfs://QmTest",
+  };
+
+  describe("description", () => {
+    it("treats empty string as undefined", () => {
+      const result = credentialIssueRowSchema.safeParse({ ...validRow, description: "" });
+      expect(result.success).toBe(true);
+      if (result.success) expect(result.data.description).toBeUndefined();
+    });
+
+    it("preserves real value", () => {
+      const result = credentialIssueRowSchema.safeParse({
+        ...validRow,
+        description: "Awarded",
+      });
+      expect(result.success).toBe(true);
+      if (result.success) expect(result.data.description).toBe("Awarded");
+    });
+  });
+
+  describe("valid_until", () => {
+    it("treats empty string as null (no expiry)", () => {
+      const result = credentialIssueRowSchema.safeParse({ ...validRow, valid_until: "" });
+      expect(result.success).toBe(true);
+      if (result.success) expect(result.data.valid_until).toBeNull();
+    });
+
+    it("rejects malformed date (non-empty) with i18n key", () => {
+      const result = credentialIssueRowSchema.safeParse({
+        ...validRow,
+        valid_until: "31/12/2030",
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.issues[0].message).toBe("zod.user.dateFormat");
+      }
+    });
+  });
+});
+
+describe("credentialBatchRevokeSchema inner id validation", () => {
+  it("rejects empty inner id with i18n key", () => {
+    const result = credentialBatchRevokeSchema.safeParse({ ids: [""] });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe("zod.credential.idRequired");
+    }
+  });
+});

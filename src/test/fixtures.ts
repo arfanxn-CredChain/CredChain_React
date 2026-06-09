@@ -45,6 +45,13 @@ export const mockUsers: UserDTO[] = [
   makeUser({ id: "usr_2", email: "admin@credchain.demo", role: Role.ADMIN, name: "Platform Admin" }),
   makeUser({ id: "usr_3", email: "issuer@credchain.demo", role: Role.ISSUER, name: "Default Issuer" }),
   makeUser({ id: "usr_4", email: "holder@credchain.demo", role: Role.HOLDER, name: "Jane Doe" }),
+  makeUser({
+    id: "usr_5",
+    email: "trashed@credchain.demo",
+    role: Role.HOLDER,
+    name: "Trashed User",
+    deleted_at: "2026-02-15T00:00:00Z",
+  }),
 ];
 
 export const mockCredentials: CredentialDTO[] = [

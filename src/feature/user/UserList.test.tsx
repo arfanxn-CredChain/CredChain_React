@@ -73,7 +73,7 @@ describe("UserList", () => {
     renderUserList();
 
     await waitFor(() => {
-      expect(screen.getByText(/4 users/i)).toBeInTheDocument();
+      expect(screen.getByText(/5 users/i)).toBeInTheDocument();
     });
   });
 
@@ -137,20 +137,20 @@ describe("UserList", () => {
     });
   });
 
-  it("renders Edit menu item as disabled for deleted users", async () => {
+  it("renders Edit menu item enabled for deleted users (opens Restore dialog)", async () => {
     const user = userEvent.setup();
     renderUserList();
 
     await waitFor(() => {
-      expect(screen.getByText("Platform Admin")).toBeInTheDocument();
+      expect(screen.getByText("Trashed User")).toBeInTheDocument();
     });
 
     const menuButtons = screen.getAllByRole("button", { name: /actions/i });
-    expect(menuButtons.length).toBeGreaterThan(0);
-
-    await user.click(menuButtons[0]);
+    // Trashed user is the 5th row (index 4)
+    await user.click(menuButtons[4]);
     const editItem = await screen.findByRole("menuitem", { name: /edit/i });
     expect(editItem).toBeInTheDocument();
+    expect(editItem).not.toHaveAttribute("data-disabled");
   });
 
   it("shows actions dropdown menu for each row", async () => {
@@ -213,8 +213,74 @@ describe("UserList", () => {
     expect(screen.queryByText(/Transfer Super Admin/i)).not.toBeInTheDocument();
   });
 
-  it("renders gender column header", async () => {
+  it("renders gender inline in the User cell, not as a separate column", async () => {
     renderUserList();
-    await waitFor(() => expect(screen.getByText(/Gender/i)).toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole("columnheader", { name: /gender/i })).not.toBeInTheDocument());
+  });
+
+  it("does not render a Phone column header", async () => {
+    renderUserList();
+    await waitFor(() => expect(screen.getByText("Jane Doe")).toBeInTheDocument());
+    expect(screen.queryByRole("columnheader", { name: /^phone$/i })).not.toBeInTheDocument();
+  });
+
+  it("renders copy buttons for email in each row", async () => {
+    renderUserList();
+    await waitFor(() => expect(screen.getByText("Jane Doe")).toBeInTheDocument());
+    expect(screen.getAllByRole("button", { name: /copy email/i }).length).toBeGreaterThan(0);
+  });
+
+  it("renders copy button for phone when phone exists", async () => {
+    renderUserList();
+    await waitFor(() => expect(screen.getByText("Jane Doe")).toBeInTheDocument());
+    expect(screen.getAllByRole("button", { name: /copy phone/i }).length).toBeGreaterThan(0);
+  });
+
+  it("selecting a role filter updates the URL with role param", async () => {
+    const user = userEvent.setup();
+    renderUserList();
+    await screen.findByText("User Directory");
+
+    await user.click(screen.getByRole("button", { name: /^role$/i }));
+    const adminItem = await screen.findByRole("menuitem", { name: /^admin$/i });
+    await user.click(adminItem);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("location-search").textContent).toContain("role=admin");
+    });
+  });
+
+  it("shows Delete option for a live user", async () => {
+    const user = userEvent.setup();
+    renderUserList();
+    await waitFor(() => expect(screen.getByText("Default Issuer")).toBeInTheDocument());
+
+    const menuButtons = screen.getAllByRole("button", { name: /actions/i });
+    await user.click(menuButtons[2]);
+
+    expect(await screen.findByRole("menuitem", { name: /delete/i })).toBeInTheDocument();
+  });
+
+  it("shows Restore option for a deleted user", async () => {
+    const user = userEvent.setup();
+    renderUserList();
+    await waitFor(() => expect(screen.getByText("Trashed User")).toBeInTheDocument());
+
+    const menuButtons = screen.getAllByRole("button", { name: /actions/i });
+    await user.click(menuButtons[4]);
+
+    expect(await screen.findByRole("menuitem", { name: /restore/i })).toBeInTheDocument();
+  });
+
+  it("clicking Delete opens a confirm dialog", async () => {
+    const user = userEvent.setup();
+    renderUserList();
+    await waitFor(() => expect(screen.getByText("Default Issuer")).toBeInTheDocument());
+
+    const menuButtons = screen.getAllByRole("button", { name: /actions/i });
+    await user.click(menuButtons[2]);
+    await user.click(await screen.findByRole("menuitem", { name: /delete/i }));
+
+    expect(await screen.findByRole("alertdialog")).toBeInTheDocument();
   });
 });

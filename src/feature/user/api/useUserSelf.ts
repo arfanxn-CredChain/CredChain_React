@@ -3,7 +3,7 @@ import { api } from "@shared/api/client";
 import type { UserDTO } from "@shared/types/api";
 import { userKeys } from "./keys";
 
-export function useUserSelf() {
+export function useUserSelf(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: userKeys.self(),
     queryFn: async () => {
@@ -12,5 +12,6 @@ export function useUserSelf() {
     },
     retry: false,
     staleTime: 1000 * 60 * 5,
+    enabled: options?.enabled ?? true,
   });
 }

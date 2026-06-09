@@ -5,6 +5,17 @@ import { useStore } from "@app/store";
 import { configureAuthHandler, configureLocaleResolver } from "@shared/api/client";
 import { FullPageSpinner } from "@shared/components/LoadingSpinner";
 import { isApiError } from "@shared/api/envelope";
+import { router } from "@app/router";
+
+// Routes accessible without auth — visiting them should NOT trigger a redirect
+// when the session probe (GET /users/self) returns 401.
+const PUBLIC_PATHS = ["/", "/login", "/help", "/about"];
+
+function isPublicPath(pathname: string): boolean {
+  if (PUBLIC_PATHS.includes(pathname)) return true;
+  if (pathname.startsWith("/credentials/verify/")) return true;
+  return false;
+}
 
 export function SessionHydrator({ children }: { children: React.ReactNode }) {
   const setUser = useStore((s) => s.setUser);
@@ -17,7 +28,12 @@ export function SessionHydrator({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     configureAuthHandler(() => {
       clearUser();
-      window.location.href = "/login";
+      // Don't navigate if already on a public route — the page should just
+      // render without auth. Prevents the refresh loop on landing/login.
+      const currentPath = window.location.pathname;
+      if (isPublicPath(currentPath)) return;
+      // Use the router instead of window.location to avoid a full page reload.
+      void router.navigate("/login", { replace: true });
     });
     configureLocaleResolver(() => locale);
   }, [clearUser, locale]);
@@ -29,7 +45,7 @@ export function SessionHydrator({ children }: { children: React.ReactNode }) {
     }
   }, [locale, i18n]);
 
-  const { data, isLoading, isError, error } = useUserSelf();
+  const { data, isLoading, isError, error } = useUserSelf({ enabled: isAuthenticated });
 
   useEffect(() => {
     if (data) setUser(data);
@@ -38,7 +54,9 @@ export function SessionHydrator({ children }: { children: React.ReactNode }) {
     }
   }, [data, isError, error, setUser, clearUser]);
 
-  if (isLoading && !isAuthenticated) {
+  // Only gate rendering on the probe if we have a persisted session.
+  // First-time visitors (isAuthenticated=false) go straight through — no spinner.
+  if (isAuthenticated && isLoading) {
     return <FullPageSpinner />;
   }
 

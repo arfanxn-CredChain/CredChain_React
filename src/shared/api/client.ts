@@ -14,6 +14,10 @@ export const api = axios.create({
   withCredentials: true,
   headers: { "Content-Type": "application/json" },
   timeout: 30_000,
+  // Gin binds repeated query params (?filters=a&filters=b) to []string.
+  // axios default emits ?filters[]=a&filters[]=b which Gin ignores. Force
+  // the un-bracketed form for compatibility across the API surface.
+  paramsSerializer: { indexes: null },
 });
 
 let onUnauthenticated: (() => void) | null = null;

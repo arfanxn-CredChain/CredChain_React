@@ -1,5 +1,6 @@
 import { Plus, X } from "lucide-react";
 import { useFieldArray, type Control, type FieldValues } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { Button } from "@ui/button";
 import { Input } from "@ui/input";
 import { Label } from "@ui/label";
@@ -13,6 +14,7 @@ export function MetaEditor<T extends FieldValues>({
   control,
   name = "meta_entries",
 }: MetaEditorProps<T>) {
+  const { t } = useTranslation();
   const { fields, append, remove } = useFieldArray({
     control,
     name: name as never,
@@ -24,11 +26,11 @@ export function MetaEditor<T extends FieldValues>({
 
   return (
     <div className="space-y-3">
-      <Label>Meta (custom fields)</Label>
+      <Label>{t("meta.label")}</Label>
       <div className="space-y-2">
         {fields.length === 0 && (
           <p className="text-xs text-gray-400 italic">
-            No custom fields. Click Add field to get started.
+            {t("meta.empty")}
           </p>
         )}
         {fields.map((field, idx) => {
@@ -38,25 +40,25 @@ export function MetaEditor<T extends FieldValues>({
             <div key={field.id} className="flex items-start gap-2">
               <div className="flex-1">
                 <Input
-                  placeholder="Key"
-                  aria-label={`Meta key ${idx + 1}`}
+                  placeholder={t("meta.keyPlaceholder")}
+                  aria-label={t("meta.keyAriaLabel", { n: idx + 1 })}
                   {...control.register(`${name}.${idx}.key` as never)}
                 />
                 {keyError && (
                   <p className="text-xs text-error mt-1" role="alert">
-                    {keyError}
+                    {t(keyError)}
                   </p>
                 )}
               </div>
               <div className="flex-1">
                 <Input
-                  placeholder="Value"
-                  aria-label={`Meta value ${idx + 1}`}
+                  placeholder={t("meta.valuePlaceholder")}
+                  aria-label={t("meta.valueAriaLabel", { n: idx + 1 })}
                   {...control.register(`${name}.${idx}.value` as never)}
                 />
                 {valueError && (
                   <p className="text-xs text-error mt-1" role="alert">
-                    {valueError}
+                    {t(valueError)}
                   </p>
                 )}
               </div>
@@ -65,7 +67,7 @@ export function MetaEditor<T extends FieldValues>({
                 variant="ghost"
                 size="icon"
                 onClick={() => remove(idx)}
-                aria-label={`Remove field ${idx + 1}`}
+                aria-label={t("meta.removeAriaLabel", { n: idx + 1 })}
                 className="h-10 w-10 mt-0.5"
               >
                 <X className="h-4 w-4" />
@@ -80,7 +82,7 @@ export function MetaEditor<T extends FieldValues>({
           className="w-full"
         >
           <Plus className="h-4 w-4 mr-2" />
-          Add field
+          {t("meta.addField")}
         </Button>
       </div>
     </div>

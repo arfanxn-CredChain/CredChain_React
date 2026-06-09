@@ -1,9 +1,21 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { Plus, Search, Filter, Pencil, UserCircle, MoreVertical } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Filter,
+  Pencil,
+  UserCircle,
+  MoreVertical,
+  ArrowRightLeft,
+  Trash2,
+  RotateCcw,
+} from "lucide-react";
 import { useUsers } from "./api/useUsers";
 import { useTransferSuperAdmin } from "./api/useTransferSuperAdmin";
+import { useDeleteUsers } from "./api/useDeleteUsers";
+import { useRestoreUsers } from "./api/useRestoreUsers";
 import { useStore } from "@app/store";
 import { Role, canAccessAny } from "@shared/auth/role";
 import { useDebouncedValue } from "@shared/hooks/useDebouncedValue";
@@ -45,6 +57,8 @@ import {
 import { UserRoleBadge } from "./components/UserRoleBadge";
 import { UserStatusBadge } from "./components/UserStatusBadge";
 import { SortMenu } from "./components/SortMenu";
+import { RoleFilterMenu } from "./components/RoleFilterMenu";
+import { CopyInlineButton } from "./components/CopyInlineButton";
 import { UserEditDrawer } from "./components/UserEditDrawer";
 import { truncateAddress } from "@shared/lib/format";
 
@@ -54,6 +68,8 @@ export function UserList() {
   const debouncedSearch = useDebouncedValue(params.search, 300);
   const [editingUser, setEditingUser] = useState<UserDTO | null>(null);
   const transfer = useTransferSuperAdmin();
+  const deleteUsers = useDeleteUsers();
+  const restoreUsers = useRestoreUsers();
   const { confirm, dialog } = useConfirm();
 
   const currentUser = useStore((s) => s.user);
@@ -62,6 +78,7 @@ export function UserList() {
   const { data, isLoading, isError } = useUsers({
     ...params,
     search: debouncedSearch || undefined,
+    role: params.role === "all" ? undefined : params.role,
   });
 
   const users = data?.items ?? [];
@@ -87,49 +104,72 @@ export function UserList() {
       />
 
       <Card className="p-0">
-        <div className="p-4 sm:p-6 border-b border-gray-50 flex justify-between items-center gap-4">
-          <div className="relative w-full max-w-md">
-            <Input
-              type="search"
-              inputMode="search"
-              enterKeyHint="search"
-              leadingIcon={Search}
-              placeholder={t("user.list.searchPlaceholder")}
-              value={params.search}
-              onChange={(e) => setParam("search", e.target.value)}
-              aria-label={t("user.list.searchPlaceholder")}
-            />
+        <div className="p-4 sm:p-6 border-b border-gray-50">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
+            <div className="w-full md:max-w-md md:flex-1">
+              <Input
+                type="search"
+                inputMode="search"
+                enterKeyHint="search"
+                leadingIcon={Search}
+                placeholder={t("user.list.searchPlaceholder")}
+                value={params.search}
+                onChange={(e) => setParam("search", e.target.value)}
+                aria-label={t("user.list.searchPlaceholder")}
+              />
+            </div>
+            <div className="flex flex-wrap items-center gap-2 md:ml-auto md:shrink-0">
+              <SortMenu
+                sort={params.sort}
+                order={params.order}
+                onChange={(s, o) => setMany({ sort: s, order: o })}
+              />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Filter className="h-4 w-4 mr-2" /> {t("user.filter.label")}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => setParam("deleted", "all")}>
+                    {t("user.filter.all")} {params.deleted === "all" && "✓"}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setParam("deleted", "none")}>
+                    {t("user.filter.live")} {params.deleted === "none" && "✓"}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setParam("deleted", "only")}>
+                    {t("user.filter.deleted")} {params.deleted === "only" && "✓"}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <RoleFilterMenu
+                value={params.role}
+                onChange={(r) => setParam("role", r)}
+              />
+              <Select
+                value={String(params.limit)}
+                onValueChange={(v) => setParam("limit", parseInt(v, 10))}
+              >
+                <SelectTrigger
+                  className="w-[88px] py-2 h-9"
+                  aria-label={t("user.list.limitLabel")}
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <SortMenu
-              sort={params.sort}
-              order={params.order}
-              onChange={(s, o) => setMany({ sort: s, order: o })}
-            />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Filter className="h-4 w-4 mr-2" /> {t("user.filter.label")}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setParam("deleted", "all")}>
-                  {t("user.filter.all")} {params.deleted === "all" && "✓"}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setParam("deleted", "none")}>
-                  {t("user.filter.live")} {params.deleted === "none" && "✓"}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setParam("deleted", "only")}>
-                  {t("user.filter.deleted")} {params.deleted === "only" && "✓"}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            {!isLoading && (
-              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">
-                {t("user.list.count", { count: total })}
-              </span>
-            )}
-          </div>
+          {!isLoading && (
+            <div className="mt-3 text-xs font-bold text-gray-400 uppercase tracking-wider">
+              {t("user.list.count", { count: total })}
+            </div>
+          )}
         </div>
 
         {isError ? (
@@ -154,8 +194,6 @@ export function UserList() {
                 <TableRow>
                   <TableHead>{t("user.column.entity")}</TableHead>
                   <TableHead>{t("user.column.role")}</TableHead>
-                  <TableHead>{t("user.column.gender")}</TableHead>
-                  <TableHead>{t("user.column.phone")}</TableHead>
                   <TableHead>{t("user.column.walletStatus")}</TableHead>
                   <TableHead className="relative">
                     <span className="sr-only">{t("user.column.actions")}</span>
@@ -172,17 +210,12 @@ export function UserList() {
                             <div className="space-y-2">
                               <Skeleton className="h-4 w-32" />
                               <Skeleton className="h-3 w-40" />
+                              <Skeleton className="h-3 w-16" />
                             </div>
                           </div>
                         </TableCell>
                         <TableCell>
                           <Skeleton className="h-5 w-20" />
-                        </TableCell>
-                        <TableCell>
-                          <Skeleton className="h-4 w-16" />
-                        </TableCell>
-                        <TableCell>
-                          <Skeleton className="h-4 w-28" />
                         </TableCell>
                         <TableCell>
                           <Skeleton className="h-4 w-32" />
@@ -197,7 +230,7 @@ export function UserList() {
                         <TableCell>
                           <div className="flex items-center">
                              <UserAvatar user={user} size="md" className="flex-shrink-0" />
-                             <div className="ml-4">
+                             <div className="ml-4 min-w-0">
                               <div
                                 className={cn(
                                   "text-sm font-bold text-navy max-w-[14rem] truncate",
@@ -207,30 +240,36 @@ export function UserList() {
                               >
                                 {user.name ?? t("user.edit.unnamed")}
                               </div>
-                              <div className="text-xs text-gray-500 font-medium mt-0.5">
-                                {user.email}
+                              <div className="flex items-center gap-1 min-w-0 mt-0.5">
+                                <span className="text-xs text-gray-500 font-medium truncate max-w-[12rem]">
+                                  {user.email}
+                                </span>
+                                <CopyInlineButton
+                                  value={user.email}
+                                  ariaLabel={t("user.copy.email")}
+                                />
                               </div>
+                              {user.phone_number && (
+                                <div className="flex items-center gap-1 min-w-0 mt-0.5">
+                                  <span className="text-xs text-gray-400 truncate max-w-[12rem]">
+                                    {user.phone_number}
+                                  </span>
+                                  <CopyInlineButton
+                                    value={user.phone_number}
+                                    ariaLabel={t("user.copy.phone")}
+                                  />
+                                </div>
+                              )}
+                              {user.gender && (
+                                <div className="mt-1 inline-flex items-center text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                                  {t(`user.field.gender.${user.gender}`)}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </TableCell>
                         <TableCell>
                           <UserRoleBadge role={user.role} />
-                        </TableCell>
-                        <TableCell>
-                          {user.gender ? (
-                            <span className="text-sm font-medium text-navy">
-                              {t(`user.field.gender.${user.gender}`)}
-                            </span>
-                          ) : (
-                            <span className="text-sm text-gray-400 italic">{t("common.notSet")}</span>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {user.phone_number ? (
-                            <span className="text-sm font-medium text-navy">{user.phone_number}</span>
-                          ) : (
-                            <span className="text-sm text-gray-400 italic">{t("common.notSet")}</span>
-                          )}
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center text-xs font-mono text-gray-500 mb-1">
@@ -253,8 +292,23 @@ export function UserList() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem
-                                onClick={() => setEditingUser(user)}
-                                disabled={!!user.deleted_at}
+                                onClick={() => {
+                                  if (user.deleted_at) {
+                                    void (async () => {
+                                      const ok = await confirm({
+                                        title: t("user.edit.trashed.title"),
+                                        description: t("user.edit.trashed.body", {
+                                          name: user.name ?? user.email,
+                                        }),
+                                        confirmLabel: t("user.edit.trashed.action"),
+                                        cancelLabel: t("common.cancel"),
+                                      });
+                                      if (ok) restoreUsers.mutate([user.id]);
+                                    })();
+                                  } else {
+                                    setEditingUser(user);
+                                  }
+                                }}
                               >
                                 <Pencil className="h-4 w-4 mr-2" />
                                 {t("common.edit")}
@@ -281,9 +335,52 @@ export function UserList() {
                                       })();
                                     }}
                                   >
+                                    <ArrowRightLeft className="h-4 w-4 mr-2" />
                                     {t("user.transfer.menuLabel")}
                                   </DropdownMenuItem>
                                 )}
+                              {!user.deleted_at && currentUser?.id !== user.id && (
+                                <DropdownMenuItem
+                                  destructive
+                                  onClick={() => {
+                                    void (async () => {
+                                      const ok = await confirm({
+                                        title: t("user.delete.confirm.title", {
+                                          name: user.name ?? user.email,
+                                        }),
+                                        description: t("user.delete.confirm.body"),
+                                        confirmLabel: t("user.delete.confirm.action"),
+                                        cancelLabel: t("common.cancel"),
+                                        tone: "destructive",
+                                      });
+                                      if (ok) deleteUsers.mutate([user.id]);
+                                    })();
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  {t("user.actions.delete")}
+                                </DropdownMenuItem>
+                              )}
+                              {user.deleted_at && (
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    void (async () => {
+                                      const ok = await confirm({
+                                        title: t("user.restore.confirm.title", {
+                                          name: user.name ?? user.email,
+                                        }),
+                                        description: t("user.restore.confirm.body"),
+                                        confirmLabel: t("user.restore.confirm.action"),
+                                        cancelLabel: t("common.cancel"),
+                                      });
+                                      if (ok) restoreUsers.mutate([user.id]);
+                                    })();
+                                  }}
+                                >
+                                  <RotateCcw className="h-4 w-4 mr-2" />
+                                  {t("user.actions.restore")}
+                                </DropdownMenuItem>
+                              )}
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
@@ -292,9 +389,9 @@ export function UserList() {
               </TableBody>
             </Table>
 
-            {totalPages > 1 && (
-              <div className="flex items-center justify-between p-4 sm:p-6 border-t border-gray-50">
-                <span className="text-sm text-gray-500">
+            {total > 0 && !isLoading && (
+              <div className="flex flex-col gap-3 p-4 sm:p-6 border-t border-gray-50 sm:flex-row sm:items-center sm:justify-between">
+                <span className="text-xs text-gray-500 sm:text-sm">
                   {t("user.pagination.showing", {
                     from: Math.min((params.page - 1) * params.limit + 1, total),
                     to: Math.min(params.page * params.limit, total),
@@ -302,42 +399,23 @@ export function UserList() {
                     label: t("user.list.count", { count: total }).split(" ").slice(1).join(" "),
                   })}
                 </span>
-                <div className="flex items-center gap-4">
-                  <Select
-                    value={String(params.limit)}
-                    onValueChange={(v) => setParam("limit", parseInt(v, 10))}
+                <div className="flex items-center gap-2 sm:justify-end">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={params.page <= 1}
+                    onClick={() => setParam("page", params.page - 1)}
                   >
-                    <SelectTrigger className="w-20">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="25">25</SelectItem>
-                      <SelectItem value="50">50</SelectItem>
-                      <SelectItem value="100">100</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <div className="flex gap-2">
-                    {params.page > 1 && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={isLoading}
-                        onClick={() => setParam("page", params.page - 1)}
-                      >
-                        {t("common.previous")}
-                      </Button>
-                    )}
-                    {params.page < totalPages && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={isLoading}
-                        onClick={() => setParam("page", params.page + 1)}
-                      >
-                        {t("common.next")}
-                      </Button>
-                    )}
-                  </div>
+                    {t("common.previous")}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={params.page >= totalPages}
+                    onClick={() => setParam("page", params.page + 1)}
+                  >
+                    {t("common.next")}
+                  </Button>
                 </div>
               </div>
             )}

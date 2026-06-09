@@ -209,7 +209,7 @@ function FormField({ label, hint, error, optional, children }: FormFieldProps) {
       {children}
       {error ? (
         <p className={cn("text-xs text-error mt-1")} role="alert">
-          {error}
+          {t(error)}
         </p>
       ) : hint ? (
         <p className="text-xs text-gray-400 mt-1">{hint}</p>

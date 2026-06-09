@@ -65,6 +65,10 @@
 }
 
 @layer base {
+  html {
+    scrollbar-gutter: stable;
+  }
+
   body {
     @apply bg-base text-navy font-sans antialiased;
     font-feature-settings:

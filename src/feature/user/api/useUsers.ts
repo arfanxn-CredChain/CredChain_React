@@ -13,12 +13,19 @@ function buildQuery(params: UserListParams): Record<string, unknown> {
   if (params.page) q.page = params.page;
   if (params.limit) q.limit = params.limit;
   if (params.search) q.search = params.search;
+
+  const sorts: string[] = [];
   if (params.sort && params.order) {
-    q.sort = params.order === "desc" ? `-${params.sort}` : params.sort;
+    sorts.push(params.order === "desc" ? `-${params.sort}` : params.sort);
   }
-  if (params.role) q.role = params.role;
-  if (params.deleted === "only") q["deleted_at!_"] = "";
-  else if (params.deleted === "none") q["deleted_at_"] = "";
+  if (sorts.length) q.sorts = sorts;
+
+  const filters: string[] = [];
+  if (params.role) filters.push(`role=${params.role}`);
+  if (params.deleted === "only") filters.push("deleted_at!_");
+  else if (params.deleted === "none") filters.push("deleted_at_");
+  if (filters.length) q.filters = filters;
+
   return q;
 }
 

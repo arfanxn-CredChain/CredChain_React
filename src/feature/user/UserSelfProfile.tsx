@@ -162,7 +162,7 @@ export function UserSelfProfile() {
               {user?.gender ? t(`user.field.gender.${user.gender}`) : empty}
             </dd>
           </div>
-          <div className="sm:col-span-2">
+          <div>
             <dt className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
               {t("profile.field.wallet")}
             </dt>
@@ -208,7 +208,7 @@ export function UserSelfProfile() {
             />
             {phoneError ? (
               <p className="text-xs text-error mt-1" role="alert">
-                {phoneError}
+                {t(phoneError)}
               </p>
             ) : (
               <p className="text-xs text-gray-400 mt-1">{t("profile.phone.hint")}</p>

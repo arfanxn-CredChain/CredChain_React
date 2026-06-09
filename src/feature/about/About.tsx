@@ -1,16 +1,26 @@
-import { ShieldCheck, Users, FileBadge, User } from "lucide-react";
+import { ShieldCheck, Users, FileBadge, User, Mail, ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import { PageHeader } from "@shared/components/PageHeader";
 import { Card } from "@ui/card";
 import { DecorBlob } from "@shared/components/DecorBlob";
 import { EyebrowLabel } from "@shared/components/EyebrowLabel";
+import { env } from "@shared/lib/env";
 
 declare const __APP_VERSION__: string;
 
 export function About() {
   const { t } = useTranslation();
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-6 pt-2">
+      <Link
+        to="/"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded-md"
+      >
+        <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+        {t("common.backToHome")}
+      </Link>
+
       <PageHeader
         title={t("about.title")}
         description={t("about.intro")}
@@ -76,6 +86,30 @@ export function About() {
               {t("about.tech")}
             </p>
           </div>
+        </div>
+      </Card>
+
+      <Card className="p-6 sm:p-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <div className="rounded-full bg-gold/10 p-2 shrink-0">
+              <Mail className="h-5 w-5 text-gold" aria-hidden="true" />
+            </div>
+            <div className="min-w-0">
+              <p className="font-bold text-navy">{t("about.contact.title")}</p>
+              <p className="text-sm text-gray-500 mt-1">{t("about.contact.body")}</p>
+              <EyebrowLabel className="mt-3" tone="muted" as="p">
+                {t("about.contact.label")}
+              </EyebrowLabel>
+            </div>
+          </div>
+          <a
+            href={`mailto:${env.supportEmail}`}
+            className="inline-flex items-center gap-2 self-start rounded-full bg-navy px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-navy/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 whitespace-nowrap sm:self-auto"
+          >
+            <Mail className="h-4 w-4 shrink-0" aria-hidden="true" />
+            {env.supportEmail}
+          </a>
         </div>
       </Card>
     </div>

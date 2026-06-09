@@ -1,6 +1,7 @@
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Plus, Save } from "lucide-react";
 
 import { PageHeader } from "@shared/components/PageHeader";
@@ -18,6 +19,7 @@ import { UserCreateRow } from "./components/UserCreateRow";
 
 export function UserCreate() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const form = useForm<UserBatchStoreFormInput>({
     resolver: zodResolver(userBatchStoreFormSchema),
@@ -46,8 +48,8 @@ export function UserCreate() {
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <PageHeader
-        title="Register New Entities"
-        description="Add multiple users and assign their network roles."
+        title={t("userCreate.title")}
+        description={t("userCreate.description")}
         onBack={() => navigate("/users")}
       />
 
@@ -72,7 +74,7 @@ export function UserCreate() {
               disabled={fields.length >= 100}
             >
               <Plus className="h-4 w-4" />
-              Add another entity
+              {t("userCreate.addAnother")}
             </Button>
 
             <Button
@@ -82,7 +84,7 @@ export function UserCreate() {
               disabled={createUsers.isPending}
             >
               <Save className="h-5 w-5" />
-              {createUsers.isPending ? "Registering..." : "Register Entities"}
+              {createUsers.isPending ? t("userCreate.submitting") : t("userCreate.submit")}
             </Button>
           </div>
         </form>

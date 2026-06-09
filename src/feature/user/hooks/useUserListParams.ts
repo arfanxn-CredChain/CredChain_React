@@ -1,4 +1,7 @@
 import { useSearchParams } from "react-router-dom";
+import { Role } from "@shared/auth/role";
+
+export type RoleFilter = "all" | Role;
 
 export interface UserListParams {
   page: number;
@@ -6,6 +9,7 @@ export interface UserListParams {
   sort: string;
   order: "asc" | "desc";
   deleted: "all" | "only" | "none";
+  role: RoleFilter;
   limit: number;
 }
 
@@ -15,14 +19,18 @@ const DEFAULTS: UserListParams = {
   sort: "created_at",
   order: "desc",
   deleted: "all",
-  limit: 25,
+  role: "all",
+  limit: 10,
 };
+
+const ALLOWED_LIMITS = [10, 20, 50, 100] as const;
 
 const PAGE_RESET_KEYS: (keyof UserListParams)[] = [
   "search",
   "sort",
   "order",
   "deleted",
+  "role",
   "limit",
 ];
 
@@ -32,8 +40,8 @@ function parsePage(raw: string | null): number {
 }
 
 function parseLimit(raw: string | null): number {
-  const n = parseInt(raw ?? "25", 10);
-  return [25, 50, 100].includes(n) ? n : 25;
+  const n = parseInt(raw ?? String(DEFAULTS.limit), 10);
+  return (ALLOWED_LIMITS as readonly number[]).includes(n) ? n : DEFAULTS.limit;
 }
 
 function parseOrder(raw: string | null): "asc" | "desc" {
@@ -42,6 +50,18 @@ function parseOrder(raw: string | null): "asc" | "desc" {
 
 function parseDeleted(raw: string | null): "all" | "only" | "none" {
   if (raw === "only" || raw === "none") return raw;
+  return "all";
+}
+
+function parseRole(raw: string | null): RoleFilter {
+  if (
+    raw === Role.SUPER_ADMIN ||
+    raw === Role.ADMIN ||
+    raw === Role.ISSUER ||
+    raw === Role.HOLDER
+  ) {
+    return raw;
+  }
   return "all";
 }
 
@@ -54,6 +74,7 @@ export function useUserListParams() {
     sort: searchParams.get("sort") ?? DEFAULTS.sort,
     order: parseOrder(searchParams.get("order")),
     deleted: parseDeleted(searchParams.get("deleted")),
+    role: parseRole(searchParams.get("role")),
     limit: parseLimit(searchParams.get("limit")),
   };
 

@@ -3,8 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ShieldCheck, LogOut, X } from "lucide-react";
 import { cn } from "@shared/lib/cn";
 import { useStore } from "@app/store";
-import { canAccess, formatRole } from "@shared/auth/role";
-import { UserAvatar } from "@shared/components/UserAvatar";
+import { canAccess } from "@shared/auth/role";
 import { useLogout } from "@feature/auth/api/useLogout";
 import { useConfirm } from "@ui/confirm-dialog";
 import { NAV_ITEMS } from "@shared/components/layout/nav-items";
@@ -43,8 +42,8 @@ export function Sidebar({ onClose }: SidebarProps) {
       <div className="flex flex-col h-full bg-navy text-gray-300">
         {/* Logo */}
         <div className="flex flex-col items-center justify-center pt-10 pb-8 relative">
-          <ShieldCheck className="h-12 w-12 text-surface mb-2" aria-hidden="true" />
-          <span className="font-display text-2xl font-bold tracking-tight text-surface">
+          <ShieldCheck className="h-12 w-12 text-gold mb-2" aria-hidden="true" />
+          <span className="font-display text-2xl font-bold tracking-tight text-gold">
             CredChain
           </span>
           {onClose && (
@@ -58,20 +57,6 @@ export function Sidebar({ onClose }: SidebarProps) {
           )}
         </div>
 
-        {user && (
-          <div className="px-4 mt-2 mb-6 flex items-center gap-3">
-            <UserAvatar user={user} size="lg" />
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-bold text-surface truncate">
-                {user.name ?? user.email}
-              </div>
-              <div className="text-xs text-gray-400 truncate capitalize">
-                {formatRole(user.role)}
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Nav */}
         <nav className="flex-1 space-y-1 px-4 mt-2" aria-label="Main navigation">
           {visibleItems.map((item) => (
@@ -82,15 +67,22 @@ export function Sidebar({ onClose }: SidebarProps) {
               onClick={onClose}
               className={({ isActive }) =>
                 cn(
-                  "flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all",
+                  "flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all border-l-[3px]",
                   isActive
-                    ? "bg-white/10 text-surface shadow-sm"
-                    : "hover:bg-white/5 hover:text-surface",
+                    ? "border-gold bg-white/15 text-surface shadow-sm"
+                    : "border-transparent hover:bg-white/5 hover:text-surface",
                 )
               }
             >
-              <item.icon className="mr-3 h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
-              {t(item.i18nKey)}
+              {({ isActive }) => (
+                <>
+                  <item.icon
+                    className={cn("mr-3 h-5 w-5 flex-shrink-0", isActive ? "text-gold" : "text-gray-400")}
+                    aria-hidden="true"
+                  />
+                  {t(item.i18nKey)}
+                </>
+              )}
             </NavLink>
           ))}
         </nav>

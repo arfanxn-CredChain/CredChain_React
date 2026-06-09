@@ -327,7 +327,7 @@ function Field({ label, error, optional, children }: FieldProps) {
       {children}
       {error && (
         <p className="text-xs text-error mt-1" role="alert">
-          {error}
+          {t(error)}
         </p>
       )}
     </div>

@@ -2,7 +2,7 @@
 
 > For AI assistants and engineers building CredChain_React/. This document is the single source of truth for the production frontend. It supersedes CredChain_React_Demo/ (reference only - do not import from it).
 
-Status: Draft v1.1 | Last updated: 2026-05-29 | Related: ../AGENTS.md, ../CredChain_Golang/
+Status: Draft v1.2 | Last updated: 2026-05-31 | Related: ../AGENTS.md, ../CredChain_Golang/
 
 ---
 
@@ -347,6 +347,10 @@ body {
 | Focus ring | `ring-gold` (via `focus:ring-2 focus:ring-gold`) |
 | Sidebar background | `bg-navy` |
 | Sidebar text | `text-gray-300` (inactive), `text-surface` (active) |
+| Brand mark (shield icon + wordmark) | `text-gold` — always, on every chrome (Sidebar, PublicLayout, mobile TopNav) |
+| DashboardLayout desktop top area | transparent over page background; no static title — each page renders its own `PageHeader` |
+| TopNav search input (resting) | `bg-gray-50 text-navy placeholder-gray-400 border-gray-200 rounded-full` |
+| TopNav search input (focus) | `bg-white ring-2 ring-gold border-transparent` |
 
 ### 5.2 Role-Color Mapping
 
@@ -510,7 +514,7 @@ The design system commits to a specific aesthetic position. These principles gua
 
 These are the things that make CredChain visually distinct. Touch them only with intent.
 
-1. **Navy + gold pairing** - Never substitute purple gradients, blue-to-cyan washes, or rainbow accents. The palette is the brand.
+1. **Navy + gold pairing** - Never substitute purple gradients, blue-to-cyan washes, or rainbow accents. The palette is the brand. The brand mark cluster (shield icon + "CredChain" wordmark) always renders in `text-gold` regardless of background — Sidebar, `PublicLayout` header, and mobile `TopNav` shield all use `text-gold`. Never `text-surface` for the wordmark.
 2. **Tinted colored shadows** - `shadow-md shadow-navy/20`, `shadow-lg shadow-gold/20`, `shadow-error/20` under brand-colored elements. This is the signature material treatment.
 3. **Single decorative blob per hero area** - One soft radial gradient, never multiple competing blobs. Restraint is the move.
 4. **Mono-font identifiers** - Every hash, address, and ID renders in `font-mono`. This is the blockchain visual cue. Never sans-serif a hash.
@@ -831,9 +835,10 @@ const handleDelete = async () => {
 
 | Layout | Used by | Pattern |
 |---|---|---|
-| `PublicLayout` | Public credential verification | Navy header + gold border, white card body, footer |
+| `PublicLayout` | Landing, public credential verification, Help/About (logged out) | Navy header with **gold brand mark** + gold underline, white card body, footer |
 | `AuthLayout` | Login | Split-screen (lg+): navy branding panel left, white form right; mobile collapses |
-| `DashboardLayout` | All authenticated routes | Fixed navy sidebar (w-72), top navbar, scrollable main |
+| `DashboardLayout` | All authenticated routes | Fixed navy sidebar (w-72) with **gold brand mark cluster**, transparent top navbar (no static title — each page renders its own `PageHeader`), scrollable main |
+| `AdaptiveLayout` | `/help`, `/about` | Renders `DashboardLayout` if authenticated, `PublicLayout` otherwise |
 
 ### 8.2 Container Widths
 
@@ -884,20 +889,30 @@ All containers center via `mx-auto`.
   "fixed inset-y-0 left-0 z-50 w-72 bg-navy text-gray-300 transition-transform duration-300 sm:translate-x-0 sm:static sm:flex-shrink-0 flex flex-col shadow-2xl",
   open ? "translate-x-0" : "-translate-x-full"
 )}>
-  {/* Logo cluster */}
+  {/* Logo cluster — both icon and wordmark in gold */}
+  <div className="flex flex-col items-center pt-10 pb-8">
+    <ShieldCheck className="h-12 w-12 text-gold mb-2" aria-hidden="true" />
+    <span className="font-display text-2xl font-bold tracking-tight text-gold">
+      CredChain
+    </span>
+  </div>
   {/* Nav items - role-filtered via canAccess() helper */}
   {/* Mt-auto logout button */}
 </aside>
 ```
 
-Nav items use `NavLink` with active state styling:
+Nav items use `NavLink` with active state styling. The active state must read clearly at every screen size (mobile drawer + desktop sidebar share this one component), so it pairs a **gold left-accent bar** with a brighter background and a gold icon. Inactive items carry a transparent left border of the same width to prevent layout shift on activation:
 
 ```tsx
 className={({ isActive }) => cn(
-  "flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all",
-  isActive ? "bg-white/10 text-surface shadow-sm" : "hover:bg-white/5 hover:text-surface"
+  "flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all border-l-[3px]",
+  isActive
+    ? "border-gold bg-white/15 text-surface shadow-sm"
+    : "border-transparent hover:bg-white/5 hover:text-surface"
 )}
 ```
+
+The icon color follows the active state via the `children` render prop (`isActive ? "text-gold" : "text-gray-400"`). `NavLink` auto-applies `aria-current="page"` to the active link — no manual ARIA needed.
 
 ### 8.7 Mobile Drawer
 
@@ -1854,6 +1869,23 @@ api.interceptors.request.use((config) => {
   return config;
 });
 ```
+
+### 14.6 Indonesian Translation Conventions
+
+Locked decisions for `id.json` — do not revert without a design review:
+
+| Key | English | Indonesian | Rationale |
+|---|---|---|---|
+| `nav.overview` | Overview | **Dasbor** | "Ikhtisar" is too archaic for a product dashboard context |
+| `nav.users` | Users | Pengguna | Standard Indonesian for users |
+| `nav.credentials` | Credentials | Kredensial | Direct loanword, widely understood |
+| `nav.settings` | Settings | Pengaturan | Standard Indonesian |
+| `dashboard.welcome` | Welcome, {{name}} | Selamat datang, {{name}} | Formal greeting, appropriate for a professional platform |
+| `user.list.count_one/other` | {{count}} user/users | {{count}} pengguna | "Entitas" was rejected — too abstract for end users |
+
+**Default locale is Indonesian (`id`).** The persisted locale is read from localStorage before i18next initializes, so users never see a flash of English on first load.
+
+**Global nav search is bilingual.** `useNavSearch` matches the query against both `en` and `id` labels simultaneously using `i18n.getFixedT("en")` and `i18n.getFixedT("id")`. Typing "dasbor" finds Dashboard on an English-locale session; typing "overview" finds it on an Indonesian-locale session. The search input placeholder stays localized to the active locale.
 
 ---
 

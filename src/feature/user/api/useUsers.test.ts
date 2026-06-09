@@ -12,39 +12,45 @@ function buildQuery(params: {
   if (params.page) q.page = params.page;
   if (params.limit) q.limit = params.limit;
   if (params.search) q.search = params.search;
+
+  const sorts: string[] = [];
   if (params.sort && params.order) {
-    q.sort = params.order === "desc" ? `-${params.sort}` : params.sort;
+    sorts.push(params.order === "desc" ? `-${params.sort}` : params.sort);
   }
-  if (params.deleted === "only") q["deleted_at!_"] = "";
-  else if (params.deleted === "none") q["deleted_at_"] = "";
+  if (sorts.length) q.sorts = sorts;
+
+  const filters: string[] = [];
+  if (params.deleted === "only") filters.push("deleted_at!_");
+  else if (params.deleted === "none") filters.push("deleted_at_");
+  if (filters.length) q.filters = filters;
+
   return q;
 }
 
 describe("useUsers query builder", () => {
   it("deleted=all sends no filter", () => {
     const q = buildQuery({ deleted: "all" });
-    expect(q["deleted_at!_"]).toBeUndefined();
-    expect(q["deleted_at_"]).toBeUndefined();
+    expect(q.filters).toBeUndefined();
   });
 
   it("deleted=only sends deleted_at!_ operator", () => {
     const q = buildQuery({ deleted: "only" });
-    expect(q["deleted_at!_"]).toBe("");
+    expect(q.filters).toEqual(["deleted_at!_"]);
   });
 
   it("deleted=none sends deleted_at_ operator", () => {
     const q = buildQuery({ deleted: "none" });
-    expect(q["deleted_at_"]).toBe("");
+    expect(q.filters).toEqual(["deleted_at_"]);
   });
 
-  it("sort=name order=asc sends sort=name", () => {
+  it("sort=name order=asc sends sorts array", () => {
     const q = buildQuery({ sort: "name", order: "asc" });
-    expect(q.sort).toBe("name");
+    expect(q.sorts).toEqual(["name"]);
   });
 
-  it("sort=name order=desc sends sort=-name", () => {
+  it("sort=name order=desc sends sorts array", () => {
     const q = buildQuery({ sort: "name", order: "desc" });
-    expect(q.sort).toBe("-name");
+    expect(q.sorts).toEqual(["-name"]);
   });
 
   it("combines page + limit + search", () => {

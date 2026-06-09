@@ -22,7 +22,7 @@ export function DashboardLayout() {
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-50 w-72 transition-transform duration-300 shadow-2xl",
-          "sm:translate-x-0 sm:static sm:flex-shrink-0",
+          "sm:translate-x-0 sm:sticky sm:top-0 sm:h-screen sm:flex-shrink-0",
           sidebarOpen ? "translate-x-0" : "-translate-x-full",
         )}
         aria-label="Sidebar"

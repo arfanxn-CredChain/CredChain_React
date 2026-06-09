@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 import { Role } from "@shared/auth/role";
 import {
   genderSchema,
+  userBatchDeleteSchema,
   userBatchStoreSchema,
+  userBatchUpdateRoleSchema,
+  userBatchUpdateSchema,
   userSelfEmailSchema,
   userSelfProfileSchema,
   userStoreSchema,
@@ -292,5 +295,314 @@ describe("userUpdateSchema gender field", () => {
 
   it("rejects invalid gender values", () => {
     expect(userUpdateSchema.safeParse({ ...baseValid, gender: "x" }).success).toBe(false);
+  });
+});
+
+describe("userUpdateSchema - optional fields empty-string handling", () => {
+  const baseValid = { id: "u1" };
+
+  describe("phone_number", () => {
+    it("accepts undefined (no change)", () => {
+      expect(userUpdateSchema.safeParse(baseValid).success).toBe(true);
+    });
+
+    it("accepts null (clear)", () => {
+      expect(userUpdateSchema.safeParse({ ...baseValid, phone_number: null }).success).toBe(true);
+    });
+
+    it("treats empty string as undefined (no validation error)", () => {
+      const result = userUpdateSchema.safeParse({ ...baseValid, phone_number: "" });
+      expect(result.success).toBe(true);
+      if (result.success) expect(result.data.phone_number).toBeUndefined();
+    });
+
+    it("accepts valid E.164 phone", () => {
+      expect(
+        userUpdateSchema.safeParse({ ...baseValid, phone_number: "+6281234567890" }).success,
+      ).toBe(true);
+    });
+
+    it("rejects invalid phone format (non-empty)", () => {
+      const result = userUpdateSchema.safeParse({ ...baseValid, phone_number: "08123" });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.issues[0].message).toBe("zod.user.phoneFormat");
+      }
+    });
+  });
+
+  describe("birth_date", () => {
+    it("accepts undefined", () => {
+      expect(userUpdateSchema.safeParse(baseValid).success).toBe(true);
+    });
+
+    it("accepts null", () => {
+      expect(userUpdateSchema.safeParse({ ...baseValid, birth_date: null }).success).toBe(true);
+    });
+
+    it("treats empty string as undefined", () => {
+      const result = userUpdateSchema.safeParse({ ...baseValid, birth_date: "" });
+      expect(result.success).toBe(true);
+      if (result.success) expect(result.data.birth_date).toBeUndefined();
+    });
+
+    it("accepts valid ISO date", () => {
+      expect(
+        userUpdateSchema.safeParse({ ...baseValid, birth_date: "1990-01-01" }).success,
+      ).toBe(true);
+    });
+
+    it("rejects malformed date (non-empty)", () => {
+      const result = userUpdateSchema.safeParse({ ...baseValid, birth_date: "01/01/1990" });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.issues[0].message).toBe("zod.user.dateFormat");
+      }
+    });
+  });
+
+  describe("number", () => {
+    it("accepts undefined", () => {
+      expect(userUpdateSchema.safeParse(baseValid).success).toBe(true);
+    });
+
+    it("accepts null", () => {
+      expect(userUpdateSchema.safeParse({ ...baseValid, number: null }).success).toBe(true);
+    });
+
+    it("treats empty string as undefined", () => {
+      const result = userUpdateSchema.safeParse({ ...baseValid, number: "" });
+      expect(result.success).toBe(true);
+      if (result.success) expect(result.data.number).toBeUndefined();
+    });
+
+    it("accepts valid string", () => {
+      expect(userUpdateSchema.safeParse({ ...baseValid, number: "EMP-001" }).success).toBe(true);
+    });
+
+    it("rejects too long", () => {
+      const result = userUpdateSchema.safeParse({ ...baseValid, number: "x".repeat(257) });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.issues[0].message).toBe("zod.user.numberTooLong");
+      }
+    });
+  });
+
+  describe("email", () => {
+    it("rejects empty string (treated as invalid email)", () => {
+      const result = userUpdateSchema.safeParse({ ...baseValid, email: "" });
+      expect(result.success).toBe(false);
+    });
+
+    it("accepts valid email", () => {
+      expect(
+        userUpdateSchema.safeParse({ ...baseValid, email: "a@b.com" }).success,
+      ).toBe(true);
+    });
+
+    it("returns localization key on invalid email", () => {
+      const result = userUpdateSchema.safeParse({ ...baseValid, email: "not-email" });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.issues[0].message).toBe("zod.user.emailInvalid");
+      }
+    });
+  });
+
+  describe("name", () => {
+    it("accepts undefined (optional)", () => {
+      expect(userUpdateSchema.safeParse(baseValid).success).toBe(true);
+    });
+
+    it("rejects empty string with localization key", () => {
+      const result = userUpdateSchema.safeParse({ ...baseValid, name: "" });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.issues[0].message).toBe("zod.user.nameRequired");
+      }
+    });
+  });
+});
+
+describe("userStoreSchema - error messages are i18n keys", () => {
+  it("name required uses i18n key", () => {
+    const result = userStoreSchema.safeParse({
+      name: "",
+      email: "a@b.com",
+      role: Role.HOLDER,
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe("zod.user.nameRequired");
+    }
+  });
+
+  it("email invalid uses i18n key", () => {
+    const result = userStoreSchema.safeParse({
+      name: "Jane",
+      email: "not-email",
+      role: Role.HOLDER,
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const emailIssue = result.error.issues.find((i) => i.path.includes("email"));
+      expect(emailIssue?.message).toBe("zod.user.emailInvalid");
+    }
+  });
+
+  it("phone format uses i18n key", () => {
+    const result = userStoreSchema.safeParse({
+      name: "Jane",
+      email: "a@b.com",
+      role: Role.HOLDER,
+      phone_number: "08123",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe("zod.user.phoneFormat");
+    }
+  });
+
+  it("role required uses i18n key", () => {
+    const result = userStoreSchema.safeParse({
+      name: "Jane",
+      email: "a@b.com",
+      role: "invalid_role",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe("zod.user.roleRequired");
+    }
+  });
+});
+
+describe("userStoreSchema number empty-string regression", () => {
+  it("treats empty number as undefined (not '')", () => {
+    const result = userStoreSchema.safeParse({
+      name: "Jane",
+      email: "a@b.com",
+      role: Role.HOLDER,
+      number: "",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.number).toBeUndefined();
+  });
+
+  it("preserves a real number value", () => {
+    const result = userStoreSchema.safeParse({
+      name: "Jane",
+      email: "a@b.com",
+      role: Role.HOLDER,
+      number: "EMP-001",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.number).toBe("EMP-001");
+  });
+});
+
+describe("userBatchUpdateSchema", () => {
+  it("rejects empty array with i18n key", () => {
+    const result = userBatchUpdateSchema.safeParse({ users: [] });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe("zod.batch.minOne");
+    }
+  });
+
+  it("rejects more than 100 users with i18n key", () => {
+    const users = Array.from({ length: 101 }, (_, i) => ({ id: `u${i}` }));
+    const result = userBatchUpdateSchema.safeParse({ users });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe("zod.batch.maxHundred");
+    }
+  });
+
+  it("accepts valid batch", () => {
+    const result = userBatchUpdateSchema.safeParse({
+      users: [{ id: "u1", name: "Alice" }],
+    });
+    expect(result.success).toBe(true);
+  });
+});
+
+describe("userBatchUpdateRoleSchema", () => {
+  it("rejects empty inner id with i18n key", () => {
+    const result = userBatchUpdateRoleSchema.safeParse({
+      users: [{ id: "", role: Role.HOLDER }],
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe("zod.user.idRequired");
+    }
+  });
+
+  it("rejects invalid role with i18n key", () => {
+    const result = userBatchUpdateRoleSchema.safeParse({
+      users: [{ id: "u1", role: "bogus" }],
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe("zod.user.roleRequired");
+    }
+  });
+
+  it("rejects empty array with i18n key", () => {
+    const result = userBatchUpdateRoleSchema.safeParse({ users: [] });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe("zod.batch.minOne");
+    }
+  });
+
+  it("rejects more than 100 entries with i18n key", () => {
+    const users = Array.from({ length: 101 }, (_, i) => ({
+      id: `u${i}`,
+      role: Role.HOLDER,
+    }));
+    const result = userBatchUpdateRoleSchema.safeParse({ users });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe("zod.batch.maxHundred");
+    }
+  });
+});
+
+describe("userBatchDeleteSchema", () => {
+  it("rejects empty inner id with i18n key", () => {
+    const result = userBatchDeleteSchema.safeParse({ ids: [""] });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe("zod.user.idRequired");
+    }
+  });
+
+  it("rejects more than 100 ids with i18n key", () => {
+    const ids = Array.from({ length: 101 }, (_, i) => `id${i}`);
+    const result = userBatchDeleteSchema.safeParse({ ids });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe("zod.batch.maxHundred");
+    }
+  });
+
+  it("accepts valid ids", () => {
+    expect(userBatchDeleteSchema.safeParse({ ids: ["a", "b"] }).success).toBe(true);
+  });
+});
+
+describe("userSelfEmailSchema email max length", () => {
+  it("rejects email longer than 256 chars with i18n key", () => {
+    const longLocal = "a".repeat(250);
+    const result = userSelfEmailSchema.safeParse({
+      email: `${longLocal}@example.com`,
+      id_token: "tok",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const tooLong = result.error.issues.find((i) => i.message === "zod.user.emailTooLong");
+      expect(tooLong).toBeDefined();
+    }
   });
 });

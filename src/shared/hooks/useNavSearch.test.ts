@@ -4,20 +4,34 @@ import { useNavSearch } from "./useNavSearch";
 import { Role } from "@shared/auth/role";
 import { useStore } from "@app/store";
 
+const EN: Record<string, string> = {
+  "nav.overview": "Overview",
+  "nav.users": "Users",
+  "nav.credentials": "Credentials",
+  "nav.myCredentials": "My Credentials",
+  "nav.settings": "Settings",
+  "nav.profile": "Profile",
+  "nav.help": "Help",
+  "nav.about": "About",
+};
+
+const ID: Record<string, string> = {
+  "nav.overview": "Dasbor",
+  "nav.users": "Pengguna",
+  "nav.credentials": "Kredensial",
+  "nav.myCredentials": "Kredensial Saya",
+  "nav.settings": "Pengaturan",
+  "nav.profile": "Profil",
+  "nav.help": "Bantuan",
+  "nav.about": "Tentang",
+};
+
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
-    t: (key: string) => {
-      const map: Record<string, string> = {
-        "nav.overview": "Overview",
-        "nav.users": "Users",
-        "nav.credentials": "Credentials",
-        "nav.myCredentials": "My Credentials",
-        "nav.settings": "Settings",
-        "nav.profile": "Profile",
-        "nav.help": "Help",
-        "nav.about": "About",
-      };
-      return map[key] ?? key;
+    t: (key: string) => EN[key] ?? key,
+    i18n: {
+      getFixedT: (lng: "en" | "id") => (key: string) =>
+        (lng === "id" ? ID : EN)[key] ?? key,
     },
   }),
 }));
@@ -92,4 +106,31 @@ describe("useNavSearch", () => {
     const hrefs = result.current.map((i) => i.href);
     expect(hrefs).toContain("/credentials/self");
   });
-});
+
+  it("matches English label regardless of active locale", () => {
+    useStore.setState({
+      user: { role: Role.ADMIN } as never,
+      isAuthenticated: true,
+    });
+    const { result } = renderHook(() => useNavSearch("users"));
+    expect(result.current.map((i) => i.href)).toContain("/users");
+  });
+
+  it("matches Indonesian label 'dasbor' for dashboard", () => {
+    useStore.setState({
+      user: { role: Role.ADMIN } as never,
+      isAuthenticated: true,
+    });
+    const { result } = renderHook(() => useNavSearch("dasbor"));
+    expect(result.current.map((i) => i.href)).toContain("/dashboard");
+  });
+
+  it("matches Indonesian label 'bantu' for help", () => {
+    useStore.setState({
+      user: { role: Role.ADMIN } as never,
+      isAuthenticated: true,
+    });
+    const { result } = renderHook(() => useNavSearch("bantu"));
+    expect(result.current.map((i) => i.href)).toContain("/help");
+  });
+})
