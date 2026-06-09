@@ -281,7 +281,7 @@
   "nav.about": "Tentang",
   "nav.searchPlaceholder": "Cari...",
   "common.cancel": "Batal",
-  "common.backToHome": "Kembali ke beranda",
+  "common.back": "Kembali",
   "help.title": "Bantuan & FAQ",
   "help.intro": "Temukan jawaban atas pertanyaan umum tentang CredChain.",
   "help.faq.gettingStarted.signIn": "Bagaimana cara masuk?",

@@ -1,6 +1,6 @@
-import { ShieldCheck, Users, FileBadge, User, Mail, ArrowLeft } from "lucide-react";
+import { ShieldCheck, Users, FileBadge, User, Mail } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { BackLink } from "@shared/components/BackLink";
 import { PageHeader } from "@shared/components/PageHeader";
 import { Card } from "@ui/card";
 import { DecorBlob } from "@shared/components/DecorBlob";
@@ -13,13 +13,7 @@ export function About() {
   const { t } = useTranslation();
   return (
     <div className="max-w-3xl mx-auto space-y-6 pt-2">
-      <Link
-        to="/"
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded-md"
-      >
-        <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-        {t("common.backToHome")}
-      </Link>
+      <BackLink />
 
       <PageHeader
         title={t("about.title")}

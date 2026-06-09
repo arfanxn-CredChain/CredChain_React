@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Phone, Save, Copy, Check, Mail } from "lucide-react";
 import { useStore } from "@app/store";
+import { BackLink } from "@shared/components/BackLink";
 import { PageHeader } from "@shared/components/PageHeader";
 import { Card } from "@ui/card";
 import { Button } from "@ui/button";
@@ -86,6 +87,7 @@ export function UserSelfProfile() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
+      <BackLink />
       <PageHeader title={t("profile.title")} description={t("profile.description")} />
 
       <Card className="p-6 sm:p-8 relative overflow-hidden shadow-lg shadow-gold/20 ring-1 ring-gold/10">

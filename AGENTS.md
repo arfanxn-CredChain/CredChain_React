@@ -475,7 +475,7 @@ All env vars must be prefixed with `VITE_` to be exposed to the browser. Reading
 | Integration | Vitest + MSW | Feature flows with mocked `/api` |
 | E2E | Playwright | Auth flow, public routes, a11y smoke |
 
-**Current count:** **244 unit/component tests across 25 spec files** under `src/`, plus **20 Playwright tests across 3 e2e specs** (`auth.spec.ts`, `public.spec.ts`, `a11y.spec.ts`).
+**Current count:** **248 unit/component tests across 26 spec files** under `src/`, plus **20 Playwright tests across 3 e2e specs** (`auth.spec.ts`, `public.spec.ts`, `a11y.spec.ts`).
 
 **Coverage** (in `vitest.config.ts`): the `coverage` config uses a **selective `include` allowlist** (NOT global). Per-file thresholds of 90% lines / 85% branches / 90% functions / 90% statements apply only to the curated paths:
 
@@ -559,6 +559,7 @@ Before pushing, run the repo's canonical verification command and confirm it pas
 ## Change Log
 
 - **2026-05-31 — Dark mode removed.** `ThemeProvider`, `ThemeToggle`, the `theme` slice in Zustand, the `:root.dark` CSS overrides, the `.text-fg` utility, and the no-flash inline script in `index.html` were all deleted. The app now renders only in light mode, faithful to `DESIGN_SYSTEM.md`. `text-navy` replaced every `text-fg` usage. `LanguageSwitcher`'s `variant="dark"` prop remains — it is a *background-aware* styling switch (for placement on the navy header/sidebar), not a theme switch.
+- **2026-06-09 — BackLink wiring across pages.** `BackLink` (browser-history back with role-aware fallback to `/dashboard` or `/`) now used on Help, About, Login, Profile, and Update Email pages. Replaced inline `<Link to="/">` / `t("common.backToHome")` with `<BackLink />`. Added `common.back` i18n key ("Back" / "Kembali"), removed `common.backToHome`. Added `BackLink.test.tsx` (4 tests) covering history-back, auth fallback, and unauth fallback.
 - **2026-06-09 — Docs resync to as-built.** AGENTS.md + DESIGN_SYSTEM.md reconciled with actual codebase. Major corrections: added `feature/landing/` (was undocumented); replaced `AuthLayout` references with `SplitLayout`/`AdaptiveLayout`; removed `RootRedirect` (deleted), added `BackLink`; shadcn count corrected to 12 primitives (not 13); test count updated to 244 + 20 E2E (was 179); coverage documented as selective allowlist (not global); env-var table extended with `VITE_API_PROXY` and `VITE_SUPPORT_EMAIL`; documented husky/lint-staged pre-commit flow; removed `ethers` from tech stack (unused dep). DESIGN_SYSTEM.md preserve design-philosophy sections intact.
 
 ## See Also

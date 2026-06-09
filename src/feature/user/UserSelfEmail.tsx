@@ -2,6 +2,7 @@ import { Mail } from "lucide-react";
 import { GoogleLogin } from "@react-oauth/google";
 import { useTranslation } from "react-i18next";
 import { useStore } from "@app/store";
+import { BackLink } from "@shared/components/BackLink";
 import { PageHeader } from "@shared/components/PageHeader";
 import { Card } from "@ui/card";
 import { Input } from "@ui/input";
@@ -39,6 +40,7 @@ export function UserSelfEmail() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
+      <BackLink />
       <PageHeader
         title={t("user.email.update.title")}
         description={t("user.email.update.intro")}

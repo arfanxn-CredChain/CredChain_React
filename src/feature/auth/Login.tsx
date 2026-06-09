@@ -1,7 +1,7 @@
 import { GoogleLogin } from "@react-oauth/google";
-import { ArrowLeft, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { Trans, useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { BackLink } from "@shared/components/BackLink";
 import { useGoogleLogin } from "./api/useGoogleLogin";
 import { SplitLayout } from "@shared/components/layout/SplitLayout";
 
@@ -39,13 +39,7 @@ export function Login() {
   return (
     <SplitLayout brandSlot={desktopBrand} mobileBrandSlot={mobileBrand}>
       <div className="w-full max-w-md px-4 sm:px-6 py-8 lg:py-0">
-        <Link
-          to="/"
-          className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded-md"
-        >
-          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-          {t("common.backToHome")}
-        </Link>
+        <BackLink className="mb-6" />
 
         <div className="bg-surface rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-8 sm:p-10">
           <h3 className="font-display text-2xl font-bold text-navy mb-2 tracking-tight">
