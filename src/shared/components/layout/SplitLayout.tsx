@@ -41,7 +41,7 @@ export function SplitLayout({ brandSlot, mobileBrandSlot, children }: SplitLayou
       <div className="w-full lg:w-1/2 flex flex-col bg-base relative min-h-screen">
         {/* Mobile-only navy band */}
         <div className="lg:hidden w-full bg-navy text-surface relative overflow-hidden safe-area-top">
-          <DecorBlob tone="gold" position="top-right" size="md" />
+          <DecorBlob tone="gold" position="top-left" size="md" />
           {/* Inline language switcher — same placement as PublicLayout header */}
           <div className="absolute top-4 right-4 z-20">
             <LanguageSwitcher variant="dark" />
