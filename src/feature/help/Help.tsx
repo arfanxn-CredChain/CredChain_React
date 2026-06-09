@@ -192,7 +192,7 @@ export function Help() {
           </div>
           <a
             href={`mailto:${env.supportEmail}`}
-            className="inline-flex items-center gap-2 rounded-full bg-navy px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-navy/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 whitespace-nowrap"
+            className="inline-flex items-center gap-2 self-start rounded-full bg-navy px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-navy/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 whitespace-nowrap sm:self-auto"
           >
             <Mail className="h-4 w-4 shrink-0" aria-hidden="true" />
             {env.supportEmail}
