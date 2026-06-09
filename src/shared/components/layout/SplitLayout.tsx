@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { LanguageSwitcher } from "@shared/components/LanguageSwitcher";
 import { DecorBlob } from "@shared/components/DecorBlob";
+import { useScrollToTop } from "@shared/hooks/useScrollToTop";
 
 interface SplitLayoutProps {
   /** Desktop navy left panel content (>= lg breakpoint) */
@@ -21,6 +22,7 @@ interface SplitLayoutProps {
  * On mobile, it lives inside the navy band's top-right corner (matches PublicLayout).
  */
 export function SplitLayout({ brandSlot, mobileBrandSlot, children }: SplitLayoutProps) {
+  useScrollToTop();
   return (
     <div className="relative flex min-h-screen bg-surface">
       {/* Desktop floating language switcher — light variant on light right panel */}

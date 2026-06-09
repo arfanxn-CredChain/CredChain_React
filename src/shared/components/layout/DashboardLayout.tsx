@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { cn } from "@shared/lib/cn";
+import { useScrollToTop } from "@shared/hooks/useScrollToTop";
 import { Sidebar } from "./Sidebar";
 import { TopNav } from "./TopNav";
 
 export function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  useScrollToTop();
 
   return (
     <div className="flex min-h-screen bg-gray-100 font-sans">

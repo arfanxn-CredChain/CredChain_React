@@ -1,8 +1,10 @@
 import { Outlet, Link } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
 import { LanguageSwitcher } from "@shared/components/LanguageSwitcher";
+import { useScrollToTop } from "@shared/hooks/useScrollToTop";
 
 export function PublicLayout() {
+  useScrollToTop();
   return (
     <div className="min-h-screen bg-base text-navy flex flex-col">
       <header className="bg-navy border-b border-gold/30 safe-area-top no-print">
