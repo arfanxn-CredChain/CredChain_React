@@ -8,7 +8,7 @@ export function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-100 flex font-sans">
+    <div className="flex min-h-screen bg-gray-100 font-sans">
       {/* Mobile backdrop */}
       {sidebarOpen && (
         <div
@@ -21,8 +21,8 @@ export function DashboardLayout() {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-72 transition-transform duration-300 shadow-2xl",
-          "sm:translate-x-0 sm:sticky sm:top-0 sm:h-screen sm:flex-shrink-0",
+          "fixed inset-y-0 left-0 z-50 w-72 shadow-2xl transition-transform duration-300",
+          "sm:sticky sm:top-0 sm:h-screen sm:flex-shrink-0 sm:translate-x-0",
           sidebarOpen ? "translate-x-0" : "-translate-x-full",
         )}
         aria-label="Sidebar"
@@ -31,12 +31,12 @@ export function DashboardLayout() {
       </aside>
 
       {/* Main */}
-      <div className="flex-1 flex flex-col min-w-0 bg-[#F4F7F6]">
+      <div className="flex min-w-0 flex-1 flex-col bg-[#F4F7F6]">
         <TopNav onMenuClick={() => setSidebarOpen(true)} />
 
         <main
           id="main"
-          className="flex-1 overflow-auto px-4 sm:px-8 pb-12 pt-4"
+          className="flex-1 [scrollbar-gutter:stable] overflow-y-scroll px-4 pt-4 pb-12 sm:px-8"
         >
           <Outlet />
         </main>
