@@ -179,7 +179,9 @@ export function Help() {
               <ShieldCheck className="h-5 w-5 text-navy" aria-hidden="true" />
             </div>
             <div>
-              <p className="font-bold text-navy">{t("help.contact.title")}</p>
+              <p className="font-display text-lg font-semibold text-navy tracking-tight">
+                {t("help.contact.title")}
+              </p>
               <p className="text-sm text-gray-500 mt-1">
                 {t(
                   "help.contact.body",
