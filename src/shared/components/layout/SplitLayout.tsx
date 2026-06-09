@@ -22,26 +22,23 @@ interface SplitLayoutProps {
  */
 export function SplitLayout({ brandSlot, mobileBrandSlot, children }: SplitLayoutProps) {
   return (
-    <div className="min-h-screen bg-surface flex relative">
+    <div className="relative flex min-h-screen bg-surface">
       {/* Desktop floating language switcher — light variant on light right panel */}
-      <div className="hidden lg:block absolute top-4 right-4 z-20">
+      <div className="absolute top-4 right-4 z-20 hidden lg:block">
         <LanguageSwitcher variant="light" />
       </div>
 
       {/* Desktop navy left panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-navy flex-col justify-center items-center relative overflow-hidden">
+      <div className="relative hidden flex-col items-center justify-center overflow-hidden bg-navy lg:flex lg:w-1/2">
         <DecorBlob tone="gold" position="top-right" size="xl" />
         <DecorBlob tone="blue" position="bottom-left" size="xl" />
-        <div className="relative z-10 flex flex-col items-center px-4 w-full">
-          {brandSlot}
-        </div>
+        <div className="relative z-10 flex w-full flex-col items-center px-4">{brandSlot}</div>
       </div>
 
       {/* Right panel (or below band on mobile) */}
-      <div className="w-full lg:w-1/2 flex flex-col bg-base relative min-h-screen">
+      <div className="relative flex min-h-screen w-full flex-col bg-base lg:w-1/2">
         {/* Mobile-only navy band */}
-        <div className="lg:hidden w-full bg-navy text-surface relative overflow-hidden safe-area-top">
-          <DecorBlob tone="gold" position="top-left" size="md" />
+        <div className="safe-area-top relative w-full overflow-hidden bg-navy text-surface lg:hidden">
           {/* Inline language switcher — same placement as PublicLayout header */}
           <div className="absolute top-4 right-4 z-20">
             <LanguageSwitcher variant="dark" />
@@ -50,9 +47,7 @@ export function SplitLayout({ brandSlot, mobileBrandSlot, children }: SplitLayou
         </div>
 
         {/* Content area — fills remaining viewport, centers content */}
-        <div className="flex-1 flex flex-col justify-center items-center w-full">
-          {children}
-        </div>
+        <div className="flex w-full flex-1 flex-col items-center justify-center">{children}</div>
       </div>
     </div>
   );
