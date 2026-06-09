@@ -490,6 +490,21 @@ export function PageHeader({ title, description, action, onBack }: PageHeaderPro
 
 **Responsive icon-button rule.** Shared headers that host icon-only controls (back, close, overflow) scale their hit-area with the viewport: `h-8 w-8` on mobile, `h-10 w-10` at `sm+`, with the inner icon stepping `w-4 → w-5`. This keeps touch targets proportional to the surrounding type ramp on phones and tablets, instead of dominating the header at fixed `h-10 w-10`. Apply the same pattern to other shared icon buttons placed alongside title text.
 
+### 6.2.1 BackLink Component
+
+`BackLink` (`shared/components/BackLink.tsx`) is the standalone "Back" affordance placed at the top of a page's content (above `PageHeader`). It is distinct from `PageHeader`'s `onBack` icon button — use `BackLink` when the page wants a labelled text link rather than an inline icon next to a title.
+
+Behavior:
+
+- Navigates to the previous in-app URL via `navigate(-1)` when prior history exists (`location.key !== "default"`).
+- Falls back to `/dashboard` when authenticated, `/` when not, when there is no prior history (e.g. deep-linked or fresh tab).
+- Renders an `ArrowLeft` icon + `t("common.back")` label in `text-gray-500 hover:text-navy` with a gold focus ring.
+
+Placement:
+
+- On `AdaptiveLayout` / `PublicLayout` / `DashboardLayout` pages (Help, About, Profile, Update Email), drop `<BackLink />` as the first child of the page's `space-y-6` wrapper — the page rhythm provides spacing, so no margin prop is needed.
+- On `SplitLayout` pages (Login), content is vertically centered with no `<main>` padding, so pass an explicit margin: `<BackLink className="mb-6" />`.
+
 ### 6.3 Eyebrow Label Component
 
 The demo uses this pattern 30+ times - extract it:
@@ -916,10 +931,10 @@ return (
 
 | Layout            | Used by                   | Pattern                                                                                                                                                                                                                                                                                                                                                                                                    |
 | ----------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `PublicLayout`    | `/credentials/verify/:id` | Navy header with **gold brand mark** + gold underline, white card body, footer                                                                                                                                                                                                                                                                                                                             |
+| `PublicLayout`    | `/credentials/verify/:id` | Navy header (`min-h-[64px] sm:min-h-[72px]` matching `TopNav`) with **gold brand mark** + gold underline, white card body, footer. `<main>` padding `px-4 pt-4 pb-12 sm:px-8` mirrors `DashboardLayout` so unauthed Help/About sit identically to their authed counterparts.                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | `SplitLayout`     | `/` (Landing), `/login`   | 50/50 split: navy brand panel left + light content right on desktop; navy band on top + content below on mobile. Desktop navy panel carries gold + blue `<DecorBlob>`s; the mobile navy band has none (too cramped — was clipped by `overflow-hidden` and the safe-area gap on notched iOS). Language switcher floats top-right on desktop (light variant), inside the navy band on mobile (dark variant). |
-| `DashboardLayout` | All authenticated routes  | Fixed navy sidebar (`w-72`) with **gold brand mark cluster**, transparent top navbar, scrollable `main` (`overflow-y-scroll [scrollbar-gutter:stable]` so route-switches with differing content heights don't reflow the navbar). On every route change, `useScrollToTop()` resets both the window scroller and the `#main` overflow container to the top so the next page never opens mid-scroll inherited from the previous one. Mobile: hand-rolled CSS-transform slide (`-translate-x-full` ↔ `translate-x-0`) with `bg-navy/80` click backdrop.                                                        |
-| `AdaptiveLayout`  | `/help`, `/about`         | Renders `DashboardLayout` if `isAuthenticated`, `PublicLayout` otherwise                                                                                                                                                                                                                                                                                                                                   |
+| `DashboardLayout` | All authenticated routes  | Fixed navy sidebar (`w-72`) with **gold brand mark cluster**, transparent top navbar (`min-h-[64px] sm:min-h-[72px]`), scrollable `main` (`overflow-y-scroll [scrollbar-gutter:stable]` so route-switches with differing content heights don't reflow the navbar). On every route change, `useScrollToTop()` resets both the window scroller and the `#main` overflow container to the top so the next page never opens mid-scroll inherited from the previous one. Mobile: hand-rolled CSS-transform slide (`-translate-x-full` ↔ `translate-x-0`) with `bg-navy/80` click backdrop. `<main>` padding `px-4 pt-4 pb-12 sm:px-8`.                                                                                                                                                                                                                                 |
+| `AdaptiveLayout`  | `/help`, `/about`         | Renders `DashboardLayout` if `isAuthenticated`, `PublicLayout` otherwise. Because both layouts use identical `<main>` padding (`px-4 pt-4 pb-12 sm:px-8`) and matching header heights, unauthed and authed Help/About pages render identically.                                                                                                                                                                                                                                                                                                                                                                 |
 
 ### 8.2 Container Widths
 

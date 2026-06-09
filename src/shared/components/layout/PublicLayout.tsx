@@ -8,7 +8,7 @@ export function PublicLayout() {
   return (
     <div className="min-h-screen bg-base text-navy flex flex-col">
       <header className="bg-navy border-b border-gold/30 safe-area-top no-print">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[64px] sm:min-h-[72px] flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 group" aria-label="CredChain home">
             <ShieldCheck
               className="h-6 w-6 text-gold transition-transform group-hover:scale-110"
@@ -24,7 +24,7 @@ export function PublicLayout() {
         </div>
       </header>
 
-      <main id="main" className="flex-1 w-full flex flex-col px-4 sm:px-6 lg:px-8 py-6">
+      <main id="main" className="flex-1 w-full flex flex-col px-4 pt-4 pb-12 sm:px-8">
         <Outlet />
       </main>
 
