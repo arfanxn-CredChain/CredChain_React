@@ -390,6 +390,8 @@ bg-error -> shadow-lg shadow-error/20
 
 **Floating surfaces (popovers, dropdowns, tooltips):** Use `shadow-xl shadow-navy/20`. The navy tint blends into dark backgrounds (where a gray-tinted shadow reads as a white smudge) and gives a subtle premium elevation on light backgrounds. Codified in `dropdown-menu.tsx` for `DropdownMenuContent` and `DropdownMenuSubContent`.
 
+**Scroll-lock / layout-shift guard:** `<html>` reserves the scrollbar gutter via `scrollbar-gutter: stable` (`styles/index.css`). Radix overlays that mount `react-remove-scroll` (`Select`, `Dialog`) lock the `<body>` with `data-scroll-locked` and inject `padding-right`/`margin-right` equal to the scrollbar width — which double-counts against the already-stable gutter and shifts the page ~12px on open/close. Two guards keep this stable: (1) `@ui/dropdown-menu` `DropdownMenu` defaults `modal={false}` (its Radix version supports the prop, so it skips scroll-lock entirely); (2) `@radix-ui/react-select@2.2.6` has **no** `modal` prop and always locks, so a global rule neutralizes the injected offsets: `body[data-scroll-locked] { margin-right: 0 !important; padding-right: 0 !important; }`. Never reintroduce per-element scrollbar-width padding to "fix" dropdown shift — the gutter is already stable.
+
 ---
 
 ## 6. Typography

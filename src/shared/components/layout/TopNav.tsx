@@ -121,7 +121,7 @@ export function TopNav({ onMenuClick }: TopNavProps) {
               <LanguageSwitcher />
             </div>
 
-            <DropdownMenu modal={false}>
+            <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
                   className="group flex items-center gap-3 rounded-xl p-1 focus-visible:[outline:none]"
