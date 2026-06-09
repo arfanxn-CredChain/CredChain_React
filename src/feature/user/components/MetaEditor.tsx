@@ -37,30 +37,32 @@ export function MetaEditor<T extends FieldValues>({
           const keyError = errors?.[idx]?.key?.message;
           const valueError = errors?.[idx]?.value?.message;
           return (
-            <div key={field.id} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] items-start gap-2">
-              <div>
-                <Input
-                  placeholder={t("meta.keyPlaceholder")}
-                  aria-label={t("meta.keyAriaLabel", { n: idx + 1 })}
-                  {...control.register(`${name}.${idx}.key` as never)}
-                />
-                {keyError && (
-                  <p className="text-xs text-error mt-1" role="alert">
-                    {t(keyError)}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Input
-                  placeholder={t("meta.valuePlaceholder")}
-                  aria-label={t("meta.valueAriaLabel", { n: idx + 1 })}
-                  {...control.register(`${name}.${idx}.value` as never)}
-                />
-                {valueError && (
-                  <p className="text-xs text-error mt-1" role="alert">
-                    {t(valueError)}
-                  </p>
-                )}
+            <div key={field.id} className="flex items-start gap-2">
+              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                  <Input
+                    placeholder={t("meta.keyPlaceholder")}
+                    aria-label={t("meta.keyAriaLabel", { n: idx + 1 })}
+                    {...control.register(`${name}.${idx}.key` as never)}
+                  />
+                  {keyError && (
+                    <p className="text-xs text-error mt-1" role="alert">
+                      {t(keyError)}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <Input
+                    placeholder={t("meta.valuePlaceholder")}
+                    aria-label={t("meta.valueAriaLabel", { n: idx + 1 })}
+                    {...control.register(`${name}.${idx}.value` as never)}
+                  />
+                  {valueError && (
+                    <p className="text-xs text-error mt-1" role="alert">
+                      {t(valueError)}
+                    </p>
+                  )}
+                </div>
               </div>
               <Button
                 type="button"
@@ -68,7 +70,7 @@ export function MetaEditor<T extends FieldValues>({
                 size="icon"
                 onClick={() => remove(idx)}
                 aria-label={t("meta.removeAriaLabel", { n: idx + 1 })}
-                className="h-10 w-10 mt-0.5"
+                className="h-10 w-10 mt-0.5 shrink-0"
               >
                 <X className="h-4 w-4" />
               </Button>
