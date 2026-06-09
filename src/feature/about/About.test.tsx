@@ -30,4 +30,11 @@ describe("About", () => {
     render(<About />, { wrapper: TestProviders });
     expect(screen.getByText(/version/i)).toBeInTheDocument();
   });
+
+  it("renders a link to the landing page", () => {
+    render(<About />, { wrapper: TestProviders });
+    const link = screen.getByRole("link", { name: /visit landing page/i });
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveAttribute("href", "/");
+  });
 });

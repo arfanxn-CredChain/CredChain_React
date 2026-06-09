@@ -325,6 +325,9 @@
   "about.contact.title": "Hubungi pengembang",
   "about.contact.body": "Ada pertanyaan, masukan, atau peluang kerja sama? Hubungi langsung.",
   "about.contact.label": "Email pengembang",
+  "about.explore.title": "Siap menjelajahi CredChain?",
+  "about.explore.body": "Lihat cara kerja kredensial on-chain yang minim kepercayaan dari awal.",
+  "about.explore.action": "Kunjungi halaman utama",
   "labels": {
     "id_token": "ID Token",
     "email": "Alamat Email",

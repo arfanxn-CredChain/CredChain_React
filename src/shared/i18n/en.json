@@ -325,6 +325,9 @@
   "about.contact.title": "Contact the developer",
   "about.contact.body": "Questions, feedback, or partnership inquiries? Reach out directly.",
   "about.contact.label": "Developer email",
+  "about.explore.title": "Ready to explore CredChain?",
+  "about.explore.body": "See how trust-minimized, on-chain credentials work from the ground up.",
+  "about.explore.action": "Visit landing page",
   "labels": {
     "id_token": "ID Token",
     "email": "Email",

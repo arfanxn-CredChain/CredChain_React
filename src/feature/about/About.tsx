@@ -1,8 +1,10 @@
-import { ShieldCheck, Users, FileBadge, User, Mail } from "lucide-react";
+import { ShieldCheck, Users, FileBadge, User, Mail, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import { BackLink } from "@shared/components/BackLink";
 import { PageHeader } from "@shared/components/PageHeader";
 import { Card } from "@ui/card";
+import { Button } from "@ui/button";
 import { DecorBlob } from "@shared/components/DecorBlob";
 import { EyebrowLabel } from "@shared/components/EyebrowLabel";
 import { env } from "@shared/lib/env";
@@ -104,6 +106,26 @@ export function About() {
             <Mail className="h-4 w-4 shrink-0" aria-hidden="true" />
             {env.supportEmail}
           </a>
+        </div>
+      </Card>
+
+      <Card className="p-6 sm:p-8 relative overflow-hidden">
+        <DecorBlob tone="gold" position="top-right" size="lg" />
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+          <div>
+            <h3 className="font-display text-lg font-semibold text-navy tracking-tight">
+              {t("about.explore.title")}
+            </h3>
+            <p className="text-sm text-gray-500 mt-1 max-w-sm">
+              {t("about.explore.body")}
+            </p>
+          </div>
+          <Button asChild variant="gold" size="lg">
+            <Link to="/" className="inline-flex items-center gap-2 whitespace-nowrap">
+              {t("about.explore.action")}
+              <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+            </Link>
+          </Button>
         </div>
       </Card>
     </div>
