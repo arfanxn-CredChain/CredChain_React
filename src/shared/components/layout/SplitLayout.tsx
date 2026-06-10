@@ -40,16 +40,16 @@ export function SplitLayout({ brandSlot, mobileBrandSlot, children }: SplitLayou
       {/* Right panel (or below band on mobile) */}
       <div className="relative flex h-dvh w-full flex-col overflow-hidden bg-base lg:w-1/2">
         {/* Mobile-only navy band */}
-        <div className="safe-area-top relative w-full max-h-[40dvh] flex-shrink-0 overflow-hidden bg-navy text-surface lg:hidden">
+        <div className="safe-area-top relative flex h-[50dvh] w-full flex-shrink-0 flex-col items-center justify-center overflow-hidden bg-navy text-surface lg:hidden">
           {/* Inline language switcher — same placement as PublicLayout header */}
           <div className="absolute top-4 right-4 z-20">
             <LanguageSwitcher variant="dark" />
           </div>
-          <div className="relative z-10">{mobileBrandSlot}</div>
+          <div className="relative z-10 flex h-full flex-col items-center justify-center">{mobileBrandSlot}</div>
         </div>
 
-        {/* Content area — fills remaining viewport, centers content */}
-        <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-center overflow-hidden">
+        {/* Content area — fills remaining viewport */}
+        <div className="flex min-h-0 w-full flex-1 flex-col items-center overflow-hidden">
           {children}
         </div>
       </div>

@@ -36,10 +36,10 @@ describe("SplitLayout", () => {
     expect(contentArea).toHaveClass("overflow-hidden");
   });
 
-  it("renders mobile brand band with max-h-[40dvh] and flex-shrink-0", () => {
+  it("renders mobile brand band with h-[50dvh] and flex-shrink-0", () => {
     renderSplitLayout();
     const mobileBand = screen.getByTestId("mobile-brand-slot").closest(".safe-area-top");
-    expect(mobileBand).toHaveClass("max-h-[40dvh]");
+    expect(mobileBand).toHaveClass("h-[50dvh]");
     expect(mobileBand).toHaveClass("flex-shrink-0");
   });
 
