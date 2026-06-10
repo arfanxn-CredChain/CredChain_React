@@ -55,7 +55,7 @@ export function TopNav({ onMenuClick }: TopNavProps) {
     <>
       <header className="no-print relative z-10 bg-navy sm:bg-transparent">
         <div className="safe-area-top" aria-hidden="true" />
-        <div className="flex min-h-[64px] items-center justify-between px-4 py-4 shadow-md sm:min-h-[72px] sm:px-8 sm:py-5 sm:shadow-none">
+        <div className="flex min-h-[64px] items-center justify-between px-4 py-4 shadow-md sm:px-8 sm:shadow-none">
           <div className="flex items-center gap-4">
             <button
               onClick={onMenuClick}
