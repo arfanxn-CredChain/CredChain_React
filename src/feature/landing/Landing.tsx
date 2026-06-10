@@ -9,9 +9,10 @@ interface AttestationStampProps {
   verified: string;
   theme?: "light" | "dark";
   size?: "full" | "mini";
+  className?: string;
 }
 
-function AttestationStamp({ verified, theme = "light", size = "full" }: AttestationStampProps) {
+function AttestationStamp({ verified, theme = "light", size = "full", className }: AttestationStampProps) {
   const isMini = size === "mini";
   const isDark = theme === "dark";
 
@@ -29,7 +30,7 @@ function AttestationStamp({ verified, theme = "light", size = "full" }: Attestat
 
   return (
     <div
-      className={`relative aspect-square ${containerSize} max-w-full mx-auto select-none flex-shrink-0`}
+      className={`relative aspect-square ${containerSize} max-w-full mx-auto select-none flex-shrink-0 ${className ?? ""}`}
       aria-hidden="true"
     >
       {/* Rotating inscription ring */}
@@ -129,6 +130,13 @@ export function Landing() {
 
   const mobileBrand = (
     <div className="text-center py-[2dvh] px-6 shadow-md rounded-b-3xl">
+      <div className="mx-auto mb-[1dvh] w-fit max-w-[min(160px,18vh)]">
+        <AttestationStamp
+          verified={t("landing.stamp.verified")}
+          theme="dark"
+          size="mini"
+        />
+      </div>
       <h2 className="font-display text-3xl font-extrabold text-gold tracking-tight">
         CredChain
       </h2>
