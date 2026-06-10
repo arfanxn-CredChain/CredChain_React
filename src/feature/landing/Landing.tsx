@@ -149,7 +149,7 @@ export function Landing() {
         aria-labelledby="landing-title"
         className="relative flex h-full w-full max-w-xl flex-col items-start justify-center py-[2dvh] lg:py-0 space-y-[1.5dvh] sm:space-y-[2dvh]"
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-start gap-3">
           <div className="h-px w-10 bg-gold shrink-0" aria-hidden="true" />
           <span className="text-[0.6875rem] font-mono uppercase tracking-[0.22em] text-gold">
             {t("landing.eyebrow")}
@@ -172,7 +172,7 @@ export function Landing() {
           {t("landing.subtitle")}
         </p>
 
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-1">
+        <div className="flex flex-wrap items-start gap-x-6 gap-y-3 pt-1">
           <Button asChild variant="gold" size="lg">
             <Link to={primaryHref} className="inline-flex items-center gap-2">
               {primaryLabel}
