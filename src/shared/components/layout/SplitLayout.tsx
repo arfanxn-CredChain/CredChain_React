@@ -24,7 +24,7 @@ interface SplitLayoutProps {
 export function SplitLayout({ brandSlot, mobileBrandSlot, children }: SplitLayoutProps) {
   useScrollToTop();
   return (
-    <div className="relative flex min-h-screen bg-surface">
+    <div className="relative flex h-dvh overflow-hidden bg-surface">
       {/* Desktop floating language switcher — light variant on light right panel */}
       <div className="absolute top-4 right-4 z-20 hidden lg:block">
         <LanguageSwitcher variant="light" />
@@ -38,9 +38,9 @@ export function SplitLayout({ brandSlot, mobileBrandSlot, children }: SplitLayou
       </div>
 
       {/* Right panel (or below band on mobile) */}
-      <div className="relative flex min-h-screen w-full flex-col bg-base lg:w-1/2">
+      <div className="relative flex h-dvh w-full flex-col overflow-hidden bg-base lg:w-1/2">
         {/* Mobile-only navy band */}
-        <div className="safe-area-top relative w-full overflow-hidden bg-navy text-surface lg:hidden">
+        <div className="safe-area-top relative w-full max-h-[35dvh] flex-shrink-0 overflow-hidden bg-navy text-surface lg:hidden">
           {/* Inline language switcher — same placement as PublicLayout header */}
           <div className="absolute top-4 right-4 z-20">
             <LanguageSwitcher variant="dark" />
@@ -49,7 +49,9 @@ export function SplitLayout({ brandSlot, mobileBrandSlot, children }: SplitLayou
         </div>
 
         {/* Content area — fills remaining viewport, centers content */}
-        <div className="flex w-full flex-1 flex-col items-center justify-center">{children}</div>
+        <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-center overflow-hidden">
+          {children}
+        </div>
       </div>
     </div>
   );

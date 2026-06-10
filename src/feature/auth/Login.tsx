@@ -13,13 +13,13 @@ export function Login() {
     <div className="flex flex-col items-center text-center gap-6">
       <ShieldCheck className="w-24 h-24 text-gold drop-shadow-xl" aria-hidden="true" />
       <div>
-        <h1 className="font-display text-4xl md:text-5xl font-extrabold text-surface mb-4 tracking-tight text-balance min-h-[2lh]">
+        <h1 className="font-display text-4xl md:text-5xl font-extrabold text-surface mb-4 tracking-tight text-balance">
           <Trans
             i18nKey="auth.welcome.title"
             components={{ brand: <span className="text-gold" /> }}
           />
         </h1>
-        <p className="text-lg text-gray-400 leading-relaxed text-pretty min-h-[5lh]">
+        <p className="text-lg text-gray-400 leading-relaxed text-pretty">
           {t("auth.welcome.tagline")}
         </p>
       </div>
@@ -27,7 +27,7 @@ export function Login() {
   );
 
   const mobileBrand = (
-    <div className="text-center py-10 px-6 shadow-md rounded-b-3xl">
+    <div className="text-center py-[2dvh] px-6 shadow-md rounded-b-3xl">
       <ShieldCheck className="w-16 h-16 text-gold mx-auto mb-3 drop-shadow-md" aria-hidden="true" />
       <h2 className="font-display text-3xl font-extrabold text-gold tracking-tight">
           CredChain
@@ -38,14 +38,14 @@ export function Login() {
 
   return (
     <SplitLayout brandSlot={desktopBrand} mobileBrandSlot={mobileBrand}>
-      <div className="w-full max-w-md px-4 sm:px-6 py-8 lg:py-0">
-        <BackLink className="mb-6" />
+      <div className="w-full max-w-md px-4 sm:px-6 py-[2dvh] lg:py-0">
+        <BackLink className="mb-[2dvh]" />
 
-        <div className="bg-surface rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-8 sm:p-10">
+        <div className="bg-surface rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-6 sm:p-8">
           <h3 className="font-display text-2xl font-bold text-navy mb-2 tracking-tight">
             {t("auth.signin.title")}
           </h3>
-          <p className="text-gray-500 text-sm mb-8 min-h-[2lh]">
+          <p className="text-gray-500 text-sm mb-[2dvh]">
             {t("auth.signin.subtitle")}
           </p>
 

@@ -128,14 +128,7 @@ export function Landing() {
   );
 
   const mobileBrand = (
-    <div className="text-center py-10 px-6 shadow-md rounded-b-3xl">
-      <div className="mx-auto mb-4 w-fit">
-        <AttestationStamp
-          verified={t("landing.stamp.verified")}
-          theme="dark"
-          size="mini"
-        />
-      </div>
+    <div className="text-center py-[2dvh] px-6 shadow-md rounded-b-3xl">
       <h2 className="font-display text-3xl font-extrabold text-gold tracking-tight">
         CredChain
       </h2>
@@ -146,7 +139,7 @@ export function Landing() {
     <SplitLayout brandSlot={desktopBrand} mobileBrandSlot={mobileBrand}>
       <section
         aria-labelledby="landing-title"
-        className="relative w-full max-w-xl px-6 sm:px-8 lg:px-12 py-10 lg:py-0 space-y-6 sm:space-y-7"
+        className="relative w-full max-w-xl px-6 sm:px-8 lg:px-12 py-[2dvh] lg:py-0 space-y-[1.5dvh] sm:space-y-[2dvh]"
       >
         <div className="flex items-center gap-3">
           <div className="h-px w-10 bg-gold shrink-0" aria-hidden="true" />
@@ -157,9 +150,9 @@ export function Landing() {
 
         <h1
           id="landing-title"
-          className="font-display font-bold text-navy text-balance min-h-[2.1lh]"
+          className="font-display font-bold text-navy text-balance"
           style={{
-            fontSize: "clamp(2rem, 5.5vw, 4rem)",
+            fontSize: "clamp(1.25rem, 5.5vw, 4rem)",
             lineHeight: "1.04",
             letterSpacing: "-0.02em",
           }}
@@ -167,7 +160,7 @@ export function Landing() {
           {t("landing.title")}
         </h1>
 
-        <p className="max-w-lg text-base sm:text-lg leading-relaxed text-gray-600 text-pretty min-h-[5lh]">
+        <p className="max-w-lg text-base sm:text-lg leading-relaxed text-gray-600 text-pretty">
           {t("landing.subtitle")}
         </p>
 
