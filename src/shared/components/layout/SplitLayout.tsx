@@ -50,7 +50,9 @@ export function SplitLayout({ brandSlot, mobileBrandSlot, children }: SplitLayou
 
         {/* Content area — fills remaining viewport */}
         <div className="flex min-h-0 w-full flex-1 flex-col items-center overflow-hidden">
-          {children}
+          <div className="flex w-full flex-1 flex-col px-4 pt-4 pb-12 sm:px-8">
+            {children}
+          </div>
         </div>
       </div>
     </div>

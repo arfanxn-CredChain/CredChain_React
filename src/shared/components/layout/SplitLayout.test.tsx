@@ -31,7 +31,7 @@ describe("SplitLayout", () => {
 
   it("renders content area with min-h-0 and overflow-hidden", () => {
     renderSplitLayout();
-    const contentArea = screen.getByTestId("content").parentElement;
+    const contentArea = screen.getByTestId("content").parentElement?.parentElement;
     expect(contentArea).toHaveClass("min-h-0");
     expect(contentArea).toHaveClass("overflow-hidden");
   });
