@@ -184,8 +184,9 @@ CredChain_React/
           DashboardLayout.tsx
           PublicLayout.tsx
           SplitLayout.tsx    # 50/50 navy+light; used by Landing + Login
-          Sidebar.tsx
-          TopNav.tsx
+          DashboardSidebar.tsx
+          NavbarDashboard.tsx
+          NavbarPublic.tsx
           nav-items.ts       # NAV_ITEMS with minRole + exactRole + inSidebar flags
         BackLink.tsx
         CopyrightFooter.tsx
@@ -359,12 +360,12 @@ body {
 | Card border                         | `border-gray-100`                                                                          |
 | Input border                        | `border-gray-200`                                                                          |
 | Focus ring                          | `ring-gold` (via `focus:ring-2 focus:ring-gold`)                                           |
-| Sidebar background                  | `bg-navy`                                                                                  |
-| Sidebar text                        | `text-gray-300` (inactive), `text-surface` (active)                                        |
-| Brand mark (shield icon + wordmark) | `text-gold` — always, on every chrome (Sidebar, PublicLayout, mobile TopNav)               |
+| DashboardSidebar background         | `bg-navy`                                                                                  |
+| DashboardSidebar text               | `text-gray-300` (inactive), `text-surface` (active)                                        |
+| Brand mark (shield icon + wordmark) | `text-gold` — always, on every chrome (DashboardSidebar, PublicLayout, mobile NavbarDashboard) |
 | DashboardLayout desktop top area    | transparent over page background; no static title — each page renders its own `PageHeader` |
-| TopNav search input (resting)       | `bg-gray-50 text-navy placeholder-gray-400 border-gray-200 rounded-full`                   |
-| TopNav search input (focus)         | `bg-white ring-2 ring-gold border-transparent`                                             |
+| NavbarDashboard search input (resting) | `bg-gray-50 text-navy placeholder-gray-400 border-gray-200 rounded-full`                   |
+| NavbarDashboard search input (focus) | `bg-white ring-2 ring-gold border-transparent`                                             |
 
 ### 5.2 Role-Color Mapping
 
@@ -561,7 +562,7 @@ The design system commits to a specific aesthetic position. These principles gua
 
 These are the things that make CredChain visually distinct. Touch them only with intent.
 
-1. **Navy + gold pairing** - Never substitute purple gradients, blue-to-cyan washes, or rainbow accents. The palette is the brand. The brand mark cluster (shield icon + "CredChain" wordmark) always renders in `text-gold` regardless of background — Sidebar, `PublicLayout` header, and mobile `TopNav` shield all use `text-gold`. Never `text-surface` for the wordmark.
+1. **Navy + gold pairing** - Never substitute purple gradients, blue-to-cyan washes, or rainbow accents. The palette is the brand. The brand mark cluster (shield icon + "CredChain" wordmark) always renders in `text-gold` regardless of background — `DashboardSidebar`, `PublicLayout` header (`NavbarPublic`), and mobile `NavbarDashboard` shield all use `text-gold`. Never `text-surface` for the wordmark.
 2. **Tinted colored shadows** - `shadow-md shadow-navy/20`, `shadow-lg shadow-gold/20`, `shadow-error/20` under brand-colored elements. This is the signature material treatment.
 3. **Single decorative blob per hero area** - One soft radial gradient, never multiple competing blobs. Restraint is the move.
 4. **Mono-font identifiers** - Every hash, address, and ID renders in `font-mono`. This is the blockchain visual cue. Never sans-serif a hash.
@@ -991,10 +992,10 @@ All containers center via `mx-auto`.
 | Form fields (3-up)      | `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6`          |
 | Form fields (2-up)      | `grid grid-cols-1 md:grid-cols-2 gap-6`                         |
 
-### 8.6 Sidebar Pattern
+### 8.6 Dashboard Sidebar Pattern
 
 ```tsx
-// shared/components/layout/Sidebar.tsx
+// shared/components/layout/DashboardSidebar.tsx
 <aside
   className={cn(
     "fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-navy text-gray-300 shadow-2xl transition-transform duration-300 sm:static sm:flex-shrink-0 sm:translate-x-0",
@@ -1026,7 +1027,7 @@ The icon color follows the active state via the `children` render prop (`isActiv
 
 ### 8.7 Mobile Drawer
 
-**As-built:** the mobile sidebar is hand-rolled in `DashboardLayout.tsx`, not a shadcn `Sheet`. The `<aside>` is fixed-position and slides via CSS transform, toggled by a `sidebarOpen` state; a `bg-navy/80` backdrop (`sm:hidden`) closes it on click. `Sidebar` accepts an `onClose` prop that renders a close (`X`) button and dismisses the drawer on nav-item click.
+**As-built:** the mobile sidebar is hand-rolled in `DashboardLayout.tsx`, not a shadcn `Sheet`. The `<aside>` is fixed-position and slides via CSS transform, toggled by a `dashboardSidebarOpen` local state (the store state is reserved for cross-component coordination, currently unused); a `bg-navy/80` backdrop (`sm:hidden`) closes it on click. `DashboardSidebar` accepts an `onClose` prop that renders a close (`X`) button and dismisses the drawer on nav-item click.
 
 ```tsx
 // DashboardLayout.tsx (abbreviated)
@@ -1034,10 +1035,10 @@ The icon color follows the active state via the `children` render prop (`isActiv
   className={cn(
     "fixed inset-y-0 left-0 z-50 w-72 shadow-2xl transition-transform duration-300",
     "sm:sticky sm:top-0 sm:h-screen sm:flex-shrink-0 sm:translate-x-0",
-    sidebarOpen ? "translate-x-0" : "-translate-x-full",
+    dashboardSidebarOpen ? "translate-x-0" : "-translate-x-full",
   )}
 >
-  <Sidebar onClose={() => setSidebarOpen(false)} />
+  <DashboardSidebar onClose={() => setDashboardSidebarOpen(false)} />
 </aside>
 ```
 
@@ -1053,7 +1054,7 @@ Mobile-first using Tailwind defaults:
 | ---------- | --------- | --------------------------------------- |
 | `sm:`      | 640px     | Tables visible, side-by-side rows       |
 | `md:`      | 768px     | 2-column grids, search bar visibility   |
-| `lg:`      | 1024px    | Sidebar visible, split auth, 4-up grids |
+| `lg:`      | 1024px    | Sidebar (DashboardSidebar) visible, split auth, 4-up grids |
 | `xl:`      | 1280px    | (rarely used) ultra-wide refinements    |
 
 ### 8.9 Responsive Design
@@ -1093,7 +1094,7 @@ Every interactive element on touch devices must be at minimum **44x44px** (Apple
 | Icon button (mobile)  | `p-3` (12px on each side, 24px icon) | 48px square                |
 | Icon button (desktop) | `p-2` (8px on each side, 24px icon)  | 40px square                |
 
-Sidebar nav items already meet target with `px-4 py-3`. Form inputs at `py-3` produce 48px - keep that on mobile, never compress to `py-2`.
+`DashboardSidebar` nav items already meet target with `px-4 py-3`. Form inputs at `py-3` produce 48px - keep that on mobile, never compress to `py-2`.
 
 #### Safe-Area Insets
 
@@ -1120,7 +1121,7 @@ Apply to:
 - Bottom-sheet dialogs (when added)
 - Toast container (sonner provides this, but verify on iOS)
 
-**Cascade gotcha:** `safe-area-top` (and `-bottom`/`-x`) sets `padding-top: env(safe-area-inset-top)` directly. When co-located with Tailwind's `py-*` utilities on the same element, `safe-area-top` overrides the `padding-top` from `py-*` (CSS utilities-layer source order), leaving the element with `padding-top: 0` on devices without a notch. Apply `safe-area-top` to a dedicated zero-height spacer `<div>` _inside_ the element instead of co-locating it with `py-*`. Pattern in use: `TopNav.tsx`.
+**Cascade gotcha:** `safe-area-top` (and `-bottom`/`-x`) sets `padding-top: env(safe-area-inset-top)` directly. When co-located with Tailwind's `py-*` utilities on the same element, `safe-area-top` overrides the `padding-top` from `py-*` (CSS utilities-layer source order), leaving the element with `padding-top: 0` on devices without a notch. Apply `safe-area-top` to a dedicated zero-height spacer `<div>` _inside_ the element instead of co-locating it with `py-*`. Pattern in use: `NavbarDashboard.tsx`.
 
 #### Mobile Keyboard Hints
 
@@ -1184,7 +1185,7 @@ The `md:` to `lg:` range needs explicit decisions:
 
 | Element          | md (tablet portrait)  | lg (tablet landscape / desktop) |
 | ---------------- | --------------------- | ------------------------------- |
-| Sidebar          | Mobile drawer (Sheet) | Fixed `w-72`                    |
+| DashboardSidebar          | Mobile drawer (Sheet) | Fixed `w-72`                    |
 | Navigation       | Hamburger menu        | Fixed sidebar                   |
 | Stat cards       | 2-up grid             | 4-up grid                       |
 | Credential cards | 2-up                  | 3-up                            |
@@ -1307,10 +1308,10 @@ interface AuthSlice {
 }
 
 interface UiSlice {
-  sidebarOpen: boolean;
+  dashboardSidebarOpen: boolean;
   locale: "en" | "id";
-  setSidebarOpen: (open: boolean) => void;
-  toggleSidebar: () => void;
+  setDashboardSidebarOpen: (open: boolean) => void;
+  toggleDashboardSidebar: () => void;
   setLocale: (locale: "en" | "id") => void;
 }
 
@@ -1322,10 +1323,10 @@ export const useStore = create<AuthSlice & UiSlice>()(
       setUser: (user) => set({ user, isAuthenticated: true }),
       clearUser: () => set({ user: null, isAuthenticated: false }),
 
-      sidebarOpen: false,
+      dashboardSidebarOpen: false,
       locale: "id",
-      setSidebarOpen: (open) => set({ sidebarOpen: open }),
-      toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
+      setDashboardSidebarOpen: (open) => set({ dashboardSidebarOpen: open }),
+      toggleDashboardSidebar: () => set((s) => ({ dashboardSidebarOpen: !s.dashboardSidebarOpen })),
       setLocale: (locale) => set({ locale }),
     }),
     {
@@ -2021,7 +2022,7 @@ export function MyComponent() {
 
 ### 14.4 Language Switcher
 
-Lives in TopNav. Persists choice to `useStore.locale`:
+Lives in `NavbarDashboard` and `NavbarPublic`. Persists choice to `useStore.locale`:
 
 ```tsx
 export function LanguageSwitcher() {
@@ -2725,7 +2726,7 @@ Production must add:
 
 ### 20.6 New Layout Pieces
 
-- `LanguageSwitcher` in TopNav
+- `LanguageSwitcher` in NavbarDashboard (and NavbarPublic)
 - User menu dropdown (replace static avatar with shadcn `DropdownMenu`)
 - Search command palette (shadcn `Command` triggered by Cmd+K) - optional Phase 2
 - Notifications bell (real-time toast feed) - optional Phase 2

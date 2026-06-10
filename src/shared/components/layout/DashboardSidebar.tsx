@@ -8,11 +8,11 @@ import { useLogout } from "@feature/auth/api/useLogout";
 import { useConfirm } from "@ui/confirm-dialog";
 import { NAV_ITEMS } from "@shared/components/layout/nav-items";
 
-interface SidebarProps {
+interface DashboardSidebarProps {
   onClose?: () => void;
 }
 
-export function Sidebar({ onClose }: SidebarProps) {
+export function DashboardSidebar({ onClose }: DashboardSidebarProps) {
   const user = useStore((s) => s.user);
   const logout = useLogout();
   const navigate = useNavigate();
