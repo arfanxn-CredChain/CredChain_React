@@ -81,7 +81,7 @@ CredChain_React/
                                # + api/ (11 hooks: useCreateUsers, useDeleteUsers, useRestoreUsers,
                                #         useTransferSuperAdmin, useUpdateSelfEmail, useUpdateSelfProfile,
                                #         useUpdateUserRoles, useUpdateUsers, useUser, useUsers, useUserSelf)
-                               # + components/ (CopyInlineButton, MetaEditor, RoleFilterMenu, SortMenu,
+                               # + components/ (MetaEditor, RoleFilterMenu, SortMenu,
                                #                UserCreateRow, UserEditDrawer, UserRoleBadge, UserStatusBadge)
                                # + hooks/ (useUserListParams) + lib/ (meta) + schemas/ (user)
       credential/              # CredentialDetail, CredentialIssue, CredentialList, MyCredentials,
@@ -341,9 +341,9 @@ className={`base classes ${isActive ? "active" : ""} ${className}`}
 
 > The `vaul` `Drawer` primitive is used by `feature/user/components/UserEditDrawer.tsx` (admin batch user edit). It lives in the feature, not in `@ui/`, and is the only content-drawer in the app — the mobile sidebar is NOT a `vaul`/`Sheet` drawer (see Error Handling / layout notes).
 
-**Custom shared components** (`@shared/components/*` — 15):
+**Custom shared components** (`@shared/components/*` — 16):
 
-`BackLink`, `CopyrightFooter`, `DecorBlob`, `EmptyState`, `ErrorBoundary` (`AppErrorBoundary`), `EyebrowLabel`, `LanguageSwitcher`, `LoadingSpinner` / `FullPageSpinner`, `MonoId`, `NotFound`, `OfflineBanner`, `PageHeader`, `RouteErrorBoundary`, `StatusPill`, `UserAvatar`.
+`BackLink`, `CopyInlineButton`, `CopyrightFooter`, `DecorBlob`, `EmptyState`, `ErrorBoundary` (`AppErrorBoundary`), `EyebrowLabel`, `LanguageSwitcher`, `LoadingSpinner` / `FullPageSpinner`, `MonoId`, `NotFound`, `OfflineBanner`, `PageHeader`, `RouteErrorBoundary`, `StatusPill`, `UserAvatar`.
 
 `CopyrightFooter` is the shared copyright strip rendered by `PublicLayout` at the bottom of public pages (and `AdaptiveLayout` when unauthenticated). It uses `font-sans` (DM Sans) for the copyright text — not `font-display` (reserved for headings) or `font-mono` (reserved for identifiers) — and renders the current year dynamically via `new Date().getFullYear()`. The footer background is `bg-transparent` (not `bg-surface`) so the page's `bg-base` shows through, eliminating the "white void" gap between short content and the footer when `bg-base` (#F8FAFC) and `bg-surface` (#FFFFFF) are nearly indistinguishable. Includes `safe-area-bottom` and `no-print` classes. The container that hosts it uses `min-h-dvh` (not `min-h-screen`) so the footer stays anchored to the bottom of the *visible* viewport on mobile, where `100vh` over-counts due to browser chrome.
 

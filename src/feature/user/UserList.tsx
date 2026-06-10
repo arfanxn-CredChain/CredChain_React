@@ -58,7 +58,7 @@ import { UserRoleBadge } from "./components/UserRoleBadge";
 import { UserStatusBadge } from "./components/UserStatusBadge";
 import { SortMenu } from "./components/SortMenu";
 import { RoleFilterMenu } from "./components/RoleFilterMenu";
-import { CopyInlineButton } from "./components/CopyInlineButton";
+import { CopyInlineButton } from "@shared/components/CopyInlineButton";
 import { UserEditDrawer } from "./components/UserEditDrawer";
 import { truncateAddress } from "@shared/lib/format";
 
@@ -272,11 +272,17 @@ export function UserList() {
                           <UserRoleBadge role={user.role} />
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center text-xs font-mono text-gray-500 mb-1">
-                            {user.wallet_address ? truncateAddress(user.wallet_address) : (
-                              <span className="text-sm text-gray-400 italic font-sans">{t("common.notSet")}</span>
-                            )}
-                          </div>
+                           <div className="flex items-center gap-1 text-xs font-mono text-gray-500 mb-1">
+                             {user.wallet_address ? truncateAddress(user.wallet_address) : (
+                               <span className="text-sm text-gray-400 italic font-sans">{t("common.notSet")}</span>
+                             )}
+                             {user.wallet_address && (
+                               <CopyInlineButton
+                                 value={user.wallet_address}
+                                 ariaLabel={t("user.copy.wallet")}
+                               />
+                             )}
+                           </div>
                           <UserStatusBadge deletedAt={user.deleted_at} />
                         </TableCell>
                         <TableCell className="text-right">

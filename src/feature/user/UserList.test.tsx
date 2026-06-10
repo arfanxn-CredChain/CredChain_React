@@ -73,7 +73,7 @@ describe("UserList", () => {
     renderUserList();
 
     await waitFor(() => {
-      expect(screen.getByText(/5 users/i)).toBeInTheDocument();
+      expect(screen.getByText(/^5 users$/i)).toBeInTheDocument();
     });
   });
 
@@ -234,6 +234,12 @@ describe("UserList", () => {
     renderUserList();
     await waitFor(() => expect(screen.getByText("Jane Doe")).toBeInTheDocument());
     expect(screen.getAllByRole("button", { name: /copy phone/i }).length).toBeGreaterThan(0);
+  });
+
+  it("renders copy buttons for wallet address in each row", async () => {
+    renderUserList();
+    await waitFor(() => expect(screen.getByText("Jane Doe")).toBeInTheDocument());
+    expect(screen.getAllByRole("button", { name: /copy wallet address/i }).length).toBeGreaterThan(0);
   });
 
   it("selecting a role filter updates the URL with role param", async () => {

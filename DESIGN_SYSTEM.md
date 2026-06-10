@@ -143,7 +143,7 @@ CredChain_React/
                              #   useCreateUsers, useUpdateUsers, useUpdateUserRoles,
                              #   useUpdateSelfProfile, useUpdateSelfEmail,
                              #   useDeleteUsers, useRestoreUsers, useTransferSuperAdmin)
-        components/          # CopyInlineButton, MetaEditor, RoleFilterMenu, SortMenu,
+        components/          # MetaEditor, RoleFilterMenu, SortMenu,
                              # UserCreateRow, UserEditDrawer (vaul), UserRoleBadge, UserStatusBadge
         hooks/               # useUserListParams
         lib/                 # meta
@@ -192,6 +192,7 @@ CredChain_React/
         CopyrightFooter.tsx
         DecorBlob.tsx
         EmptyState.tsx
+        CopyInlineButton.tsx
         ErrorBoundary.tsx    # AppErrorBoundary
         EyebrowLabel.tsx
         LanguageSwitcher.tsx

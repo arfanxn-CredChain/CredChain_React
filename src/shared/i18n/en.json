@@ -71,6 +71,7 @@
   "user.column.phone": "Phone",
   "user.copy.email": "Copy email",
   "user.copy.phone": "Copy phone number",
+  "user.copy.wallet": "Copy wallet address",
   "user.copy.copied": "Copied",
   "user.role.filter.label": "Role",
   "user.role.filter.all": "All roles",

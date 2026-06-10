@@ -96,6 +96,18 @@ describe("UserSelfProfile", () => {
     });
   });
 
+  it("renders copy email button on the profile card", async () => {
+    useStore.setState({
+      user: mockUserWithMeta({ email: "user@example.com" }),
+      isAuthenticated: true,
+    });
+    render(<UserSelfProfile />, { wrapper: TestProviders });
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /copy email/i })).toBeInTheDocument();
+    });
+  });
+
   it("renders Indonesian copy when locale is id", async () => {
     await i18n.changeLanguage("id");
     useStore.setState({

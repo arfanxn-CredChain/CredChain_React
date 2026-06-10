@@ -1,32 +1,16 @@
-import { useState } from "react";
-import { Settings as SettingsIcon, Globe, ShieldCheck, Wallet, Copy, Check } from "lucide-react";
+import { Settings as SettingsIcon, Globe, ShieldCheck, Wallet } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useStore } from "@app/store";
 import { Card } from "@ui/card";
 import { EyebrowLabel } from "@shared/components/EyebrowLabel";
 import { MonoId } from "@shared/components/MonoId";
 import { LanguageSwitcher } from "@shared/components/LanguageSwitcher";
+import { CopyInlineButton } from "@shared/components/CopyInlineButton";
 import { formatRole } from "@shared/auth/role";
-import { notify } from "@shared/lib/notify";
-import { cn } from "@shared/lib/cn";
 
 export function Settings() {
   const user = useStore((s) => s.user);
   const { t } = useTranslation();
-  const [copiedField, setCopiedField] = useState<"email" | "wallet" | null>(null);
-
-  const handleCopy = async (field: "email" | "wallet", value: string) => {
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopiedField(field);
-      notify.success(
-        field === "email" ? "settings.account.emailCopied" : "settings.account.walletCopied",
-      );
-      setTimeout(() => setCopiedField(null), 1800);
-    } catch {
-      notify.error("system.internal_error");
-    }
-  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -53,21 +37,10 @@ export function Settings() {
             <dd className="flex items-center gap-2">
               <span className="text-sm font-bold text-navy break-all">{user?.email}</span>
               {user?.email && (
-                <button
-                  type="button"
-                  onClick={() => void handleCopy("email", user.email!)}
-                  aria-label={t("settings.account.copyEmail")}
-                  className={cn(
-                    "shrink-0 p-1 rounded-md text-gray-400 hover:text-navy hover:bg-gray-100",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold transition-colors",
-                  )}
-                >
-                  {copiedField === "email" ? (
-                    <Check className="h-4 w-4 text-success" aria-hidden="true" />
-                  ) : (
-                    <Copy className="h-4 w-4" aria-hidden="true" />
-                  )}
-                </button>
+                <CopyInlineButton
+                  value={user.email}
+                  ariaLabel={t("settings.account.copyEmail")}
+                />
               )}
             </dd>
           </div>
@@ -91,21 +64,10 @@ export function Settings() {
                 className="text-sm"
               />
               {user?.wallet_address && (
-                <button
-                  type="button"
-                  onClick={() => void handleCopy("wallet", user.wallet_address!)}
-                  aria-label={t("settings.account.copyWallet")}
-                  className={cn(
-                    "shrink-0 p-1 rounded-md text-gray-400 hover:text-navy hover:bg-gray-100",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold transition-colors",
-                  )}
-                >
-                  {copiedField === "wallet" ? (
-                    <Check className="h-4 w-4 text-success" aria-hidden="true" />
-                  ) : (
-                    <Copy className="h-4 w-4" aria-hidden="true" />
-                  )}
-                </button>
+                <CopyInlineButton
+                  value={user.wallet_address}
+                  ariaLabel={t("settings.account.copyWallet")}
+                />
               )}
             </dd>
           </div>

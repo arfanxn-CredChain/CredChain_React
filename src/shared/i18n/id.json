@@ -71,6 +71,7 @@
   "user.column.phone": "Telepon",
   "user.copy.email": "Salin email",
   "user.copy.phone": "Salin nomor telepon",
+  "user.copy.wallet": "Salin alamat wallet",
   "user.copy.copied": "Tersalin",
   "user.role.filter.label": "Peran",
   "user.role.filter.all": "Semua peran",
