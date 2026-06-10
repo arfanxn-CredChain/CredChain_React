@@ -43,6 +43,12 @@ describe("CopyrightFooter", () => {
     expect(footer.className).not.toContain("font-display");
   });
 
+  it("renders with a transparent background so the page background shows through", () => {
+    render(<CopyrightFooter />);
+    const footer = screen.getByRole("contentinfo");
+    expect(footer.className).toContain("bg-transparent");
+  });
+
   it("applies custom className when provided", () => {
     render(<CopyrightFooter className="custom-class" />);
     const footer = screen.getByRole("contentinfo");
