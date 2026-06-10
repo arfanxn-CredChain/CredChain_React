@@ -39,7 +39,7 @@ export function Login() {
   return (
     <SplitLayout brandSlot={desktopBrand} mobileBrandSlot={mobileBrand}>
       <div className="flex h-full w-full flex-col items-center justify-start lg:justify-center px-4 sm:px-6 py-[2dvh] lg:py-0">
-        <BackLink className="mb-[2dvh]" />
+        <BackLink className="mb-[2dvh] self-start" />
 
         <div className="bg-surface rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-6 sm:p-8">
           <h3 className="font-display text-2xl font-bold text-navy mb-2 tracking-tight">
