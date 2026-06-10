@@ -93,7 +93,7 @@ CredChain_React/
     shared/
       api/                     # client.ts + codes.ts + envelope.ts + query-client.ts
       auth/                    # role.ts + guards.tsx
-      components/              # 14 shared components
+      components/              # 15 shared components
         ui/                    # 12 shadcn-style primitives (sole Radix import location)
         layout/                # AdaptiveLayout, DashboardLayout, PublicLayout, SplitLayout,
                                # Sidebar, TopNav, nav-items.ts
@@ -341,9 +341,11 @@ className={`base classes ${isActive ? "active" : ""} ${className}`}
 
 > The `vaul` `Drawer` primitive is used by `feature/user/components/UserEditDrawer.tsx` (admin batch user edit). It lives in the feature, not in `@ui/`, and is the only content-drawer in the app — the mobile sidebar is NOT a `vaul`/`Sheet` drawer (see Error Handling / layout notes).
 
-**Custom shared components** (`@shared/components/*` — 14):
+**Custom shared components** (`@shared/components/*` — 15):
 
-`BackLink`, `DecorBlob`, `EmptyState`, `ErrorBoundary` (`AppErrorBoundary`), `EyebrowLabel`, `LanguageSwitcher`, `LoadingSpinner` / `FullPageSpinner`, `MonoId`, `NotFound`, `OfflineBanner`, `PageHeader`, `RouteErrorBoundary`, `StatusPill`, `UserAvatar`.
+`BackLink`, `CopyrightFooter`, `DecorBlob`, `EmptyState`, `ErrorBoundary` (`AppErrorBoundary`), `EyebrowLabel`, `LanguageSwitcher`, `LoadingSpinner` / `FullPageSpinner`, `MonoId`, `NotFound`, `OfflineBanner`, `PageHeader`, `RouteErrorBoundary`, `StatusPill`, `UserAvatar`.
+
+`CopyrightFooter` is the shared copyright strip rendered by `PublicLayout` at the bottom of public pages (and `AdaptiveLayout` when unauthenticated). It uses `font-sans` (DM Sans) for the copyright text — not `font-display` (reserved for headings) or `font-mono` (reserved for identifiers) — includes `safe-area-bottom` and `no-print` classes, and renders the current year dynamically via `new Date().getFullYear()`. The container that hosts it uses `min-h-dvh` (not `min-h-screen`) so the footer stays anchored to the bottom of the *visible* viewport on mobile, where `100vh` over-counts due to browser chrome.
 
 ### Error Handling Layers
 
@@ -476,7 +478,7 @@ All env vars must be prefixed with `VITE_` to be exposed to the browser. Reading
 | Integration | Vitest + MSW | Feature flows with mocked `/api`                            |
 | E2E         | Playwright   | Auth flow, public routes, a11y smoke                        |
 
-**Current count:** **249 unit/component tests across 26 spec files** under `src/`, plus **20 Playwright tests across 3 e2e specs** (`auth.spec.ts`, `public.spec.ts`, `a11y.spec.ts`).
+**Current count:** **257 unit/component tests across 27 spec files** under `src/`, plus **20 Playwright tests across 3 e2e specs** (`auth.spec.ts`, `public.spec.ts`, `a11y.spec.ts`).
 
 **Coverage** (in `vitest.config.ts`): the `coverage` config uses a **selective `include` allowlist** (NOT global). Per-file thresholds of 90% lines / 85% branches / 90% functions / 90% statements apply only to the curated paths:
 
@@ -559,6 +561,7 @@ Before pushing, run the repo's canonical verification command and confirm it pas
 
 ## Change Log
 
+- **2026-06-10 — Extract `CopyrightFooter` component + fix mobile bottom-anchoring.** New shared component `@shared/components/CopyrightFooter` (`@shared/components/CopyrightFooter.tsx`) replaces the inline `<footer>` previously duplicated in `PublicLayout`. Renders `© {year} · CredChain · All rights reserved` in `font-sans` (DM Sans) at `text-xs` — copyright text is functional/legal copy, not a heading (`font-display`) or an identifier (`font-mono`). Carries `safe-area-bottom` and `no-print` classes. `PublicLayout` container switched from `min-h-screen` to `min-h-dvh` so the footer stays anchored to the bottom of the *visible* viewport on mobile browsers where `100vh` over-counts (mobile browser chrome collapses/expands the viewport, leaving the old `100vh` footer below the fold or cropped against the bottom bar). 8 new tests in `CopyrightFooter.test.tsx` cover year rendering, role, classes, and custom `className` passthrough. DESIGN_SYSTEM.md §8.1 updated to reference the new component.
 - **2026-06-09 — Flatten all header heights to `min-h-[64px]` (no `sm:` breakpoint).** Reverted `TopNav` desktop height from `min-h-[64px] sm:min-h-[72px]` to flat `min-h-[64px]` — the extra 8px on desktop was unnecessary for the search input + avatar combo, and the user found it too tall on responsive screens. Updated `PublicLayout` header to match (was `min-h-[64px] sm:min-h-[72px]` from the previous unification). Both headers now render identically at 64px on every breakpoint. `SplitLayout` (Landing, Login) still uses its own navy band pattern. Updated DESIGN_SYSTEM.md §8.1 to reflect the flat height.
 - **2026-06-09 — Unify BackLink top spacing on AdaptiveLayout pages.** Removed redundant `pt-2` from Help and About page wrappers. All four pages with `<BackLink />` (Help, About, Profile, Update Email) now share an identical wrapper pattern: `max-w-{N}xl mx-auto space-y-6` (no `pt-*`). The 16px `pt-4` on `<main>` already provides the top breathing room, so `pt-2` only created an 8px inconsistency between Help/About and Profile/Email.
 - **2026-06-09 — Unify PublicLayout chrome with DashboardLayout.** Public header height now `min-h-[64px]` matching `TopNav` (was fixed `h-16`, 8px shorter on desktop). Public `<main>` padding now `px-4 pt-4 pb-12 sm:px-8` matching `DashboardLayout` (was `px-4 sm:px-6 lg:px-8 py-6`). Effect: unauthed Help / About / VerifyCredential now render with identical navbar height and content offset to their authed (`DashboardLayout`) counterparts. `SplitLayout` (Landing, Login) intentionally unchanged — it uses its own centered-content pattern. Documented BackLink behavior + placement in DESIGN_SYSTEM.md §6.2.1.
