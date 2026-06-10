@@ -1,7 +1,6 @@
 import { ArrowLeft } from "lucide-react";
-import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useStore } from "@app/store";
+import { useSmartBack } from "@shared/hooks/useSmartBack";
 import { cn } from "@shared/lib/cn";
 
 interface BackLinkProps {
@@ -10,22 +9,12 @@ interface BackLinkProps {
 
 export function BackLink({ className }: BackLinkProps) {
   const { t } = useTranslation();
-  const isAuthenticated = useStore((s) => s.isAuthenticated);
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const handleClick = () => {
-    if (location.key !== "default") {
-      navigate(-1);
-    } else {
-      navigate(isAuthenticated ? "/dashboard" : "/");
-    }
-  };
+  const handleBack = useSmartBack();
 
   return (
     <button
       type="button"
-      onClick={handleClick}
+      onClick={handleBack}
       className={cn(
         "inline-flex items-center gap-1.5 text-sm font-medium text-gray-500",
         "transition-colors hover:text-navy",

@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ShieldCheck, LogOut, X } from "lucide-react";
 import { cn } from "@shared/lib/cn";
@@ -15,7 +15,6 @@ interface DashboardSidebarProps {
 export function DashboardSidebar({ onClose }: DashboardSidebarProps) {
   const user = useStore((s) => s.user);
   const logout = useLogout();
-  const navigate = useNavigate();
   const { t } = useTranslation();
   const { confirm, dialog } = useConfirm();
 
@@ -27,7 +26,7 @@ export function DashboardSidebar({ onClose }: DashboardSidebarProps) {
       cancelLabel: t("common.cancel"),
       tone: "destructive",
     });
-    if (ok) logout.mutate(undefined, { onSettled: () => navigate("/login") });
+    if (ok) logout.mutate();
   };
 
   const visibleItems = NAV_ITEMS.filter((item) => {

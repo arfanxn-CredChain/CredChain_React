@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { AlertCircle, Calendar, Mail, Phone, Wallet, Hash } from "lucide-react";
 import { useUser } from "./api/useUser";
 import { PageHeader } from "@shared/components/PageHeader";
@@ -14,13 +14,12 @@ import { formatDate, formatDateTime } from "@shared/lib/format";
 
 export function UserDetail() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const { data: user, isLoading, isError } = useUser(id ?? "");
 
   if (isError) {
     return (
       <div className="max-w-3xl mx-auto space-y-6">
-        <PageHeader title="User Profile" onBack={() => navigate("/users")} />
+        <PageHeader title="User Profile" onBack />
         <EmptyState
           icon={AlertCircle}
           title="User not found"
@@ -35,7 +34,7 @@ export function UserDetail() {
       <PageHeader
         title={user?.name ?? "User Profile"}
         description={user?.email}
-        onBack={() => navigate("/users")}
+        onBack
       />
 
       {isLoading || !user ? (

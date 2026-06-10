@@ -1,22 +1,32 @@
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@shared/components/ui/button";
+import { useSmartBack } from "@shared/hooks/useSmartBack";
 
 interface PageHeaderProps {
   title: string;
   description?: string;
   action?: React.ReactNode;
-  onBack?: () => void;
+  /**
+   * When true, render the back icon button using `useSmartBack()` (browser
+   * history if available, otherwise `/dashboard` for authed users or `/`
+   * for unauthed users). Pass a function to override with custom behavior.
+   * Omit (or pass `false`) to hide the back button entirely.
+   */
+  onBack?: (() => void) | true;
 }
 
 export function PageHeader({ title, description, action, onBack }: PageHeaderProps) {
+  const handleSmartBack = useSmartBack();
+  const handleBack = onBack === true ? handleSmartBack : onBack;
+
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div className="flex items-center gap-4">
-        {onBack && (
+        {handleBack && (
           <Button
             variant="ghost"
             size="icon"
-            onClick={onBack}
+            onClick={handleBack}
             aria-label="Go back"
             className="h-8 w-8 shrink-0 sm:h-10 sm:w-10 text-gray-400 hover:text-navy hover:bg-white rounded-full"
           >

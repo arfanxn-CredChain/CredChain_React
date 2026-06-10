@@ -49,7 +49,7 @@ export function CredentialIssue() {
       <PageHeader
         title="Issue Credentials"
         description="Generate and distribute verifiable records to network entities."
-        onBack={() => navigate("/credentials")}
+        onBack
       />
 
       <Card className="p-0">

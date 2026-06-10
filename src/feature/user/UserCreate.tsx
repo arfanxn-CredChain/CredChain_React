@@ -50,7 +50,7 @@ export function UserCreate() {
       <PageHeader
         title={t("userCreate.title")}
         description={t("userCreate.description")}
-        onBack={() => navigate("/users")}
+        onBack
       />
 
       <Card className="p-0">

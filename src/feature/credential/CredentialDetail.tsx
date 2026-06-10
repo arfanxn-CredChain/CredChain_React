@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import {
   AlertCircle,
   ExternalLink,
@@ -20,7 +20,6 @@ import { formatDate, formatDateTime } from "@shared/lib/format";
 
 export function CredentialDetail() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const { data: cred, isLoading, isError } = useCredential(id ?? "");
   const { data: holder } = useUser(cred?.holder_id ?? "");
   const { data: issuer } = useUser(cred?.issuer_id ?? "");
@@ -28,7 +27,7 @@ export function CredentialDetail() {
   if (isError) {
     return (
       <div className="max-w-4xl mx-auto space-y-6">
-        <PageHeader title="Credential Detail" onBack={() => navigate("/credentials")} />
+        <PageHeader title="Credential Detail" onBack />
         <EmptyState
           icon={AlertCircle}
           title="Credential not found"
@@ -43,7 +42,7 @@ export function CredentialDetail() {
       <PageHeader
         title={cred?.title ?? "Credential Detail"}
         description={cred?.type}
-        onBack={() => navigate("/credentials")}
+        onBack
       />
 
       {isLoading || !cred ? (
