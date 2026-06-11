@@ -144,7 +144,7 @@ CredChain_React/
                              #   useUpdateSelfProfile, useUpdateSelfEmail,
                              #   useDeleteUsers, useRestoreUsers, useTransferSuperAdmin)
         components/          # MetaEditor, RoleFilterMenu, SortMenu,
-                             # UserCreateRow, UserEditDrawer (vaul), UserRoleBadge, UserStatusBadge
+                             # UserCreateRow, UserEditDrawer (vaul), UserStatusBadge
         hooks/               # useUserListParams
         lib/                 # meta
         schemas/             # user (Zod)
@@ -204,8 +204,9 @@ CredChain_React/
         PageHeader.tsx
         RouteErrorBoundary.tsx
         StatusPill.tsx
-        UserAvatar.tsx
-      hooks/                 # useDebouncedValue, useNavSearch, useOnline, useT
+         UserAvatar.tsx
+         UserRoleBadge.tsx
+       hooks/                 # useDebouncedValue, useNavSearch, useOnline, useT
       i18n/
         config.ts
         en.json              # mirrors backend locales/en.json

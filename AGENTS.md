@@ -82,7 +82,7 @@ CredChain_React/
                                #         useTransferSuperAdmin, useUpdateSelfEmail, useUpdateSelfProfile,
                                #         useUpdateUserRoles, useUpdateUsers, useUser, useUsers, useUserSelf)
                                # + components/ (MetaEditor, RoleFilterMenu, SortMenu,
-                               #                UserCreateRow, UserEditDrawer, UserRoleBadge, UserStatusBadge)
+                               #                UserCreateRow, UserEditDrawer, UserStatusBadge)
                                # + hooks/ (useUserListParams) + lib/ (meta) + schemas/ (user)
       credential/              # CredentialDetail, CredentialIssue, CredentialList, MyCredentials,
                                # VerifyCredential + api/ (6 hooks + keys.ts) + components/ + schemas/
@@ -93,7 +93,7 @@ CredChain_React/
     shared/
       api/                     # client.ts + codes.ts + envelope.ts + query-client.ts
       auth/                    # role.ts + guards.tsx
-      components/              # 18 shared components
+      components/              # 19 shared components
         ui/                    # 12 shadcn-style primitives (sole Radix import location)
         layout/                # AdaptiveLayout, DashboardLayout, PublicLayout, SplitLayout,
                                # DashboardSidebar, NavbarDashboard, nav-items.ts
@@ -341,9 +341,9 @@ className={`base classes ${isActive ? "active" : ""} ${className}`}
 
 > The `vaul` `Drawer` primitive is used by `feature/user/components/UserEditDrawer.tsx` (admin batch user edit). It lives in the feature, not in `@ui/`, and is the only content-drawer in the app — the mobile sidebar is NOT a `vaul`/`Sheet` drawer (see Error Handling / layout notes).
 
-**Custom shared components** (`@shared/components/*` — 18):
+**Custom shared components** (`@shared/components/*` — 19):
 
-`BackLink`, `CopyInlineButton`, `CopyrightFooter`, `DecorBlob`, `DetailRow`, `EmptyState`, `ErrorBoundary` (`AppErrorBoundary`), `EyebrowLabel`, `FormField` (in `@ui/form-field`), `LanguageSwitcher`, `LoadingSpinner` / `FullPageSpinner`, `MonoId`, `NotFound`, `OfflineBanner`, `PageHeader`, `RouteErrorBoundary`, `StatusPill`, `UserAvatar`.
+`BackLink`, `CopyInlineButton`, `CopyrightFooter`, `DecorBlob`, `DetailRow`, `EmptyState`, `ErrorBoundary` (`AppErrorBoundary`), `EyebrowLabel`, `FormField` (in `@ui/form-field`), `LanguageSwitcher`, `LoadingSpinner` / `FullPageSpinner`, `MonoId`, `NotFound`, `OfflineBanner`, `PageHeader`, `RouteErrorBoundary`, `StatusPill`, `UserAvatar`, `UserRoleBadge`.
 
 `DetailRow` renders a dt/dd pair (`label` + `value`) with optional icon and error/default tone. Extracted from the repeated pattern in UserDetail, UserSelfProfile, Settings, and CredentialDetail.
 
