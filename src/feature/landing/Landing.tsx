@@ -180,7 +180,7 @@ export function Landing() {
         aria-labelledby="landing-title"
         className="relative flex h-full max-w-[min(36rem,90vw)] flex-col items-start justify-center space-y-[1.5dvh] self-center py-[2dvh] sm:space-y-[2dvh] lg:py-0"
       >
-        <div className="flex items-start gap-3">
+        <div className="flex items-center gap-3">
           <div className="h-px w-10 shrink-0 bg-gold" aria-hidden="true" />
           <span className="font-mono text-[0.6875rem] tracking-[0.22em] text-gold uppercase">
             {t("landing.eyebrow")}
