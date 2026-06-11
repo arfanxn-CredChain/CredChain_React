@@ -17,7 +17,7 @@ import { MonoId } from "@shared/components/MonoId";
 import { DecorBlob } from "@shared/components/DecorBlob";
 import { cn } from "@shared/lib/cn";
 import { CopyInlineButton } from "@shared/components/CopyInlineButton";
-import { UserRoleBadge } from "./components/UserRoleBadge";
+import { UserRoleBadge } from "@shared/components/UserRoleBadge";
 import { useUpdateSelfProfile } from "./api/useUpdateSelfProfile";
 import { userSelfProfileSchema, type UserSelfProfileInput } from "./schemas/user";
 

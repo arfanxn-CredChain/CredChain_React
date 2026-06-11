@@ -41,7 +41,7 @@ import {
 } from "@ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@ui/table";
 
-import { UserRoleBadge } from "./components/UserRoleBadge";
+import { UserRoleBadge } from "@shared/components/UserRoleBadge";
 import { UserStatusBadge } from "./components/UserStatusBadge";
 import { SortMenu } from "./components/SortMenu";
 import { RoleFilterMenu } from "./components/RoleFilterMenu";

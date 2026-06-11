@@ -153,6 +153,7 @@
   "settings.account.email": "Email",
   "settings.account.role": "Peran",
   "settings.account.wallet": "Wallet",
+  "settings.description": "Kelola preferensi dan pengaturan akun Anda.",
   "settings.account.copyEmail": "Salin email",
   "settings.account.emailCopied": "Email tersalin",
   "settings.account.copyWallet": "Salin alamat wallet",

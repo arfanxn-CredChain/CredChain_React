@@ -153,6 +153,7 @@
   "settings.account.email": "Email",
   "settings.account.role": "Role",
   "settings.account.wallet": "Wallet",
+  "settings.description": "Manage your account preferences and settings.",
   "settings.account.copyEmail": "Copy email",
   "settings.account.emailCopied": "Email copied",
   "settings.account.copyWallet": "Copy wallet address",

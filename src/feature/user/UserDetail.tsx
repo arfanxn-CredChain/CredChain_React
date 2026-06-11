@@ -9,7 +9,7 @@ import { MonoId } from "@shared/components/MonoId";
 import { Card } from "@ui/card";
 import { Skeleton } from "@ui/skeleton";
 import { UserAvatar } from "@shared/components/UserAvatar";
-import { UserRoleBadge } from "./components/UserRoleBadge";
+import { UserRoleBadge } from "@shared/components/UserRoleBadge";
 import { UserStatusBadge } from "./components/UserStatusBadge";
 import { formatDate, formatDateTime } from "@shared/lib/format";
 
