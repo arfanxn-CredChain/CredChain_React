@@ -128,7 +128,12 @@ describe("UserSelfProfile", () => {
     });
     render(<UserSelfProfile />, { wrapper: TestProviders });
 
-    await waitFor(() => expect(screen.getByRole("textbox", { hidden: true }) ?? document.querySelector('input[type="tel"]')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(
+        screen.getByRole("textbox", { hidden: true }) ??
+          document.querySelector('input[type="tel"]'),
+      ).toBeInTheDocument(),
+    );
 
     const phoneInput = document.querySelector('input[type="tel"]') as HTMLInputElement;
     await userEvent.clear(phoneInput);

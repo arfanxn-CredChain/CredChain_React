@@ -38,17 +38,17 @@ export function DashboardSidebar({ onClose }: DashboardSidebarProps) {
 
   return (
     <>
-      <div className="flex flex-col h-full bg-navy text-gray-300">
+      <div className="flex h-full flex-col bg-navy text-gray-300">
         {/* Logo */}
-        <div className="flex flex-col items-center justify-center pt-10 pb-8 relative">
-          <ShieldCheck className="h-12 w-12 text-gold mb-2" aria-hidden="true" />
+        <div className="relative flex flex-col items-center justify-center pt-10 pb-8">
+          <ShieldCheck className="mb-2 h-12 w-12 text-gold" aria-hidden="true" />
           <span className="font-display text-2xl font-bold tracking-tight text-gold">
             CredChain
           </span>
           {onClose && (
             <button
               onClick={onClose}
-              className="sm:hidden absolute top-4 right-4 text-gray-400 hover:text-white p-1"
+              className="absolute top-4 right-4 p-1 text-gray-400 hover:text-white sm:hidden"
               aria-label="Close sidebar"
             >
               <X className="h-6 w-6" />
@@ -57,7 +57,7 @@ export function DashboardSidebar({ onClose }: DashboardSidebarProps) {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 space-y-1 px-4 mt-2" aria-label="Main navigation">
+        <nav className="mt-2 flex-1 space-y-1 px-4" aria-label="Main navigation">
           {visibleItems.map((item) => (
             <NavLink
               key={item.href}
@@ -66,17 +66,20 @@ export function DashboardSidebar({ onClose }: DashboardSidebarProps) {
               onClick={onClose}
               className={({ isActive }) =>
                 cn(
-                  "flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all border-l-[3px]",
+                  "flex items-center rounded-xl border-l-[3px] px-4 py-3 text-sm font-medium transition-all",
                   isActive
-                    ? "border-gold bg-white/15 text-surface shadow-sm"
-                    : "border-transparent hover:bg-white/5 hover:text-surface",
+                    ? "border-gold bg-surface/15 text-surface shadow-sm"
+                    : "border-transparent hover:bg-surface/5 hover:text-surface",
                 )
               }
             >
               {({ isActive }) => (
                 <>
                   <item.icon
-                    className={cn("mr-3 h-5 w-5 flex-shrink-0", isActive ? "text-gold" : "text-gray-400")}
+                    className={cn(
+                      "mr-3 h-5 w-5 shrink-0",
+                      isActive ? "text-gold" : "text-gray-400",
+                    )}
                     aria-hidden="true"
                   />
                   {t(item.i18nKey)}
@@ -87,14 +90,14 @@ export function DashboardSidebar({ onClose }: DashboardSidebarProps) {
         </nav>
 
         {/* Logout */}
-        <div className="px-4 mb-8 safe-area-bottom">
+        <div className="safe-area-bottom mb-8 px-4">
           <button
             onClick={handleLogout}
             disabled={logout.isPending}
-            className="flex items-center w-full px-4 py-3 text-sm font-medium hover:text-surface hover:bg-white/5 rounded-xl transition-colors group"
+            className="group flex w-full items-center rounded-xl px-4 py-3 text-sm font-medium transition-colors hover:bg-white/5 hover:text-surface"
           >
             <LogOut
-              className="mr-3 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-surface"
+              className="mr-3 h-5 w-5 shrink-0 text-gray-400 group-hover:text-surface"
               aria-hidden="true"
             />
             {logout.isPending ? t("auth.logout.signingOut") : t("auth.logout.confirm.action")}

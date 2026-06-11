@@ -59,9 +59,7 @@ export const handlers = [
     if (search) {
       const s = search.toLowerCase();
       items = items.filter(
-        (u) =>
-          (u.name?.toLowerCase().includes(s) ?? false) ||
-          u.email.toLowerCase().includes(s),
+        (u) => (u.name?.toLowerCase().includes(s) ?? false) || u.email.toLowerCase().includes(s),
       );
     }
     items = applyFilters(items, filters);

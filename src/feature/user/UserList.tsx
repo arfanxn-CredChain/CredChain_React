@@ -32,27 +32,14 @@ import { Button } from "@ui/button";
 import { Card } from "@ui/card";
 import { Input } from "@ui/input";
 import { Skeleton } from "@ui/skeleton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/select";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@ui/dropdown-menu";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@ui/table";
 
 import { UserRoleBadge } from "./components/UserRoleBadge";
 import { UserStatusBadge } from "./components/UserStatusBadge";
@@ -87,7 +74,7 @@ export function UserList() {
   const isEmpty = !isLoading && users.length === 0;
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="mx-auto max-w-7xl space-y-6">
       <PageHeader
         title={t("user.list.title")}
         description={t("user.list.description")}
@@ -104,7 +91,7 @@ export function UserList() {
       />
 
       <Card className="p-0">
-        <div className="p-4 sm:p-6 border-b border-gray-50">
+        <div className="border-b border-gray-50 p-4 sm:p-6">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
             <div className="w-full md:max-w-md md:flex-1">
               <Input
@@ -127,7 +114,7 @@ export function UserList() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm">
-                    <Filter className="h-4 w-4 mr-2" /> {t("user.filter.label")}
+                    <Filter className="mr-2 h-4 w-4" /> {t("user.filter.label")}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
@@ -142,18 +129,12 @@ export function UserList() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <RoleFilterMenu
-                value={params.role}
-                onChange={(r) => setParam("role", r)}
-              />
+              <RoleFilterMenu value={params.role} onChange={(r) => setParam("role", r)} />
               <Select
                 value={String(params.limit)}
                 onValueChange={(v) => setParam("limit", parseInt(v, 10))}
               >
-                <SelectTrigger
-                  className="w-[88px] py-2 h-9"
-                  aria-label={t("user.list.limitLabel")}
-                >
+                <SelectTrigger className="h-9 w-[88px] py-2" aria-label={t("user.list.limitLabel")}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -166,239 +147,244 @@ export function UserList() {
             </div>
           </div>
           {!isLoading && (
-            <div className="mt-3 text-xs font-bold text-gray-400 uppercase tracking-wider">
+            <div className="mt-3 text-xs font-bold tracking-wider text-gray-400 uppercase">
               {t("user.list.count", { count: total })}
             </div>
           )}
         </div>
 
         {isError ? (
-          <div className="p-12 text-center text-error text-sm">
-            {t("user.list.error")}
-          </div>
+          <div className="p-12 text-center text-sm text-error">{t("user.list.error")}</div>
         ) : isEmpty ? (
           <EmptyState
             icon={UserCircle}
-            title={debouncedSearch ? t("user.list.empty.search.title") : t("user.list.empty.none.title")}
-            description={
-              debouncedSearch
-                ? t("user.list.empty.search.body")
-                : t("user.list.empty.none.body")
+            title={
+              debouncedSearch ? t("user.list.empty.search.title") : t("user.list.empty.none.title")
             }
-            className="border-0 shadow-none rounded-none"
+            description={
+              debouncedSearch ? t("user.list.empty.search.body") : t("user.list.empty.none.body")
+            }
+            className="rounded-none border-0 shadow-none"
           />
         ) : (
           <>
             <div className="overflow-x-auto">
               <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t("user.column.entity")}</TableHead>
-                  <TableHead>{t("user.column.role")}</TableHead>
-                  <TableHead>{t("user.column.walletStatus")}</TableHead>
-                  <TableHead className="relative">
-                    <span className="sr-only">{t("user.column.actions")}</span>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading
-                  ? Array.from({ length: 5 }).map((_, i) => (
-                      <TableRow key={`sk-${i}`}>
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <Skeleton className="h-10 w-10 rounded-full" />
-                            <div className="space-y-2">
-                              <Skeleton className="h-4 w-32" />
-                              <Skeleton className="h-3 w-40" />
-                              <Skeleton className="h-3 w-16" />
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t("user.column.entity")}</TableHead>
+                    <TableHead>{t("user.column.role")}</TableHead>
+                    <TableHead>{t("user.column.walletStatus")}</TableHead>
+                    <TableHead className="relative">
+                      <span className="sr-only">{t("user.column.actions")}</span>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {isLoading
+                    ? Array.from({ length: 5 }).map((_, i) => (
+                        <TableRow key={`sk-${i}`}>
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              <Skeleton className="h-10 w-10 rounded-full" />
+                              <div className="space-y-2">
+                                <Skeleton className="h-4 w-32" />
+                                <Skeleton className="h-3 w-40" />
+                                <Skeleton className="h-3 w-16" />
+                              </div>
                             </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Skeleton className="h-5 w-20" />
-                        </TableCell>
-                        <TableCell>
-                          <Skeleton className="h-4 w-32" />
-                        </TableCell>
-                        <TableCell>
-                          <Skeleton className="h-4 w-16 ml-auto" />
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  : users.map((user) => (
-                      <TableRow key={user.id} className={cn("cursor-pointer", user.deleted_at && "bg-error/5")}>
-                        <TableCell>
-                          <div className="flex items-center">
-                             <UserAvatar user={user} size="md" className="flex-shrink-0" />
-                             <div className="ml-4 min-w-0">
-                              <div
-                                className={cn(
-                                  "text-sm font-bold text-navy max-w-[14rem] truncate",
-                                  user.deleted_at && "line-through text-gray-400",
-                                )}
-                                title={user.name ?? t("user.edit.unnamed")}
-                              >
-                                {user.name ?? t("user.edit.unnamed")}
-                              </div>
-                              <div className="flex items-center gap-1 min-w-0 mt-0.5">
-                                <span className="text-xs text-gray-500 font-medium truncate max-w-[12rem]">
-                                  {user.email}
-                                </span>
-                                <CopyInlineButton
-                                  value={user.email}
-                                  ariaLabel={t("user.copy.email")}
-                                />
-                              </div>
-                              {user.phone_number && (
-                                <div className="flex items-center gap-1 min-w-0 mt-0.5">
-                                  <span className="text-xs text-gray-400 truncate max-w-[12rem]">
-                                    {user.phone_number}
+                          </TableCell>
+                          <TableCell>
+                            <Skeleton className="h-5 w-20" />
+                          </TableCell>
+                          <TableCell>
+                            <Skeleton className="h-4 w-32" />
+                          </TableCell>
+                          <TableCell>
+                            <Skeleton className="ml-auto h-4 w-16" />
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    : users.map((user) => (
+                        <TableRow
+                          key={user.id}
+                          className={cn("cursor-pointer", user.deleted_at && "bg-error/5")}
+                        >
+                          <TableCell>
+                            <div className="flex items-center">
+                               <UserAvatar user={user} size="md" className="shrink-0" />
+                              <div className="ml-4 min-w-0">
+                                <div
+                                  className={cn(
+                                    "max-w-[14rem] truncate text-sm font-bold text-navy",
+                                    user.deleted_at && "text-gray-400 line-through",
+                                  )}
+                                  title={user.name ?? t("user.edit.unnamed")}
+                                >
+                                  {user.name ?? t("user.edit.unnamed")}
+                                </div>
+                                <div className="mt-0.5 flex min-w-0 items-center gap-1">
+                                  <span className="max-w-[12rem] truncate text-xs font-medium text-gray-500">
+                                    {user.email}
                                   </span>
                                   <CopyInlineButton
-                                    value={user.phone_number}
-                                    ariaLabel={t("user.copy.phone")}
+                                    value={user.email}
+                                    ariaLabel={t("user.copy.email")}
                                   />
                                 </div>
+                                {user.phone_number && (
+                                  <div className="mt-0.5 flex min-w-0 items-center gap-1">
+                                    <span className="max-w-[12rem] truncate text-xs text-gray-400">
+                                      {user.phone_number}
+                                    </span>
+                                    <CopyInlineButton
+                                      value={user.phone_number}
+                                      ariaLabel={t("user.copy.phone")}
+                                    />
+                                  </div>
+                                )}
+                                {user.gender && (
+                                  <div className="mt-1 inline-flex items-center text-[10px] font-bold tracking-wider text-gray-400 uppercase">
+                                    {t(`user.field.gender.${user.gender}`)}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <UserRoleBadge role={user.role} />
+                          </TableCell>
+                          <TableCell>
+                            <div className="mb-1 flex items-center gap-1 font-mono text-xs text-gray-500">
+                              {user.wallet_address ? (
+                                truncateAddress(user.wallet_address)
+                              ) : (
+                                <span className="font-sans text-sm text-gray-400 italic">
+                                  {t("common.notSet")}
+                                </span>
                               )}
-                              {user.gender && (
-                                <div className="mt-1 inline-flex items-center text-[10px] font-bold uppercase tracking-wider text-gray-400">
-                                  {t(`user.field.gender.${user.gender}`)}
-                                </div>
+                              {user.wallet_address && (
+                                <CopyInlineButton
+                                  value={user.wallet_address}
+                                  ariaLabel={t("user.copy.wallet")}
+                                />
                               )}
                             </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <UserRoleBadge role={user.role} />
-                        </TableCell>
-                        <TableCell>
-                           <div className="flex items-center gap-1 text-xs font-mono text-gray-500 mb-1">
-                             {user.wallet_address ? truncateAddress(user.wallet_address) : (
-                               <span className="text-sm text-gray-400 italic font-sans">{t("common.notSet")}</span>
-                             )}
-                             {user.wallet_address && (
-                               <CopyInlineButton
-                                 value={user.wallet_address}
-                                 ariaLabel={t("user.copy.wallet")}
-                               />
-                             )}
-                           </div>
-                          <UserStatusBadge deletedAt={user.deleted_at} />
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                aria-label={t("user.actions.menu")}
-                              >
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  if (user.deleted_at) {
-                                    void (async () => {
-                                      const ok = await confirm({
-                                        title: t("user.edit.trashed.title"),
-                                        description: t("user.edit.trashed.body", {
-                                          name: user.name ?? user.email,
-                                        }),
-                                        confirmLabel: t("user.edit.trashed.action"),
-                                        cancelLabel: t("common.cancel"),
-                                      });
-                                      if (ok) restoreUsers.mutate([user.id]);
-                                    })();
-                                  } else {
-                                    setEditingUser(user);
-                                  }
-                                }}
-                              >
-                                <Pencil className="h-4 w-4 mr-2" />
-                                {t("common.edit")}
-                              </DropdownMenuItem>
-                              {currentUser?.role === Role.SUPER_ADMIN &&
-                                currentUser.id !== user.id &&
-                                user.role !== Role.SUPER_ADMIN &&
-                                !user.deleted_at && (
+                            <UserStatusBadge deletedAt={user.deleted_at} />
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  aria-label={t("user.actions.menu")}
+                                >
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    if (user.deleted_at) {
+                                      void (async () => {
+                                        const ok = await confirm({
+                                          title: t("user.edit.trashed.title"),
+                                          description: t("user.edit.trashed.body", {
+                                            name: user.name ?? user.email,
+                                          }),
+                                          confirmLabel: t("user.edit.trashed.action"),
+                                          cancelLabel: t("common.cancel"),
+                                        });
+                                        if (ok) restoreUsers.mutate([user.id]);
+                                      })();
+                                    } else {
+                                      setEditingUser(user);
+                                    }
+                                  }}
+                                >
+                                  <Pencil className="mr-2 h-4 w-4" />
+                                  {t("common.edit")}
+                                </DropdownMenuItem>
+                                {currentUser?.role === Role.SUPER_ADMIN &&
+                                  currentUser.id !== user.id &&
+                                  user.role !== Role.SUPER_ADMIN &&
+                                  !user.deleted_at && (
+                                    <DropdownMenuItem
+                                      onClick={() => {
+                                        void (async () => {
+                                          const ok = await confirm({
+                                            title: t("user.transfer.confirm.title", {
+                                              name: user.name ?? user.email,
+                                            }),
+                                            description: t("user.transfer.confirm.body", {
+                                              name: user.name ?? user.email,
+                                            }),
+                                            confirmLabel: t("user.transfer.confirm.action"),
+                                            cancelLabel: t("common.cancel"),
+                                            tone: "destructive",
+                                          });
+                                          if (ok) transfer.mutate(user.id);
+                                        })();
+                                      }}
+                                    >
+                                      <ArrowRightLeft className="mr-2 h-4 w-4" />
+                                      {t("user.transfer.menuLabel")}
+                                    </DropdownMenuItem>
+                                  )}
+                                {!user.deleted_at && currentUser?.id !== user.id && (
+                                  <DropdownMenuItem
+                                    destructive
+                                    onClick={() => {
+                                      void (async () => {
+                                        const ok = await confirm({
+                                          title: t("user.delete.confirm.title", {
+                                            name: user.name ?? user.email,
+                                          }),
+                                          description: t("user.delete.confirm.body"),
+                                          confirmLabel: t("user.delete.confirm.action"),
+                                          cancelLabel: t("common.cancel"),
+                                          tone: "destructive",
+                                        });
+                                        if (ok) deleteUsers.mutate([user.id]);
+                                      })();
+                                    }}
+                                  >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    {t("user.actions.delete")}
+                                  </DropdownMenuItem>
+                                )}
+                                {user.deleted_at && (
                                   <DropdownMenuItem
                                     onClick={() => {
                                       void (async () => {
                                         const ok = await confirm({
-                                          title: t("user.transfer.confirm.title", {
+                                          title: t("user.restore.confirm.title", {
                                             name: user.name ?? user.email,
                                           }),
-                                          description: t("user.transfer.confirm.body", {
-                                            name: user.name ?? user.email,
-                                          }),
-                                          confirmLabel: t("user.transfer.confirm.action"),
+                                          description: t("user.restore.confirm.body"),
+                                          confirmLabel: t("user.restore.confirm.action"),
                                           cancelLabel: t("common.cancel"),
-                                          tone: "destructive",
                                         });
-                                        if (ok) transfer.mutate(user.id);
+                                        if (ok) restoreUsers.mutate([user.id]);
                                       })();
                                     }}
                                   >
-                                    <ArrowRightLeft className="h-4 w-4 mr-2" />
-                                    {t("user.transfer.menuLabel")}
+                                    <RotateCcw className="mr-2 h-4 w-4" />
+                                    {t("user.actions.restore")}
                                   </DropdownMenuItem>
                                 )}
-                              {!user.deleted_at && currentUser?.id !== user.id && (
-                                <DropdownMenuItem
-                                  destructive
-                                  onClick={() => {
-                                    void (async () => {
-                                      const ok = await confirm({
-                                        title: t("user.delete.confirm.title", {
-                                          name: user.name ?? user.email,
-                                        }),
-                                        description: t("user.delete.confirm.body"),
-                                        confirmLabel: t("user.delete.confirm.action"),
-                                        cancelLabel: t("common.cancel"),
-                                        tone: "destructive",
-                                      });
-                                      if (ok) deleteUsers.mutate([user.id]);
-                                    })();
-                                  }}
-                                >
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  {t("user.actions.delete")}
-                                </DropdownMenuItem>
-                              )}
-                              {user.deleted_at && (
-                                <DropdownMenuItem
-                                  onClick={() => {
-                                    void (async () => {
-                                      const ok = await confirm({
-                                        title: t("user.restore.confirm.title", {
-                                          name: user.name ?? user.email,
-                                        }),
-                                        description: t("user.restore.confirm.body"),
-                                        confirmLabel: t("user.restore.confirm.action"),
-                                        cancelLabel: t("common.cancel"),
-                                      });
-                                      if (ok) restoreUsers.mutate([user.id]);
-                                    })();
-                                  }}
-                                >
-                                  <RotateCcw className="h-4 w-4 mr-2" />
-                                  {t("user.actions.restore")}
-                                </DropdownMenuItem>
-                              )}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-              </TableBody>
-            </Table>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                </TableBody>
+              </Table>
             </div>
 
             {total > 0 && !isLoading && (
-              <div className="flex flex-col gap-3 p-4 sm:p-6 border-t border-gray-50 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-col gap-3 border-t border-gray-50 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
                 <span className="text-xs text-gray-500 sm:text-sm">
                   {t("user.pagination.showing", {
                     from: Math.min((params.page - 1) * params.limit + 1, total),
@@ -435,9 +421,7 @@ export function UserList() {
       {dialog}
 
       {!canManageUsers && (
-        <p className="text-xs text-gray-400 text-center">
-          {t("user.list.roleAdminNotice")}
-        </p>
+        <p className="text-center text-xs text-gray-400">{t("user.list.roleAdminNotice")}</p>
       )}
     </div>
   );

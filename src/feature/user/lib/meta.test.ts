@@ -49,7 +49,13 @@ describe("mergeMeta", () => {
   });
 
   it("skips empty keys", () => {
-    const result = mergeMeta([{ key: "", value: "x" }, { key: "ok", value: "y" }], {});
+    const result = mergeMeta(
+      [
+        { key: "", value: "x" },
+        { key: "ok", value: "y" },
+      ],
+      {},
+    );
     expect(result).toEqual({ ok: "y" });
   });
 });

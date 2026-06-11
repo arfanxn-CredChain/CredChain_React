@@ -13,7 +13,11 @@ const sizeMap = {
   lg: "h-10 w-10",
 };
 
-export function LoadingSpinner({ size = "md", className, label = "Loading..." }: LoadingSpinnerProps) {
+export function LoadingSpinner({
+  size = "md",
+  className,
+  label = "Loading...",
+}: LoadingSpinnerProps) {
   return (
     <Loader2
       className={cn("animate-spin text-navy", sizeMap[size], className)}
@@ -25,7 +29,7 @@ export function LoadingSpinner({ size = "md", className, label = "Loading..." }:
 
 export function FullPageSpinner() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-base">
+    <div className="flex min-h-dvh items-center justify-center bg-base">
       <LoadingSpinner size="lg" />
     </div>
   );

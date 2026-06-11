@@ -14,7 +14,7 @@ interface DecorBlobProps {
 const toneMap: Record<BlobTone, string> = {
   gold: "bg-gold/10",
   navy: "bg-navy/10",
-  blue: "bg-blue-500/10",
+  blue: "bg-info/10",
   error: "bg-error/10",
 };
 
@@ -41,7 +41,7 @@ export function DecorBlob({
     <div
       aria-hidden="true"
       className={cn(
-        "absolute pointer-events-none rounded-full",
+        "pointer-events-none absolute rounded-full",
         toneMap[tone],
         positionMap[position],
         sizeMap[size],

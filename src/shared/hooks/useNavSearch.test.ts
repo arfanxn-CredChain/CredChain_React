@@ -30,8 +30,7 @@ vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (key: string) => EN[key] ?? key,
     i18n: {
-      getFixedT: (lng: "en" | "id") => (key: string) =>
-        (lng === "id" ? ID : EN)[key] ?? key,
+      getFixedT: (lng: "en" | "id") => (key: string) => (lng === "id" ? ID : EN)[key] ?? key,
     },
   }),
 }));
@@ -133,4 +132,4 @@ describe("useNavSearch", () => {
     const { result } = renderHook(() => useNavSearch("bantu"));
     expect(result.current.map((i) => i.href)).toContain("/help");
   });
-})
+});

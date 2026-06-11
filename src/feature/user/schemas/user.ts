@@ -27,9 +27,7 @@ export const phoneSchema = z
   .max(19, "zod.user.phoneTooLong")
   .regex(STRICT_E164, "zod.user.phoneFormat");
 
-export const birthDateSchema = z
-  .string()
-  .regex(ISO_DATE, "zod.user.dateFormat");
+export const birthDateSchema = z.string().regex(ISO_DATE, "zod.user.dateFormat");
 
 export const metaSchema = z.record(z.string(), z.unknown());
 
@@ -83,31 +81,20 @@ export const userStoreSchema = z.object({
 export type UserStoreInput = z.infer<typeof userStoreSchema>;
 
 export const userBatchStoreSchema = z.object({
-  users: z
-    .array(userStoreSchema)
-    .min(1, "zod.batch.minOne")
-    .max(100, "zod.batch.maxHundred"),
+  users: z.array(userStoreSchema).min(1, "zod.batch.minOne").max(100, "zod.batch.maxHundred"),
 });
 
 export type UserBatchStoreInput = z.infer<typeof userBatchStoreSchema>;
 
 export const userUpdateSchema = z.object({
   id: z.string().min(1, "zod.user.idRequired"),
-  name: z
-    .string()
-    .min(1, "zod.user.nameRequired")
-    .max(256, "zod.user.nameTooLong")
-    .optional(),
+  name: z.string().min(1, "zod.user.nameRequired").max(256, "zod.user.nameTooLong").optional(),
   number: nullableOptionalEmptyToUndefined(z.string().max(256, "zod.user.numberTooLong")),
   phone_number: nullableOptionalEmptyToUndefined(phoneSchema),
   birth_date: nullableOptionalEmptyToUndefined(birthDateSchema),
   gender: genderSchema.nullable().optional(),
   meta: metaSchema.nullable().optional(),
-  email: z
-    .string()
-    .max(256, "zod.user.emailTooLong")
-    .email("zod.user.emailInvalid")
-    .optional(),
+  email: z.string().max(256, "zod.user.emailTooLong").email("zod.user.emailInvalid").optional(),
   role: z
     .enum([Role.HOLDER, Role.ISSUER, Role.ADMIN], { message: "zod.user.roleRequired" })
     .optional(),
@@ -116,10 +103,7 @@ export const userUpdateSchema = z.object({
 export type UserUpdateInput = z.infer<typeof userUpdateSchema>;
 
 export const userBatchUpdateSchema = z.object({
-  users: z
-    .array(userUpdateSchema)
-    .min(1, "zod.batch.minOne")
-    .max(100, "zod.batch.maxHundred"),
+  users: z.array(userUpdateSchema).min(1, "zod.batch.minOne").max(100, "zod.batch.maxHundred"),
 });
 
 export type UserBatchUpdateInput = z.infer<typeof userBatchUpdateSchema>;
@@ -192,10 +176,7 @@ export const userStoreFormSchema = userStoreSchema
 export type UserStoreFormInput = z.infer<typeof userStoreFormSchema>;
 
 export const userBatchStoreFormSchema = z.object({
-  users: z
-    .array(userStoreFormSchema)
-    .min(1, "zod.batch.minOne")
-    .max(100, "zod.batch.maxHundred"),
+  users: z.array(userStoreFormSchema).min(1, "zod.batch.minOne").max(100, "zod.batch.maxHundred"),
 });
 
 export type UserBatchStoreFormInput = z.infer<typeof userBatchStoreFormSchema>;

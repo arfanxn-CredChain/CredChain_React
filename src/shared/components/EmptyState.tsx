@@ -13,13 +13,13 @@ export function EmptyState({ icon: Icon, title, description, action, className }
   return (
     <div
       className={cn(
-        "bg-surface rounded-2xl shadow-sm border border-gray-100 p-12 text-center",
+        "rounded-2xl border border-gray-100 bg-surface p-12 text-center shadow-sm",
         className,
       )}
     >
-      <Icon className="mx-auto h-12 w-12 text-gray-300 mb-4" aria-hidden="true" />
-      <h3 className="font-display text-lg font-bold text-navy mb-2">{title}</h3>
-      {description && <p className="text-sm text-gray-500 mb-6">{description}</p>}
+      <Icon className="mx-auto mb-4 h-12 w-12 text-gray-300" aria-hidden="true" />
+      <h3 className="mb-2 font-sans text-lg font-bold text-navy">{title}</h3>
+      {description && <p className="mb-6 text-sm text-gray-500">{description}</p>}
       {action}
     </div>
   );

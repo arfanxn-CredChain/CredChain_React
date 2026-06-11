@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Ban, FileBadge, Search } from "lucide-react";
 import { useCredentials } from "./api/useCredentials";
@@ -21,17 +22,14 @@ import { CredentialCard } from "./components/CredentialCard";
 const PAGE_SIZE = 30;
 
 export function CredentialList() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const debouncedSearch = useDebouncedValue(search, 300);
 
   const currentUser = useStore((s) => s.user);
-  const canIssue = canAccessAny(currentUser?.role, [
-    Role.ISSUER,
-    Role.ADMIN,
-    Role.SUPER_ADMIN,
-  ]);
+  const canIssue = canAccessAny(currentUser?.role, [Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]);
 
   const { data, isLoading, isError } = useCredentials({
     page,
@@ -56,10 +54,9 @@ export function CredentialList() {
 
   const handleBulkRevoke = async () => {
     const ok = await confirm({
-      title: `Revoke ${selectedIds.size} credential${selectedIds.size === 1 ? "" : "s"}?`,
-      description:
-        "This action revokes the credential on-chain and cannot be undone. Holders will lose verification.",
-      confirmLabel: "Revoke",
+      title: t("cred.revoke.confirmTitle", { count: selectedIds.size }),
+      description: t("cred.revoke.confirmBody"),
+      confirmLabel: t("cred.revoke.confirmAction"),
       tone: "destructive",
     });
     if (!ok) return;
@@ -70,12 +67,12 @@ export function CredentialList() {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="mx-auto max-w-7xl space-y-6">
       <PageHeader
-        title="Credentials Ledger"
-        description="Review all issued and revoked verifiable credentials across the network."
+        title={t("cred.list.title")}
+        description={t("cred.list.description")}
         action={
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <RoleGate allowed={[Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]}>
               {selectedIds.size > 0 && (
                 <Button
@@ -84,13 +81,13 @@ export function CredentialList() {
                   disabled={revoke.isPending}
                 >
                   <Ban className="h-4 w-4" />
-                  Revoke Selected ({selectedIds.size})
+                  {t("cred.list.revokeSelectedCount", { count: selectedIds.size })}
                 </Button>
               )}
               <Button asChild variant="gold">
                 <Link to="/credentials/issue">
                   <FileBadge className="h-4 w-4" />
-                  Issue New
+                  {t("cred.list.issueCta")}
                 </Link>
               </Button>
             </RoleGate>
@@ -99,57 +96,53 @@ export function CredentialList() {
       />
 
       <Card className="p-0">
-        <div className="p-4 sm:p-6 border-b border-gray-50 flex justify-between items-center gap-4">
+        <div className="flex items-center justify-between gap-4 border-b border-gray-50 p-4 sm:p-6">
           <div className="relative w-full max-w-md">
             <Input
               type="search"
               inputMode="search"
               enterKeyHint="search"
               leadingIcon={Search}
-              placeholder="Search by ID, type, or title..."
+              placeholder={t("cred.list.searchPlaceholder")}
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
                 setPage(1);
               }}
-              aria-label="Search credentials"
+              aria-label={t("cred.list.searchAriaLabel")}
             />
           </div>
           {!isLoading && (
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">
-              {total.toLocaleString()} record{total === 1 ? "" : "s"}
+            <span className="text-xs font-bold tracking-wider whitespace-nowrap text-gray-400 uppercase">
+              {t("cred.list.count", { count: total })}
             </span>
           )}
         </div>
 
-        <div className="p-4 sm:p-6 bg-gray-50/30">
+        <div className="bg-gray-50/30 p-4 sm:p-6">
           {isError ? (
-            <div className="p-12 text-center text-error text-sm">
-              Failed to load credentials. Please try again.
-            </div>
+            <div className="p-12 text-center text-sm text-error">{t("cred.list.error")}</div>
           ) : isEmpty ? (
             <EmptyState
               icon={FileBadge}
               title={
                 debouncedSearch
-                  ? "No credentials match your search"
-                  : "No credentials yet"
+                  ? t("cred.list.empty.search.title")
+                  : t("cred.list.empty.none.title")
               }
               description={
-                debouncedSearch
-                  ? "Try a different search term."
-                  : "Issued credentials will appear here."
+                debouncedSearch ? t("cred.list.empty.search.body") : t("cred.list.empty.none.body")
               }
-              className="border-0 shadow-none rounded-none bg-transparent"
+              className="rounded-none border-0 bg-transparent shadow-none"
             />
           ) : isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 6 }).map((_, i) => (
                 <Skeleton key={i} className="h-64 rounded-2xl" />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {credentials.map((cred) => (
                 <CredentialCard
                   key={cred.id}
@@ -164,9 +157,9 @@ export function CredentialList() {
         </div>
 
         {totalPages > 1 && (
-          <div className="flex items-center justify-between p-4 sm:p-6 border-t border-gray-50">
+          <div className="flex items-center justify-between border-t border-gray-50 p-4 sm:p-6">
             <span className="text-sm text-gray-500">
-              Page {page} of {totalPages}
+              {t("cred.list.pagination.page", { page, total: totalPages })}
             </span>
             <div className="flex gap-2">
               <Button
@@ -175,7 +168,7 @@ export function CredentialList() {
                 disabled={page <= 1 || isLoading}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
               >
-                Previous
+                {t("cred.list.pagination.previous")}
               </Button>
               <Button
                 variant="outline"
@@ -183,7 +176,7 @@ export function CredentialList() {
                 disabled={page >= totalPages || isLoading}
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               >
-                Next
+                {t("cred.list.pagination.next")}
               </Button>
             </div>
           </div>

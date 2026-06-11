@@ -12,6 +12,7 @@ import { BackLink } from "@shared/components/BackLink";
 import { PageHeader } from "@shared/components/PageHeader";
 import { DecorBlob } from "@shared/components/DecorBlob";
 import { Card } from "@ui/card";
+import { Button } from "@ui/button";
 import { EyebrowLabel } from "@shared/components/EyebrowLabel";
 import { env } from "@shared/lib/env";
 
@@ -30,14 +31,14 @@ interface FaqGroup {
 function FaqItem({ item }: { item: FaqEntry }) {
   return (
     <details className="group border-b border-gray-100 last:border-b-0">
-      <summary className="flex cursor-pointer items-center justify-between gap-4 py-4 text-sm font-bold text-navy outline-none focus-visible:ring-2 focus-visible:ring-gold/40 rounded-md">
+      <summary className="flex cursor-pointer items-center justify-between gap-4 rounded-md py-4 text-sm font-bold text-navy outline-none focus-visible:ring-2 focus-visible:ring-gold/40">
         <span className="flex-1">{item.q}</span>
         <ChevronDown
           className="h-4 w-4 shrink-0 text-gray-400 transition-transform duration-200 group-open:rotate-180"
           aria-hidden="true"
         />
       </summary>
-      <p className="pb-4 pr-8 text-sm leading-relaxed text-gray-600">{item.a}</p>
+      <p className="pr-8 pb-4 text-sm leading-relaxed text-gray-600">{item.a}</p>
     </details>
   );
 }
@@ -138,13 +139,10 @@ export function Help() {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="mx-auto max-w-4xl space-y-6">
       <BackLink />
 
-      <PageHeader
-        title={t("help.title")}
-        description={t("help.intro")}
-      />
+      <PageHeader title={t("help.title")} description={t("help.intro")} />
 
       <Card className="relative p-6 sm:p-8">
         <DecorBlob tone="gold" position="top-right" size="lg" />
@@ -154,14 +152,11 @@ export function Help() {
               <HelpCircle className="h-5 w-5 text-gold" aria-hidden="true" />
             </div>
             <div>
-              <h3 className="font-display text-lg font-semibold text-navy tracking-tight">
+              <h3 className="font-display text-lg font-semibold tracking-tight text-navy">
                 {t("help.faq.title", "Frequently asked questions")}
               </h3>
-              <p className="text-sm text-gray-500 mt-1">
-                {t(
-                  "help.faq.subtitle",
-                  "Browse by topic. Click a question to expand its answer.",
-                )}
+              <p className="mt-1 text-sm text-gray-500">
+                {t("help.faq.subtitle", "Browse by topic. Click a question to expand its answer.")}
               </p>
             </div>
           </div>
@@ -173,16 +168,16 @@ export function Help() {
       </Card>
 
       <Card className="p-6 sm:p-8">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
             <div className="rounded-full bg-navy/5 p-2">
               <ShieldCheck className="h-5 w-5 text-navy" aria-hidden="true" />
             </div>
             <div>
-              <p className="font-display text-lg font-semibold text-navy tracking-tight">
+              <p className="font-display text-lg font-semibold tracking-tight text-navy">
                 {t("help.contact.title")}
               </p>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="mt-1 text-sm text-gray-500">
                 {t(
                   "help.contact.body",
                   "Reach out to our support team and we'll get back to you within one business day.",
@@ -190,13 +185,12 @@ export function Help() {
               </p>
             </div>
           </div>
-          <a
-            href={`mailto:${env.supportEmail}`}
-            className="inline-flex items-center gap-2 self-start rounded-full bg-navy px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-navy/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 whitespace-nowrap sm:self-auto"
-          >
-            <Mail className="h-4 w-4 shrink-0" aria-hidden="true" />
-            {env.supportEmail}
-          </a>
+          <Button asChild variant="primary" className="self-start sm:self-auto">
+            <a href={`mailto:${env.supportEmail}`}>
+              <Mail className="h-4 w-4 shrink-0" aria-hidden="true" />
+              {env.supportEmail}
+            </a>
+          </Button>
         </div>
       </Card>
     </div>

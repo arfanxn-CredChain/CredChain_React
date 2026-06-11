@@ -13,9 +13,5 @@ interface UserRoleBadgeProps {
 }
 
 export function UserRoleBadge({ role }: UserRoleBadgeProps) {
-  return (
-    <Badge tone={roleToneMap[role]}>
-      {role.replace("_", " ")}
-    </Badge>
-  );
+  return <Badge tone={roleToneMap[role]}>{role.replace("_", " ")}</Badge>;
 }

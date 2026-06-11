@@ -434,5 +434,171 @@
   "error_transfer_super_admin_self_target_forbidden": "Tidak dapat mengalihkan peran super admin ke diri sendiri.",
   "error_transfer_super_admin_target_not_found": "Pengguna target tidak ditemukan.",
   "error_transfer_super_admin_trashed_forbidden": "Tidak dapat mengalihkan peran super admin ke pengguna yang telah dihapus.",
-  "error_transfer_super_admin_blockchain_sync_failed": "Gagal mengalihkan peran super admin di blockchain."
+  "error_transfer_super_admin_blockchain_sync_failed": "Gagal mengalihkan peran super admin di blockchain.",
+  "not_found": {
+    "code": "404",
+    "title": "Halaman tidak ditemukan",
+    "description": "Halaman yang Anda cari tidak ada atau telah dipindahkan.",
+    "goDashboard": "Kembali ke Dasbor",
+    "signIn": "Masuk"
+  },
+  "offline": {
+    "banner": "Anda sedang offline. Beberapa tindakan mungkin gagal hingga koneksi pulih."
+  },
+  "error_boundary": {
+    "title": "Terjadi kesalahan",
+    "description": "Kesalahan tak terduga terjadi. Silakan segarkan halaman.",
+    "notFoundTitle": "Halaman tidak ditemukan",
+    "notFoundDescription": "Halaman yang Anda cari tidak ada.",
+    "reload": "Muat ulang",
+    "goDashboard": "Dasbor"
+  },
+  "user.detail": {
+    "title": "Profil Pengguna",
+    "identity": "Identitas",
+    "unnamed": "Entitas tanpa nama",
+    "email": "Email",
+    "phone": "Telepon",
+    "number": "Nomor",
+    "birthDate": "Tanggal lahir",
+    "onChain": "Identitas on-chain",
+    "audit": "Audit",
+    "created": "Dibuat",
+    "updated": "Diperbarui",
+    "deleted": "Dihapus",
+    "metadata": "Metadata",
+    "notFound": {
+      "title": "Pengguna tidak ditemukan",
+      "body": "Pengguna ini tidak ada atau telah dihapus."
+    }
+  },
+  "user.status": {
+    "active": "Aktif",
+    "trashed": "Dihapus"
+  },
+  "cred": {
+    "list": {
+      "title": "Buku Besar Kredensial",
+      "description": "Tinjau semua kredensial terverifikasi yang diterbitkan dan dicabut di seluruh jaringan.",
+      "searchPlaceholder": "Cari berdasarkan ID, tipe, atau judul...",
+      "searchAriaLabel": "Cari kredensial",
+      "count_one": "{{count}} data",
+      "count_other": "{{count}} data",
+      "error": "Gagal memuat kredensial. Silakan coba lagi.",
+      "empty": {
+        "none": {
+          "title": "Belum ada kredensial",
+          "body": "Kredensial yang diterbitkan akan muncul di sini."
+        },
+        "search": {
+          "title": "Tidak ada kredensial yang cocok",
+          "body": "Coba istilah pencarian yang berbeda."
+        }
+      },
+      "pagination": {
+        "previous": "Sebelumnya",
+        "next": "Berikutnya",
+        "page": "Halaman {{page}} dari {{total}}"
+      },
+      "issueCta": "Terbitkan Baru",
+      "revokeSelected": "Cabut Terpilih",
+      "revokeSelectedCount": "Cabut Terpilih ({{count}})"
+    },
+    "detail": {
+      "title": "Detail Kredensial",
+      "notFound": {
+        "title": "Kredensial tidak ditemukan",
+        "body": "Kredensial ini tidak ada atau telah dihapus."
+      },
+      "status": "Status",
+      "issued": "Diterbitkan",
+      "expires": "Berakhir",
+      "publicVerify": "Verifikasi publik",
+      "subjectAuthority": "Subjek & Otoritas",
+      "holder": "Pemegang",
+      "issuer": "Penerbit",
+      "description": "Deskripsi",
+      "cryptoHash": "Hash Kriptografis",
+      "metadataAttachment": "Lampiran Metadata",
+      "audit": "Audit",
+      "created": "Dibuat",
+      "lastUpdated": "Terakhir diperbarui"
+    },
+    "issue": {
+      "title": "Terbitkan Kredensial",
+      "description": "Buat dan distribusikan catatan terverifikasi ke entitas jaringan.",
+      "addAnother": "Tambah catatan lain",
+      "submit": "Terbitkan Kredensial",
+      "submitting": "Menerbitkan..."
+    },
+    "verify": {
+      "title": "Verifikasi Kredensial",
+      "description": "Verifikasi keaslian dokumen digital secara kriptografis terhadap buku besar on-chain.",
+      "loading": "Memuat...",
+      "notFound": {
+        "title": "Data Tidak Ditemukan",
+        "body": "Pengenal kredensial yang diminta tidak ada atau telah dihapus secara permanen dari buku besar.",
+        "returnHome": "Kembali ke Beranda"
+      },
+      "credentialType": "Tipe Kredensial",
+      "blockchainHash": "Tanda Tangan Hash Blockchain",
+      "issuingAuthority": "Otoritas Penerbit",
+      "dateOfIssuance": "Tanggal Penerbitan",
+      "validUntil": "Berlaku Hingga",
+      "verificationDisabled": "Verifikasi Dinonaktifkan",
+      "revokedDesc": "Data ini telah dicabut secara eksplisit dan tidak dapat lagi dinyatakan secara kriptografis.",
+      "verifyDoc": "Verifikasi Dokumen Sumber",
+      "verifyDocDesc": "Unggah file asli untuk menghitung hash SHA-256 lokal dan membandingkannya dengan buku besar.",
+      "selectFile": "Pilih File untuk Verifikasi",
+      "processing": "Memproses...",
+      "uploadAriaLabel": "Unggah file untuk verifikasi",
+      "success": "Verifikasi Berhasil",
+      "successDesc": "Dokumen yang diberikan adalah asli. Hash yang dihitung cocok dengan tanda tangan buku besar resmi.",
+      "failed": "Verifikasi Gagal",
+      "failedDesc": "Dokumen TIDAK cocok dengan tanda tangan di buku besar. Mungkin telah diubah atau file yang salah.",
+      "computedHash": "Hash Lokal Terhitung"
+    },
+    "mine": {
+      "title": "Kredensial Saya",
+      "description": "Kelola dan lihat catatan digital terverifikasi pribadi Anda.",
+      "empty": {
+        "title": "Belum ada kredensial",
+        "body": "Kredensial yang ditautkan ke dompet Anda akan muncul di sini."
+      },
+      "error": { "title": "Gagal memuat kredensial", "body": "Silakan coba lagi nanti." }
+    },
+    "card": {
+      "viewDetails": "Lihat Detail",
+      "noDescription": "Tidak ada deskripsi.",
+      "holder": "Pemegang:",
+      "issued": "Diterbitkan:",
+      "expires": "Berakhir:",
+      "select": "Pilih kredensial",
+      "deselect": "Batal pilih kredensial"
+    },
+    "status": { "active": "Aktif", "revoked": "Dicabut" },
+    "field": {
+      "recipient": "Penerima (pemegang)",
+      "type": "Tipe kredensial",
+      "title": "Judul",
+      "description": "Deskripsi",
+      "uri": "URI Metadata",
+      "uriHint": "Tautan ipfs:// atau https:// ke metadata kredensial",
+      "validUntil": "Berlaku hingga",
+      "optional": "(opsional)",
+      "hashNote": "Hash akan dihitung dan dikomit ke blockchain saat diterbitkan.",
+      "selectRecipient": "Pilih penerima...",
+      "selectType": "Pilih tipe...",
+      "noHolders": "Tidak ada pemegang ditemukan.",
+      "titlePlaceholder": "Sarjana Ilmu Komputer",
+      "descriptionPlaceholder": "Diberikan atas penyelesaian persyaratan gelar sarjana.",
+      "uriPlaceholder": "ipfs://Qm..."
+    },
+    "revoke": {
+      "confirmTitle": "Cabut {{count}} kredensial?",
+      "confirmTitle_plural": "Cabut {{count}} kredensial?",
+      "confirmBody": "Tindakan ini mencabut kredensial di blockchain dan tidak dapat dibatalkan. Pemegang akan kehilangan verifikasi.",
+      "confirmAction": "Cabut"
+    }
+  }
 }

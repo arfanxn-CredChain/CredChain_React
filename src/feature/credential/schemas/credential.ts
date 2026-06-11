@@ -11,14 +11,8 @@ const CREDENTIAL_TYPES = [
 
 export const credentialIssueRowSchema = z.object({
   holder_id: z.string().min(1, "zod.credential.holderRequired"),
-  type: z
-    .string()
-    .min(1, "zod.credential.typeRequired")
-    .max(256, "zod.credential.typeTooLong"),
-  title: z
-    .string()
-    .min(1, "zod.credential.titleRequired")
-    .max(256, "zod.credential.titleTooLong"),
+  type: z.string().min(1, "zod.credential.typeRequired").max(256, "zod.credential.typeTooLong"),
+  title: z.string().min(1, "zod.credential.titleRequired").max(256, "zod.credential.titleTooLong"),
   description: z.preprocess(
     (v) => (v === "" ? undefined : v),
     z.string().max(1024, "zod.credential.descriptionTooLong").optional(),
@@ -32,7 +26,11 @@ export const credentialIssueRowSchema = z.object({
     }),
   valid_until: z.preprocess(
     (v) => (v === "" ? null : v),
-    z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "zod.user.dateFormat").nullable().optional(),
+    z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "zod.user.dateFormat")
+      .nullable()
+      .optional(),
   ),
 });
 

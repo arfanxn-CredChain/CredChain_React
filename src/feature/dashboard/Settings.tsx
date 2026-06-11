@@ -1,7 +1,8 @@
-import { Settings as SettingsIcon, Globe, ShieldCheck, Wallet } from "lucide-react";
+import { Globe, ShieldCheck, Wallet } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useStore } from "@app/store";
 import { Card } from "@ui/card";
+import { PageHeader } from "@shared/components/PageHeader";
 import { EyebrowLabel } from "@shared/components/EyebrowLabel";
 import { MonoId } from "@shared/components/MonoId";
 import { LanguageSwitcher } from "@shared/components/LanguageSwitcher";
@@ -13,39 +14,31 @@ export function Settings() {
   const { t } = useTranslation();
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div className="pb-4 border-b border-gray-200 flex items-center">
-        <SettingsIcon className="mr-2 h-6 w-6 text-navy" aria-hidden="true" />
-        <h2 className="font-display text-2xl font-bold text-navy tracking-tight">
-          {t("settings.title")}
-        </h2>
-      </div>
+    <div className="mx-auto max-w-4xl space-y-6">
+      <PageHeader title={t("settings.title")} />
 
       <Card className="p-6 sm:p-8">
         <EyebrowLabel className="mb-4">{t("settings.account.heading")}</EyebrowLabel>
-        <dl className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <dl className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <div>
-            <dt className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+            <dt className="mb-1 text-xs font-bold tracking-wider text-gray-400 uppercase">
               {t("settings.account.name")}
             </dt>
             <dd className="text-sm font-bold text-navy">{user?.name ?? "—"}</dd>
           </div>
           <div>
-            <dt className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+            <dt className="mb-1 text-xs font-bold tracking-wider text-gray-400 uppercase">
               {t("settings.account.email")}
             </dt>
             <dd className="flex items-center gap-2">
-              <span className="text-sm font-bold text-navy break-all">{user?.email}</span>
+              <span className="text-sm font-bold break-all text-navy">{user?.email}</span>
               {user?.email && (
-                <CopyInlineButton
-                  value={user.email}
-                  ariaLabel={t("settings.account.copyEmail")}
-                />
+                <CopyInlineButton value={user.email} ariaLabel={t("settings.account.copyEmail")} />
               )}
             </dd>
           </div>
           <div>
-            <dt className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+            <dt className="mb-1 text-xs font-bold tracking-wider text-gray-400 uppercase">
               {t("settings.account.role")}
             </dt>
             <dd className="text-sm font-bold text-navy capitalize">
@@ -53,16 +46,12 @@ export function Settings() {
             </dd>
           </div>
           <div>
-            <dt className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+            <dt className="mb-1 flex items-center gap-1.5 text-xs font-bold tracking-wider text-gray-400 uppercase">
               <Wallet className="h-3.5 w-3.5" aria-hidden="true" />
               {t("settings.account.wallet")}
             </dt>
             <dd className="flex items-center gap-2">
-              <MonoId
-                value={user?.wallet_address ?? ""}
-                mode="address"
-                className="text-sm"
-              />
+              <MonoId value={user?.wallet_address ?? ""} mode="address" className="text-sm" />
               {user?.wallet_address && (
                 <CopyInlineButton
                   value={user.wallet_address}
@@ -80,9 +69,7 @@ export function Settings() {
           {t("settings.language.heading")}
         </EyebrowLabel>
         <div className="flex items-center justify-between gap-4">
-          <p className="text-sm text-gray-600">
-            {t("settings.language.body")}
-          </p>
+          <p className="text-sm text-gray-600">{t("settings.language.body")}</p>
           <LanguageSwitcher />
         </div>
       </Card>
@@ -92,9 +79,7 @@ export function Settings() {
           <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
           {t("settings.security.heading")}
         </EyebrowLabel>
-        <p className="text-sm text-gray-600">
-          {t("settings.security.body")}
-        </p>
+        <p className="text-sm text-gray-600">{t("settings.security.body")}</p>
       </Card>
     </div>
   );

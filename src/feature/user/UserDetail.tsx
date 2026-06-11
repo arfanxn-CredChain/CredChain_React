@@ -1,4 +1,5 @@
 import { useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { AlertCircle, Calendar, Mail, Phone, Wallet, Hash } from "lucide-react";
 import { useUser } from "./api/useUser";
 import { PageHeader } from "@shared/components/PageHeader";
@@ -13,32 +14,29 @@ import { UserStatusBadge } from "./components/UserStatusBadge";
 import { formatDate, formatDateTime } from "@shared/lib/format";
 
 export function UserDetail() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const { data: user, isLoading, isError } = useUser(id ?? "");
 
   if (isError) {
     return (
-      <div className="max-w-4xl mx-auto space-y-6">
-        <PageHeader title="User Profile" onBack />
+      <div className="mx-auto max-w-4xl space-y-6">
+        <PageHeader title={t("user.detail.title")} onBack />
         <EmptyState
           icon={AlertCircle}
-          title="User not found"
-          description="This user does not exist or has been removed."
+          title={t("user.detail.notFound.title")}
+          description={t("user.detail.notFound.body")}
         />
       </div>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <PageHeader
-        title={user?.name ?? "User Profile"}
-        description={user?.email}
-        onBack
-      />
+    <div className="mx-auto max-w-4xl space-y-6">
+      <PageHeader title={user?.name ?? t("user.detail.title")} description={user?.email} onBack />
 
       {isLoading || !user ? (
-        <Card className="p-8 space-y-6">
+        <Card className="space-y-6 p-8">
           <Skeleton className="h-6 w-1/3" />
           <Skeleton className="h-4 w-2/3" />
           <Skeleton className="h-4 w-1/2" />
@@ -47,15 +45,15 @@ export function UserDetail() {
       ) : (
         <>
           <Card className="p-6 sm:p-8">
-            <div className="flex items-start justify-between gap-4 mb-6">
+            <div className="mb-6 flex items-start justify-between gap-4">
               <div className="flex items-start gap-4">
                 <UserAvatar user={user} size="xl" />
                 <div>
-                  <EyebrowLabel>Identity</EyebrowLabel>
+                  <EyebrowLabel>{t("user.detail.identity")}</EyebrowLabel>
                   <h3 className="font-display text-xl font-bold text-navy">
-                    {user.name ?? "Unnamed entity"}
+                    {user.name ?? t("user.detail.unnamed")}
                   </h3>
-                  <p className="text-sm text-gray-500 mt-1">{user.email}</p>
+                  <p className="mt-1 text-sm text-gray-500">{user.email}</p>
                 </div>
               </div>
               <div className="flex flex-col items-end gap-2">
@@ -64,22 +62,22 @@ export function UserDetail() {
               </div>
             </div>
 
-            <hr className="border-gray-50 my-6" />
+            <hr className="my-6 border-gray-50" />
 
-            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <Field icon={Mail} label="Email" value={user.email} />
-              <Field icon={Phone} label="Phone" value={user.phone_number ?? "—"} />
-              <Field icon={Hash} label="Number" value={user.number ?? "—"} />
+            <dl className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <Field icon={Mail} label={t("user.detail.email")} value={user.email} />
+              <Field icon={Phone} label={t("user.detail.phone")} value={user.phone_number ?? "—"} />
+              <Field icon={Hash} label={t("user.detail.number")} value={user.number ?? "—"} />
               <Field
                 icon={Calendar}
-                label="Birth date"
+                label={t("user.detail.birthDate")}
                 value={user.birth_date ? formatDate(user.birth_date) : "—"}
               />
             </dl>
           </Card>
 
           <Card className="p-6 sm:p-8">
-            <EyebrowLabel className="mb-4">On-chain identity</EyebrowLabel>
+            <EyebrowLabel className="mb-4">{t("user.detail.onChain")}</EyebrowLabel>
             <div className="flex items-center gap-3">
               <Wallet className="h-5 w-5 text-gray-400" aria-hidden="true" />
               <MonoId value={user.wallet_address} mode="address" className="text-sm text-navy" />
@@ -87,24 +85,24 @@ export function UserDetail() {
           </Card>
 
           <Card className="p-6 sm:p-8">
-            <EyebrowLabel className="mb-4">Audit</EyebrowLabel>
-            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <EyebrowLabel className="mb-4">{t("user.detail.audit")}</EyebrowLabel>
+            <dl className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
-                <dt className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
-                  Created
+                <dt className="mb-1 text-xs font-bold tracking-wider text-gray-400 uppercase">
+                  {t("user.detail.created")}
                 </dt>
                 <dd className="text-sm text-navy">{formatDateTime(user.created_at)}</dd>
               </div>
               <div>
-                <dt className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
-                  Updated
+                <dt className="mb-1 text-xs font-bold tracking-wider text-gray-400 uppercase">
+                  {t("user.detail.updated")}
                 </dt>
                 <dd className="text-sm text-navy">{formatDateTime(user.updated_at)}</dd>
               </div>
               {user.deleted_at && (
                 <div className="sm:col-span-2">
-                  <dt className="text-xs font-bold text-error uppercase tracking-wider mb-1">
-                    Deleted
+                  <dt className="mb-1 text-xs font-bold tracking-wider text-error uppercase">
+                    {t("user.detail.deleted")}
                   </dt>
                   <dd className="text-sm text-error">{formatDateTime(user.deleted_at)}</dd>
                 </div>
@@ -114,8 +112,8 @@ export function UserDetail() {
 
           {user.meta && Object.keys(user.meta).length > 0 && (
             <Card className="p-6 sm:p-8">
-              <EyebrowLabel className="mb-4">Metadata</EyebrowLabel>
-              <pre className="font-mono text-xs text-gray-600 bg-gray-50 p-4 rounded-xl overflow-x-auto">
+              <EyebrowLabel className="mb-4">{t("user.detail.metadata")}</EyebrowLabel>
+              <pre className="overflow-x-auto rounded-xl bg-gray-50 p-4 font-mono text-xs text-gray-600">
                 {JSON.stringify(user.meta, null, 2)}
               </pre>
             </Card>
@@ -135,11 +133,11 @@ interface FieldProps {
 function Field({ icon: Icon, label, value }: FieldProps) {
   return (
     <div>
-      <dt className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+      <dt className="mb-1 flex items-center gap-1.5 text-xs font-bold tracking-wider text-gray-400 uppercase">
         <Icon className="h-3.5 w-3.5" aria-hidden="true" />
         {label}
       </dt>
-      <dd className="text-sm text-navy break-all">{value}</dd>
+      <dd className="text-sm break-all text-navy">{value}</dd>
     </div>
   );
 }

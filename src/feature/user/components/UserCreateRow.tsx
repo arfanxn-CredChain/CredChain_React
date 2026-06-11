@@ -4,16 +4,9 @@ import { Briefcase, Calendar, Hash, Mail, Phone, Trash2, User } from "lucide-rea
 
 import { Button } from "@ui/button";
 import { Input } from "@ui/input";
-import { Label } from "@ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@ui/select";
+import { FormField } from "@ui/form-field";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/select";
 import { Role } from "@shared/auth/role";
-import { cn } from "@shared/lib/cn";
 
 import type { UserBatchStoreFormInput } from "../schemas/user";
 import { MetaEditor } from "./MetaEditor";
@@ -37,25 +30,22 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
   ];
 
   return (
-    <div className="flex flex-col gap-4 sm:gap-6 bg-gray-50/50 p-4 sm:p-6 rounded-xl border border-gray-100 transition-all focus-within:border-gold/50 focus-within:bg-white relative">
+    <div className="relative flex flex-col gap-4 rounded-xl border border-gray-100 bg-gray-50/50 p-4 transition-all focus-within:border-gold/50 focus-within:bg-white sm:gap-6 sm:p-6">
       {onRemove && (
         <Button
           type="button"
           variant="ghost"
           size="icon"
           onClick={onRemove}
-          className="absolute top-3 right-3 sm:top-4 sm:right-4 h-8 w-8 sm:h-9 sm:w-9 text-gray-400 hover:text-error hover:bg-error/10"
+          className="absolute top-3 right-3 h-8 w-8 text-gray-400 hover:bg-error/10 hover:text-error sm:top-4 sm:right-4 sm:h-9 sm:w-9"
           aria-label={t("userCreate.removeAriaLabel", { n: index + 1 })}
         >
           <Trash2 className="h-4 w-4" />
         </Button>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 w-full pr-12">
-        <FormField
-          label={t("user.edit.fullName")}
-          error={errors?.name?.message}
-        >
+      <div className="grid w-full grid-cols-1 gap-4 pr-12 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <FormField label={t("user.edit.fullName")} error={errors?.name?.message}>
           <Input
             leadingIcon={User}
             placeholder={t("userCreate.field.name.placeholder")}
@@ -64,10 +54,7 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
           />
         </FormField>
 
-        <FormField
-          label={t("user.edit.email")}
-          error={errors?.email?.message}
-        >
+        <FormField label={t("user.edit.email")} error={errors?.email?.message}>
           <Input
             type="email"
             inputMode="email"
@@ -108,11 +95,7 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
           />
         </FormField>
 
-        <FormField
-          label={t("user.edit.birthDate")}
-          error={errors?.birth_date?.message}
-          optional
-        >
+        <FormField label={t("user.edit.birthDate")} error={errors?.birth_date?.message} optional>
           <Input
             type="date"
             leadingIcon={Calendar}
@@ -120,11 +103,7 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
           />
         </FormField>
 
-        <FormField
-          label={t("user.field.gender")}
-          error={errors?.gender?.message}
-          optional
-        >
+        <FormField label={t("user.field.gender")} error={errors?.gender?.message} optional>
           <Select
             value={gender ?? "__none__"}
             onValueChange={(value) => {
@@ -147,10 +126,7 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
           </Select>
         </FormField>
 
-        <FormField
-          label={t("user.edit.role")}
-          error={errors?.role?.message}
-        >
+        <FormField label={t("user.edit.role")} error={errors?.role?.message}>
           <Select
             value={role}
             onValueChange={(value) => {
@@ -179,41 +155,13 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
       </div>
 
       <details className="mt-2 sm:mt-4">
-        <summary className="cursor-pointer text-sm font-medium text-gray-500 hover:text-navy py-2 list-none">
+        <summary className="cursor-pointer list-none py-2 text-sm font-medium text-gray-500 hover:text-navy">
           + {t("userCreate.customFields.toggle")}
         </summary>
         <div className="mt-4 ml-2">
           <MetaEditor control={form.control} name={`users.${index}.meta_entries`} />
         </div>
       </details>
-    </div>
-  );
-}
-
-interface FormFieldProps {
-  label: string;
-  hint?: string;
-  error?: string;
-  optional?: boolean;
-  children: React.ReactNode;
-}
-
-function FormField({ label, hint, error, optional, children }: FormFieldProps) {
-  const { t } = useTranslation();
-  return (
-    <div className="space-y-1">
-      <Label>
-        {label}
-        {optional && <span className="ml-1 text-gray-400 font-normal">{t("common.optional")}</span>}
-      </Label>
-      {children}
-      {error ? (
-        <p className={cn("text-xs text-error mt-1")} role="alert">
-          {t(error)}
-        </p>
-      ) : hint ? (
-        <p className="text-xs text-gray-400 mt-1">{hint}</p>
-      ) : null}
     </div>
   );
 }

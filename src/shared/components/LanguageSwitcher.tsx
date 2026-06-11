@@ -36,7 +36,7 @@ export function LanguageSwitcher({ variant = "light" }: LanguageSwitcherProps) {
       <DropdownMenuTrigger
         className={cn(
           "inline-flex items-center gap-1.5 text-sm font-semibold transition-colors",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded-md p-1",
+          "rounded-md p-1 focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none",
           triggerColor,
         )}
         aria-label="Change language"
@@ -50,12 +50,12 @@ export function LanguageSwitcher({ variant = "light" }: LanguageSwitcherProps) {
             key={locale.code}
             onClick={() => change(locale.code)}
             className={cn(
-              "flex items-center justify-between cursor-pointer",
+              "flex cursor-pointer items-center justify-between",
               currentLocale === locale.code && "font-bold",
             )}
           >
             {locale.label}
-            <span className="text-xs font-mono text-gray-400">{locale.short}</span>
+            <span className="font-mono text-xs text-gray-400">{locale.short}</span>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

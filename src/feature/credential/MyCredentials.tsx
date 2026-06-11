@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { FileBadge } from "lucide-react";
 import { useMyCredentials } from "./api/useMyCredentials";
 import { PageHeader } from "@shared/components/PageHeader";
@@ -6,24 +7,22 @@ import { Skeleton } from "@ui/skeleton";
 import { CredentialCard } from "./components/CredentialCard";
 
 export function MyCredentials() {
+  const { t } = useTranslation();
   const { data, isLoading, isError } = useMyCredentials();
   const credentials = data?.items ?? [];
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
-      <PageHeader
-        title="My Credentials"
-        description="Manage and view your personal verifiable digital records."
-      />
+    <div className="mx-auto max-w-7xl space-y-6">
+      <PageHeader title={t("cred.mine.title")} description={t("cred.mine.description")} />
 
       {isError ? (
         <EmptyState
           icon={FileBadge}
-          title="Couldn't load your credentials"
-          description="Please try again in a moment."
+          title={t("cred.mine.error.title")}
+          description={t("cred.mine.error.body")}
         />
       ) : isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 3 }).map((_, i) => (
             <Skeleton key={i} className="h-64 rounded-2xl" />
           ))}
@@ -31,11 +30,11 @@ export function MyCredentials() {
       ) : credentials.length === 0 ? (
         <EmptyState
           icon={FileBadge}
-          title="No credentials yet"
-          description="Issued credentials linked to your wallet will appear here."
+          title={t("cred.mine.empty.title")}
+          description={t("cred.mine.empty.body")}
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {credentials.map((cred) => (
             <CredentialCard key={cred.id} credential={cred} />
           ))}

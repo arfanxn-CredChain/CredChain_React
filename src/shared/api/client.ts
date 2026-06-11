@@ -70,12 +70,9 @@ api.interceptors.response.use(
     if (status === 429) {
       const retryAfter = error.response?.headers?.["retry-after"];
       const seconds = retryAfter ? parseInt(retryAfter, 10) : null;
-      const messageKey = seconds && !isNaN(seconds)
-        ? "system.rate_limited_with_retry"
-        : "system.rate_limited";
-      return Promise.reject(
-        new ApiError(status, code, messageKey, error, fieldErrors),
-      );
+      const messageKey =
+        seconds && !isNaN(seconds) ? "system.rate_limited_with_retry" : "system.rate_limited";
+      return Promise.reject(new ApiError(status, code, messageKey, error, fieldErrors));
     }
 
     if (

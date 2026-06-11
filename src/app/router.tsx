@@ -100,9 +100,7 @@ export const router = createBrowserRouter([
 
           // Issuer+
           {
-            element: (
-              <ProtectedRoute allowedRoles={[Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]} />
-            ),
+            element: <ProtectedRoute allowedRoles={[Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]} />,
             children: [
               { path: "/users", ...lazyRoute(() => import("@feature/user/UserList"), "UserList") },
               {

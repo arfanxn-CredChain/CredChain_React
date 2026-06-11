@@ -28,17 +28,13 @@ export function MetaEditor<T extends FieldValues>({
     <div className="space-y-3">
       <Label>{t("meta.label")}</Label>
       <div className="space-y-2">
-        {fields.length === 0 && (
-          <p className="text-xs text-gray-400 italic">
-            {t("meta.empty")}
-          </p>
-        )}
+        {fields.length === 0 && <p className="text-xs text-gray-400 italic">{t("meta.empty")}</p>}
         {fields.map((field, idx) => {
           const keyError = errors?.[idx]?.key?.message;
           const valueError = errors?.[idx]?.value?.message;
           return (
             <div key={field.id} className="flex items-start gap-2">
-              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="grid flex-1 grid-cols-1 gap-2 sm:grid-cols-2">
                 <div>
                   <Input
                     placeholder={t("meta.keyPlaceholder")}
@@ -46,7 +42,7 @@ export function MetaEditor<T extends FieldValues>({
                     {...control.register(`${name}.${idx}.key` as never)}
                   />
                   {keyError && (
-                    <p className="text-xs text-error mt-1" role="alert">
+                    <p className="mt-1 text-xs text-error" role="alert">
                       {t(keyError)}
                     </p>
                   )}
@@ -58,7 +54,7 @@ export function MetaEditor<T extends FieldValues>({
                     {...control.register(`${name}.${idx}.value` as never)}
                   />
                   {valueError && (
-                    <p className="text-xs text-error mt-1" role="alert">
+                    <p className="mt-1 text-xs text-error" role="alert">
                       {t(valueError)}
                     </p>
                   )}
@@ -70,7 +66,7 @@ export function MetaEditor<T extends FieldValues>({
                 size="icon"
                 onClick={() => remove(idx)}
                 aria-label={t("meta.removeAriaLabel", { n: idx + 1 })}
-                className="h-10 w-10 mt-0.5 shrink-0"
+                className="mt-0.5 h-10 w-10 shrink-0"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -83,7 +79,7 @@ export function MetaEditor<T extends FieldValues>({
           onClick={() => append({ key: "", value: "" } as never)}
           className="w-full"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="mr-2 h-4 w-4" />
           {t("meta.addField")}
         </Button>
       </div>

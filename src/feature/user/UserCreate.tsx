@@ -46,15 +46,11 @@ export function UserCreate() {
   });
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      <PageHeader
-        title={t("userCreate.title")}
-        description={t("userCreate.description")}
-        onBack
-      />
+    <div className="mx-auto max-w-6xl space-y-6">
+      <PageHeader title={t("userCreate.title")} description={t("userCreate.description")} onBack />
 
       <Card className="p-0">
-        <form onSubmit={onSubmit} className="p-6 sm:p-8 space-y-8">
+        <form onSubmit={onSubmit} className="space-y-8 p-6 sm:p-8">
           <div className="space-y-6">
             {fields.map((field, index) => (
               <UserCreateRow
@@ -66,7 +62,7 @@ export function UserCreate() {
             ))}
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 pt-6 border-t border-gray-100">
+          <div className="flex flex-col items-stretch justify-between gap-3 border-t border-gray-100 pt-6 sm:flex-row sm:items-center">
             <Button
               type="button"
               variant="dashed"
@@ -77,12 +73,7 @@ export function UserCreate() {
               {t("userCreate.addAnother")}
             </Button>
 
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              disabled={createUsers.isPending}
-            >
+            <Button type="submit" variant="primary" size="lg" disabled={createUsers.isPending}>
               <Save className="h-5 w-5" />
               {createUsers.isPending ? t("userCreate.submitting") : t("userCreate.submit")}
             </Button>

@@ -347,9 +347,9 @@ describe("userUpdateSchema - optional fields empty-string handling", () => {
     });
 
     it("accepts valid ISO date", () => {
-      expect(
-        userUpdateSchema.safeParse({ ...baseValid, birth_date: "1990-01-01" }).success,
-      ).toBe(true);
+      expect(userUpdateSchema.safeParse({ ...baseValid, birth_date: "1990-01-01" }).success).toBe(
+        true,
+      );
     });
 
     it("rejects malformed date (non-empty)", () => {
@@ -396,9 +396,7 @@ describe("userUpdateSchema - optional fields empty-string handling", () => {
     });
 
     it("accepts valid email", () => {
-      expect(
-        userUpdateSchema.safeParse({ ...baseValid, email: "a@b.com" }).success,
-      ).toBe(true);
+      expect(userUpdateSchema.safeParse({ ...baseValid, email: "a@b.com" }).success).toBe(true);
     });
 
     it("returns localization key on invalid email", () => {

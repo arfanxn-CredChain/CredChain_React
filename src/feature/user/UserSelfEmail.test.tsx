@@ -15,10 +15,12 @@ vi.mock("@react-oauth/google", () => ({
   GoogleLogin: ({ onSuccess }: { onSuccess: (r: { credential: string }) => void }) => (
     <button
       type="button"
-      onClick={() => onSuccess({
-        // header.payload.signature where payload base64 = {"email":"new@example.com"}
-        credential: "header.eyJlbWFpbCI6Im5ld0BleGFtcGxlLmNvbSJ9.signature",
-      })}
+      onClick={() =>
+        onSuccess({
+          // header.payload.signature where payload base64 = {"email":"new@example.com"}
+          credential: "header.eyJlbWFpbCI6Im5ld0BleGFtcGxlLmNvbSJ9.signature",
+        })
+      }
     >
       Mock Google Login
     </button>
@@ -60,9 +62,7 @@ describe("UserSelfEmail", () => {
     const dialog = await screen.findByRole("alertdialog");
     const buttons = dialog.querySelectorAll("button");
     await userEvent.click(buttons[1]);
-    expect(mockMutate).toHaveBeenCalledWith(
-      expect.objectContaining({ email: "new@example.com" }),
-    );
+    expect(mockMutate).toHaveBeenCalledWith(expect.objectContaining({ email: "new@example.com" }));
   });
 
   it("does not mutate on cancel", async () => {

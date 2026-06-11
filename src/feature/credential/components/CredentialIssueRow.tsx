@@ -4,19 +4,9 @@ import { Calendar, FileText, Hash, Link as LinkIcon, Trash2, Type } from "lucide
 import type { UserDTO } from "@shared/types/api";
 import { Button } from "@ui/button";
 import { Input } from "@ui/input";
-import { Label } from "@ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@ui/select";
-import {
-  CREDENTIAL_TYPE_OPTIONS,
-  type CredentialBatchIssueInput,
-} from "../schemas/credential";
-import { cn } from "@shared/lib/cn";
+import { FormField } from "@ui/form-field";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/select";
+import { CREDENTIAL_TYPE_OPTIONS, type CredentialBatchIssueInput } from "../schemas/credential";
 
 interface CredentialIssueRowProps {
   index: number;
@@ -26,27 +16,28 @@ interface CredentialIssueRowProps {
 }
 
 export function CredentialIssueRow({ index, form, holders, onRemove }: CredentialIssueRowProps) {
+  const { t } = useTranslation();
   const errors = form.formState.errors.credentials?.[index];
   const holderId = form.watch(`credentials.${index}.holder_id`);
   const type = form.watch(`credentials.${index}.type`);
 
   return (
-    <div className="flex flex-col gap-4 sm:gap-6 bg-gray-50/50 p-4 sm:p-6 rounded-xl border border-gray-100 transition-all focus-within:border-gold/50 focus-within:bg-white relative">
+    <div className="relative flex flex-col gap-4 rounded-xl border border-gray-100 bg-gray-50/50 p-4 transition-all focus-within:border-gold/50 focus-within:bg-white sm:gap-6 sm:p-6">
       {onRemove && (
         <Button
           type="button"
           variant="ghost"
           size="icon"
           onClick={onRemove}
-          className="absolute top-3 right-3 sm:top-4 sm:right-4 h-8 w-8 sm:h-9 sm:w-9 text-gray-400 hover:text-error hover:bg-error/10"
+          className="absolute top-3 right-3 h-8 w-8 text-gray-400 hover:bg-error/10 hover:text-error sm:top-4 sm:right-4 sm:h-9 sm:w-9"
           aria-label={`Remove row ${index + 1}`}
         >
           <Trash2 className="h-4 w-4" />
         </Button>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 w-full pr-12">
-        <Field label="Recipient (holder)" error={errors?.holder_id?.message}>
+      <div className="grid w-full grid-cols-1 gap-4 pr-12 sm:gap-6 md:grid-cols-2">
+        <FormField label={t("cred.field.recipient")} error={errors?.holder_id?.message}>
           <Select
             value={holderId}
             onValueChange={(value) =>
@@ -56,11 +47,11 @@ export function CredentialIssueRow({ index, form, holders, onRemove }: Credentia
             }
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select recipient..." />
+              <SelectValue placeholder={t("cred.field.selectRecipient")} />
             </SelectTrigger>
             <SelectContent>
               {holders.length === 0 ? (
-                <div className="p-4 text-sm text-gray-500">No holders found.</div>
+                <div className="p-4 text-sm text-gray-500">{t("cred.field.noHolders")}</div>
               ) : (
                 holders.map((h) => (
                   <SelectItem key={h.id} value={h.id}>
@@ -70,9 +61,9 @@ export function CredentialIssueRow({ index, form, holders, onRemove }: Credentia
               )}
             </SelectContent>
           </Select>
-        </Field>
+        </FormField>
 
-        <Field label="Credential type" error={errors?.type?.message}>
+        <FormField label={t("cred.field.type")} error={errors?.type?.message}>
           <Select
             value={type}
             onValueChange={(value) =>
@@ -82,7 +73,7 @@ export function CredentialIssueRow({ index, form, holders, onRemove }: Credentia
             }
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select type..." />
+              <SelectValue placeholder={t("cred.field.selectType")} />
             </SelectTrigger>
             <SelectContent>
               {CREDENTIAL_TYPE_OPTIONS.map((opt) => (
@@ -92,79 +83,55 @@ export function CredentialIssueRow({ index, form, holders, onRemove }: Credentia
               ))}
             </SelectContent>
           </Select>
-        </Field>
+        </FormField>
 
-        <Field label="Title" error={errors?.title?.message}>
+        <FormField label={t("cred.field.title")} error={errors?.title?.message}>
           <Input
             leadingIcon={Type}
-            placeholder="Bachelor of Science in Computer Science"
+            placeholder={t("cred.field.titlePlaceholder")}
             {...form.register(`credentials.${index}.title`)}
           />
-        </Field>
+        </FormField>
 
-        <Field label="Description" error={errors?.description?.message} optional>
+        <FormField
+          label={t("cred.field.description")}
+          error={errors?.description?.message}
+          optional
+        >
           <Input
             leadingIcon={FileText}
-            placeholder="Awarded for completing the undergraduate degree requirements."
+            placeholder={t("cred.field.descriptionPlaceholder")}
             {...form.register(`credentials.${index}.description`)}
           />
-        </Field>
+        </FormField>
 
-        <Field
-          label="Metadata URI"
-          hint="ipfs:// or https:// link to credential metadata"
+        <FormField
+          label={t("cred.field.uri")}
+          hint={t("cred.field.uriHint")}
           error={errors?.uri?.message}
         >
           <Input
             leadingIcon={LinkIcon}
-            placeholder="ipfs://Qm..."
+            placeholder={t("cred.field.uriPlaceholder")}
             inputMode="url"
             autoCapitalize="off"
             {...form.register(`credentials.${index}.uri`)}
           />
-        </Field>
+        </FormField>
 
-        <Field label="Valid until" error={errors?.valid_until?.message} optional>
+        <FormField label={t("cred.field.validUntil")} error={errors?.valid_until?.message} optional>
           <Input
             type="date"
             leadingIcon={Calendar}
             {...form.register(`credentials.${index}.valid_until`)}
           />
-        </Field>
+        </FormField>
       </div>
 
-      <div className="flex items-center text-xs font-mono text-gray-400">
-        <Hash className="w-3 h-3 mr-1" aria-hidden="true" />
-        Hash will be computed and committed on-chain when issued.
+      <div className="flex items-center font-mono text-xs text-gray-400">
+        <Hash className="mr-1 h-3 w-3" aria-hidden="true" />
+        {t("cred.field.hashNote")}
       </div>
-    </div>
-  );
-}
-
-interface FieldProps {
-  label: string;
-  hint?: string;
-  error?: string;
-  optional?: boolean;
-  children: React.ReactNode;
-}
-
-function Field({ label, hint, error, optional, children }: FieldProps) {
-  const { t } = useTranslation();
-  return (
-    <div className="space-y-1">
-      <Label>
-        {label}
-        {optional && <span className="ml-1 text-gray-400 font-normal">(optional)</span>}
-      </Label>
-      {children}
-      {error ? (
-        <p className={cn("text-xs text-error mt-1")} role="alert">
-          {t(error)}
-        </p>
-      ) : hint ? (
-        <p className="text-xs text-gray-400 mt-1">{hint}</p>
-      ) : null}
     </div>
   );
 }

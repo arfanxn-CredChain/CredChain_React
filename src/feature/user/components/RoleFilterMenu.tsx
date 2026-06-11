@@ -30,7 +30,7 @@ export function RoleFilterMenu({ value, onChange }: RoleFilterMenuProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm">
-          <Users className="h-4 w-4 mr-2" />
+          <Users className="mr-2 h-4 w-4" />
           {t("user.role.filter.label")}
         </Button>
       </DropdownMenuTrigger>
@@ -41,7 +41,7 @@ export function RoleFilterMenu({ value, onChange }: RoleFilterMenuProps) {
             <DropdownMenuItem
               key={opt.key}
               onClick={() => onChange(opt.key)}
-              className="flex items-center justify-between cursor-pointer"
+              className="flex cursor-pointer items-center justify-between"
             >
               <span className={active ? "font-bold" : ""}>{opt.label}</span>
               {active && <Check className="h-4 w-4 text-gold" aria-hidden="true" />}

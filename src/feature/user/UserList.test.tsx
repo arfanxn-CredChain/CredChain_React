@@ -215,7 +215,9 @@ describe("UserList", () => {
 
   it("renders gender inline in the User cell, not as a separate column", async () => {
     renderUserList();
-    await waitFor(() => expect(screen.queryByRole("columnheader", { name: /gender/i })).not.toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.queryByRole("columnheader", { name: /gender/i })).not.toBeInTheDocument(),
+    );
   });
 
   it("does not render a Phone column header", async () => {
@@ -239,7 +241,9 @@ describe("UserList", () => {
   it("renders copy buttons for wallet address in each row", async () => {
     renderUserList();
     await waitFor(() => expect(screen.getByText("Jane Doe")).toBeInTheDocument());
-    expect(screen.getAllByRole("button", { name: /copy wallet address/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("button", { name: /copy wallet address/i }).length).toBeGreaterThan(
+      0,
+    );
   });
 
   it("selecting a role filter updates the URL with role param", async () => {

@@ -1,11 +1,6 @@
 import { Link, useParams } from "react-router-dom";
-import {
-  AlertCircle,
-  ExternalLink,
-  Hash,
-  Link as LinkIcon,
-  ShieldCheck,
-} from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { AlertCircle, ExternalLink, Hash, Link as LinkIcon, ShieldCheck } from "lucide-react";
 import { useCredential } from "./api/useCredential";
 import { useUser } from "@feature/user/api/useUser";
 import { PageHeader } from "@shared/components/PageHeader";
@@ -19,6 +14,7 @@ import { CredentialStatusBadge } from "./components/CredentialStatusBadge";
 import { formatDate, formatDateTime } from "@shared/lib/format";
 
 export function CredentialDetail() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const { data: cred, isLoading, isError } = useCredential(id ?? "");
   const { data: holder } = useUser(cred?.holder_id ?? "");
@@ -26,67 +22,64 @@ export function CredentialDetail() {
 
   if (isError) {
     return (
-      <div className="max-w-4xl mx-auto space-y-6">
-        <PageHeader title="Credential Detail" onBack />
+      <div className="mx-auto max-w-4xl space-y-6">
+        <PageHeader title={t("cred.detail.title")} onBack />
         <EmptyState
           icon={AlertCircle}
-          title="Credential not found"
-          description="This credential does not exist or has been removed."
+          title={t("cred.detail.notFound.title")}
+          description={t("cred.detail.notFound.body")}
         />
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <PageHeader
-        title={cred?.title ?? "Credential Detail"}
-        description={cred?.type}
-        onBack
-      />
+    <div className="mx-auto max-w-4xl space-y-6">
+      <PageHeader title={cred?.title ?? t("cred.detail.title")} description={cred?.type} onBack />
 
       {isLoading || !cred ? (
-        <Card className="p-8 space-y-6">
+        <Card className="space-y-6 p-8">
           <Skeleton className="h-6 w-1/3" />
           <Skeleton className="h-4 w-2/3" />
           <Skeleton className="h-32 w-full" />
         </Card>
       ) : (
         <>
-          <Card className="p-6 sm:p-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <Card className="flex flex-col gap-4 p-6 sm:flex-row sm:items-start sm:justify-between sm:p-8">
             <div>
-              <EyebrowLabel>Status</EyebrowLabel>
+              <EyebrowLabel>{t("cred.detail.status")}</EyebrowLabel>
               <CredentialStatusBadge revoked={cred.revoked} />
-              <p className="text-sm text-gray-500 mt-3">
-                Issued {formatDate(cred.issued_at)}
-                {cred.valid_until && ` · Expires ${formatDate(cred.valid_until)}`}
+              <p className="mt-3 text-sm text-gray-500">
+                {t("cred.detail.issued")} {formatDate(cred.issued_at)}
+                {cred.valid_until &&
+                  ` · ${t("cred.detail.expires")} ${formatDate(cred.valid_until)}`}
               </p>
             </div>
             <Button asChild variant="primary">
               <Link to={`/credentials/verify/${cred.id}`}>
                 <ShieldCheck className="h-4 w-4 text-gold" />
-                Public verification
+                {t("cred.detail.publicVerify")}
               </Link>
             </Button>
           </Card>
 
           <Card className="p-6 sm:p-8">
-            <EyebrowLabel className="mb-4">Subject &amp; Authority</EyebrowLabel>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <EyebrowLabel className="mb-4">{t("cred.detail.subjectAuthority")}</EyebrowLabel>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
-                  Holder
+                <p className="mb-1 text-xs font-bold tracking-wider text-gray-400 uppercase">
+                  {t("cred.detail.holder")}
                 </p>
-                <p className="text-sm font-bold text-navy break-all">
+                <p className="text-sm font-bold break-all text-navy">
                   {holder?.name ?? holder?.email ?? cred.holder_id}
                 </p>
                 <MonoId value={cred.holder_id} className="mt-1 block" />
               </div>
               <div>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
-                  Issuer
+                <p className="mb-1 text-xs font-bold tracking-wider text-gray-400 uppercase">
+                  {t("cred.detail.issuer")}
                 </p>
-                <p className="text-sm font-bold text-navy break-all">
+                <p className="text-sm font-bold break-all text-navy">
                   {issuer?.name ?? issuer?.email ?? cred.issuer_id}
                 </p>
                 <MonoId value={cred.issuer_id} className="mt-1 block" />
@@ -96,17 +89,17 @@ export function CredentialDetail() {
 
           {cred.description && (
             <Card className="p-6 sm:p-8">
-              <EyebrowLabel className="mb-2">Description</EyebrowLabel>
-              <p className="text-sm text-navy leading-relaxed">{cred.description}</p>
+              <EyebrowLabel className="mb-2">{t("cred.detail.description")}</EyebrowLabel>
+              <p className="text-sm leading-relaxed text-navy">{cred.description}</p>
             </Card>
           )}
 
           <Card className="p-6 sm:p-8">
             <EyebrowLabel className="mb-2 flex items-center gap-1.5">
               <Hash className="h-3.5 w-3.5" aria-hidden="true" />
-              Cryptographic Hash
+              {t("cred.detail.cryptoHash")}
             </EyebrowLabel>
-            <code className="block font-mono text-xs sm:text-sm text-gray-700 bg-gray-50 p-4 rounded-xl border border-gray-100 break-all">
+            <code className="block rounded-xl border border-gray-100 bg-gray-50 p-4 font-mono text-xs break-all text-gray-700 sm:text-sm">
               {cred.hash}
             </code>
           </Card>
@@ -115,32 +108,39 @@ export function CredentialDetail() {
             <Card className="p-6 sm:p-8">
               <EyebrowLabel className="mb-2 flex items-center gap-1.5">
                 <LinkIcon className="h-3.5 w-3.5" aria-hidden="true" />
-                Metadata Attachment
+                {t("cred.detail.metadataAttachment")}
               </EyebrowLabel>
               <a
-                href={cred.uri.startsWith("ipfs://") ? `https://ipfs.io/ipfs/${cred.uri.slice(7)}` : cred.uri}
+                href={
+                  cred.uri.startsWith("ipfs://")
+                    ? `https://ipfs.io/ipfs/${cred.uri.slice(7)}`
+                    : cred.uri
+                }
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center text-sm font-bold text-gold hover:text-navy transition-colors break-all"
+                className="inline-flex items-center text-sm font-bold break-all text-gold transition-colors hover:text-navy"
               >
                 {cred.uri}
-                <ExternalLink className="w-3 h-3 ml-1 opacity-70 flex-shrink-0" aria-hidden="true" />
+                <ExternalLink
+                  className="ml-1 h-3 w-3 shrink-0 opacity-70"
+                  aria-hidden="true"
+                />
               </a>
             </Card>
           )}
 
           <Card className="p-6 sm:p-8">
-            <EyebrowLabel className="mb-4">Audit</EyebrowLabel>
-            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <EyebrowLabel className="mb-4">{t("cred.detail.audit")}</EyebrowLabel>
+            <dl className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
-                <dt className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
-                  Created
+                <dt className="mb-1 text-xs font-bold tracking-wider text-gray-400 uppercase">
+                  {t("cred.detail.created")}
                 </dt>
                 <dd className="text-sm text-navy">{formatDateTime(cred.created_at)}</dd>
               </div>
               <div>
-                <dt className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
-                  Last updated
+                <dt className="mb-1 text-xs font-bold tracking-wider text-gray-400 uppercase">
+                  {t("cred.detail.lastUpdated")}
                 </dt>
                 <dd className="text-sm text-navy">{formatDateTime(cred.updated_at)}</dd>
               </div>

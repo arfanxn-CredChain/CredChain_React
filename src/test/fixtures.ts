@@ -41,9 +41,24 @@ export function makeCredential(overrides: Partial<CredentialDTO> = {}): Credenti
 }
 
 export const mockUsers: UserDTO[] = [
-  makeUser({ id: "usr_1", email: "superadmin@credchain.demo", role: Role.SUPER_ADMIN, name: "Super Admin" }),
-  makeUser({ id: "usr_2", email: "admin@credchain.demo", role: Role.ADMIN, name: "Platform Admin" }),
-  makeUser({ id: "usr_3", email: "issuer@credchain.demo", role: Role.ISSUER, name: "Default Issuer" }),
+  makeUser({
+    id: "usr_1",
+    email: "superadmin@credchain.demo",
+    role: Role.SUPER_ADMIN,
+    name: "Super Admin",
+  }),
+  makeUser({
+    id: "usr_2",
+    email: "admin@credchain.demo",
+    role: Role.ADMIN,
+    name: "Platform Admin",
+  }),
+  makeUser({
+    id: "usr_3",
+    email: "issuer@credchain.demo",
+    role: Role.ISSUER,
+    name: "Default Issuer",
+  }),
   makeUser({ id: "usr_4", email: "holder@credchain.demo", role: Role.HOLDER, name: "Jane Doe" }),
   makeUser({
     id: "usr_5",

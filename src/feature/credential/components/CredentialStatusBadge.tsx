@@ -1,20 +1,20 @@
+import { useTranslation } from "react-i18next";
 import { ShieldAlert, ShieldCheck } from "lucide-react";
-import { Badge } from "@ui/badge";
+import { StatusPill } from "@shared/components/StatusPill";
 
 interface CredentialStatusBadgeProps {
   revoked: boolean;
 }
 
 export function CredentialStatusBadge({ revoked }: CredentialStatusBadgeProps) {
+  const { t } = useTranslation();
   return revoked ? (
-    <Badge tone="error">
-      <ShieldAlert className="w-3 h-3 mr-1" aria-hidden="true" />
-      Revoked
-    </Badge>
+    <StatusPill tone="error" icon={ShieldAlert}>
+      {t("cred.status.revoked")}
+    </StatusPill>
   ) : (
-    <Badge tone="green">
-      <ShieldCheck className="w-3 h-3 mr-1" aria-hidden="true" />
-      Active
-    </Badge>
+    <StatusPill tone="green" icon={ShieldCheck}>
+      {t("cred.status.active")}
+    </StatusPill>
   );
 }

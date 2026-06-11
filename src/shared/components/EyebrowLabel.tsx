@@ -18,7 +18,7 @@ export function EyebrowLabel({
   return (
     <Tag
       className={cn(
-        "text-xs font-bold uppercase tracking-wider mb-1",
+        "mb-1 text-xs font-bold tracking-wider uppercase",
         tone === "navy" ? "text-navy" : "text-gray-400",
         className,
       )}

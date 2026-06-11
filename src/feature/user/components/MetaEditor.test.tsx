@@ -60,20 +60,18 @@ describe("MetaEditor", () => {
   });
 
   it("clicking remove drops the row", async () => {
-    render(
-      <Harness defaultValues={{ meta_entries: [{ key: "k1", value: "v1" }] }} />,
-      { wrapper: TestProviders },
-    );
+    render(<Harness defaultValues={{ meta_entries: [{ key: "k1", value: "v1" }] }} />, {
+      wrapper: TestProviders,
+    });
     expect(screen.getAllByRole("textbox")).toHaveLength(2);
     await userEvent.click(screen.getByRole("button", { name: /remove/i }));
     expect(screen.queryAllByRole("textbox")).toHaveLength(0);
   });
 
   it("shows translated error message (not raw key) when key is empty", async () => {
-    render(
-      <ValidatedHarness defaultValues={{ meta_entries: [{ key: "", value: "v1" }] }} />,
-      { wrapper: TestProviders },
-    );
+    render(<ValidatedHarness defaultValues={{ meta_entries: [{ key: "", value: "v1" }] }} />, {
+      wrapper: TestProviders,
+    });
     await userEvent.click(screen.getByRole("button", { name: /submit/i }));
     await waitFor(() => {
       expect(screen.getByRole("alert")).toBeInTheDocument();

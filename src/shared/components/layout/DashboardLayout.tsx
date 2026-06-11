@@ -24,7 +24,7 @@ export function DashboardLayout() {
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-50 w-72 shadow-2xl transition-transform duration-300",
-          "sm:sticky sm:top-0 sm:h-dvh sm:flex-shrink-0 sm:translate-x-0",
+          "sm:sticky sm:top-0 sm:h-dvh sm:shrink-0 sm:translate-x-0",
           sidebarOpen ? "translate-x-0" : "-translate-x-full",
         )}
         aria-label="Sidebar"
@@ -38,7 +38,7 @@ export function DashboardLayout() {
 
         <main
           id="main"
-          className="flex-1 [scrollbar-gutter:stable] overflow-y-scroll px-4 pt-4 pb-12 sm:px-8"
+          className="flex-1 scrollbar-gutter-stable overflow-y-scroll px-4 pt-4 pb-12 sm:px-8"
         >
           <Outlet />
         </main>

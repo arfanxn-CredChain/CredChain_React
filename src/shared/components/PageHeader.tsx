@@ -20,7 +20,7 @@ export function PageHeader({ title, description, action, onBack }: PageHeaderPro
   const handleBack = onBack === true ? handleSmartBack : onBack;
 
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
       <div className="flex items-center gap-4">
         {handleBack && (
           <Button
@@ -28,16 +28,16 @@ export function PageHeader({ title, description, action, onBack }: PageHeaderPro
             size="icon"
             onClick={handleBack}
             aria-label="Go back"
-            className="h-8 w-8 shrink-0 sm:h-10 sm:w-10 text-gray-400 hover:text-navy hover:bg-white rounded-full"
+            className="h-8 w-8 shrink-0 rounded-full text-gray-400 hover:bg-white hover:text-navy sm:h-10 sm:w-10"
           >
-            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+            <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
         )}
         <div>
-          <h2 className="font-display text-2xl md:text-3xl font-bold text-navy tracking-tight">
+          <h2 className="font-display text-2xl font-bold tracking-tight text-navy md:text-3xl">
             {title}
           </h2>
-          {description && <p className="text-sm text-gray-500 mt-1">{description}</p>}
+          {description && <p className="mt-1 text-sm text-gray-500">{description}</p>}
         </div>
       </div>
       {action && <div className="w-full sm:w-auto">{action}</div>}

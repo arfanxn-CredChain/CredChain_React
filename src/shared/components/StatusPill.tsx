@@ -22,12 +22,12 @@ export function StatusPill({ tone, icon: Icon, children, className }: StatusPill
   return (
     <span
       className={cn(
-        "inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider",
+        "inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-bold tracking-wider uppercase",
         toneClasses[tone],
         className,
       )}
     >
-      {Icon && <Icon className="w-3 h-3 mr-1" aria-hidden="true" />}
+      {Icon && <Icon className="mr-1 h-3 w-3" aria-hidden="true" />}
       {children}
     </span>
   );

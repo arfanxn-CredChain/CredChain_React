@@ -11,10 +11,9 @@ describe("CopyInlineButton", () => {
   });
 
   it("renders with the provided aria-label", () => {
-    render(
-      <CopyInlineButton value="test@example.com" ariaLabel="Copy email" />,
-      { wrapper: TestProviders },
-    );
+    render(<CopyInlineButton value="test@example.com" ariaLabel="Copy email" />, {
+      wrapper: TestProviders,
+    });
     expect(screen.getByRole("button", { name: /copy email/i })).toBeInTheDocument();
   });
 
@@ -27,10 +26,9 @@ describe("CopyInlineButton", () => {
       configurable: true,
     });
 
-    render(
-      <CopyInlineButton value="test@example.com" ariaLabel="Copy email" />,
-      { wrapper: TestProviders },
-    );
+    render(<CopyInlineButton value="test@example.com" ariaLabel="Copy email" />, {
+      wrapper: TestProviders,
+    });
 
     await user.click(screen.getByRole("button", { name: /copy email/i }));
     expect(writeTextMock).toHaveBeenCalledWith("test@example.com");
@@ -44,10 +42,9 @@ describe("CopyInlineButton", () => {
       configurable: true,
     });
 
-    render(
-      <CopyInlineButton value="test@example.com" ariaLabel="Copy email" />,
-      { wrapper: TestProviders },
-    );
+    render(<CopyInlineButton value="test@example.com" ariaLabel="Copy email" />, {
+      wrapper: TestProviders,
+    });
 
     await user.click(screen.getByRole("button", { name: /copy email/i }));
     await waitFor(() => {

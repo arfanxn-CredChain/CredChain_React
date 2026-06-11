@@ -18,7 +18,7 @@ export function BackLink({ className }: BackLinkProps) {
       className={cn(
         "inline-flex items-center gap-1.5 text-sm font-medium text-gray-500",
         "transition-colors hover:text-navy",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded-md",
+        "rounded-md focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none",
         className,
       )}
     >

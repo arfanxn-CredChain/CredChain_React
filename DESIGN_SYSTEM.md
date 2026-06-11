@@ -2,7 +2,7 @@
 
 > For AI assistants and engineers building CredChain_React/. This document is the single source of truth for the production frontend. It supersedes CredChain_React_Demo/ (reference only - do not import from it).
 
-Status: Draft v1.5 | Last updated: 2026-06-11 | Related: ../AGENTS.md, ../CredChain_Golang/
+Status: Draft v1.6 | Last updated: 2026-06-11 | Related: ../AGENTS.md, ../CredChain_Golang/
 
 ---
 
@@ -107,7 +107,7 @@ Backend contract (see ../CredChain_Golang/AGENTS.md):
 
 The demo hand-rolls everything (selects, modals via window.confirm, no popovers). Production needs accessible select dropdowns, dialogs, command palettes, dropdown menus, toasts, tabs - building all of that from scratch is months of work and an accessibility liability. shadcn/ui gives us Radix primitives (WAI-ARIA compliant, keyboard navigation, focus traps) as source files in our repo that we restyle to our tokens. We own the code; we don't depend on a versioned package. This is the 2026 default for Tailwind apps.
 
-**Components installed in `src/shared/components/ui/` (12 primitives):** badge, button, card, confirm-dialog, dialog, dropdown-menu, input, label, select, skeleton, table, toaster.
+**Components installed in `src/shared/components/ui/` (13 primitives):** badge, button, card, confirm-dialog, dialog, dropdown-menu, form-field, input, label, select, skeleton, table, toaster.
 
 All shadcn components live in `src/shared/components/ui/` and are restyled to use our tokens (`navy`, `gold`, `error`) before any feature code consumes them. The `vaul` `Drawer` primitive is used outside `ui/` by `feature/user/components/UserEditDrawer.tsx` for the admin batch-edit flow; it is the only content drawer in the app and is **not** used for sidebar navigation (the mobile sidebar is hand-rolled — see §8.7).
 
@@ -176,9 +176,9 @@ CredChain_React/
         role.ts              # Role const object, ROLE_LEVEL, canAccess, canAccessAny, formatRole
         guards.tsx           # ProtectedRoute, PublicRoute, RoleGate
       components/
-        ui/                  # 12 shadcn primitives (sole Radix import location)
+        ui/                  # 13 shadcn primitives (sole Radix import location)
                              # badge, button, card, confirm-dialog, dialog,
-                             # dropdown-menu, input, label, select, skeleton, table, toaster
+                             # dropdown-menu, form-field, input, label, select, skeleton, table, toaster
         layout/
           AdaptiveLayout.tsx # renders DashboardLayout if authed, PublicLayout otherwise
           DashboardLayout.tsx
@@ -188,10 +188,11 @@ CredChain_React/
           NavbarDashboard.tsx
           NavbarPublic.tsx
           nav-items.ts       # NAV_ITEMS with minRole + exactRole + inSidebar flags
-        BackLink.tsx
-        CopyrightFooter.tsx
-        DecorBlob.tsx
-        EmptyState.tsx
+         BackLink.tsx
+         CopyrightFooter.tsx
+         DecorBlob.tsx
+         DetailRow.tsx
+         EmptyState.tsx
         CopyInlineButton.tsx
         ErrorBoundary.tsx    # AppErrorBoundary
         EyebrowLabel.tsx
@@ -434,7 +435,7 @@ Fraunces uses optical sizing (`opsz`) — at large display sizes (28px+) it rend
 | Hero            | `font-display text-4xl md:text-5xl font-extrabold tracking-tight`      | Auth landing, public verification page |
 | Page title (H2) | `font-display text-2xl md:text-3xl font-bold text-navy tracking-tight` | All page titles                        |
 | Section (H3)    | `font-display text-xl font-semibold text-navy tracking-tight`          | Card section headers                   |
-| Card title      | `font-sans text-lg font-bold text-navy`                                | Credential cards, settings             |
+| Card title      | `font-sans text-lg font-bold text-navy`                                | Credential cards, settings, CardTitle primitive       |
 | Stat value      | `font-display text-4xl font-extrabold tracking-tight`                  | Dashboard metrics                      |
 | Body            | `font-sans text-sm text-navy`                                          | Default body                           |
 | Label           | `font-sans text-sm font-semibold text-gray-700`                        | Form labels                            |
@@ -668,14 +669,14 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: "bg-navy text-surface shadow-md shadow-navy/20 hover:bg-navy/90 focus:ring-navy",
-        gold: "bg-gold text-navy shadow-md shadow-gold/20 hover:bg-gold/90 focus:ring-gold",
+        primary: "bg-navy text-surface shadow-md shadow-navy/20 hover:bg-navy/90 focus-visible:ring-gold",
+        gold: "bg-gold text-navy shadow-md shadow-gold/20 hover:bg-gold/90 focus-visible:ring-gold",
         destructive:
-          "bg-error text-surface shadow-md shadow-error/20 hover:bg-error/90 focus:ring-error",
-        outline: "border border-gray-200 bg-surface text-navy hover:bg-gray-50 focus:ring-navy",
-        ghost: "text-navy hover:bg-gray-100 focus:ring-navy",
+          "bg-error text-surface shadow-md shadow-error/20 hover:bg-error/90 focus-visible:ring-error",
+        outline: "border border-gray-200 bg-surface text-navy hover:bg-gray-50 focus-visible:ring-gold",
+        ghost: "text-navy hover:bg-gray-100 focus-visible:ring-gold",
         dashed:
-          "border-2 border-dashed border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 hover:border-gray-300",
+          "border-2 border-dashed border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 hover:border-gray-300 focus-visible:ring-gold",
       },
       size: {
         sm: "px-3 py-1.5 text-xs",
@@ -926,6 +927,55 @@ return (
 );
 ```
 
+### 7.10 FormField (shared form control wrapper)
+
+Extracted from three duplicated inline implementations in UserCreateRow, CredentialIssueRow, and UserEditDrawer. Wraps a `<Label>` + children + optional error/hint/optional tag:
+
+```tsx
+// shared/components/ui/form-field.tsx
+export function FormField({ label, hint, error, optional, children }: {
+  label: string; hint?: string; error?: string; optional?: boolean; children: React.ReactNode;
+}) {
+  const { t } = useTranslation();
+  return (
+    <div className="space-y-1">
+      <Label>
+        {label}
+        {optional && <span className="ml-1 font-normal text-gray-400">{t("common.optional")}</span>}
+      </Label>
+      {children}
+      {error ? (
+        <p className="mt-1 text-xs text-error" role="alert">{t(error)}</p>
+      ) : hint ? (
+        <p className="mt-1 text-xs text-gray-400">{hint}</p>
+      ) : null}
+    </div>
+  );
+}
+```
+
+### 7.11 DetailRow (dt/dd pair for read-only detail views)
+
+Extracted from the repeated `<dt>`/`<dd>` pattern in UserDetail, UserSelfProfile, Settings, and CredentialDetail. Supports optional icon and error tone:
+
+```tsx
+// shared/components/DetailRow.tsx
+export function DetailRow({ label, value, icon: Icon, tone = "default", className }: {
+  label: string; value: React.ReactNode; icon?: LucideIcon; tone?: "default" | "error"; className?: string;
+}) {
+  return (
+    <div className={className}>
+      <dt className={cn("mb-1 flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase",
+        tone === "error" ? "text-error" : "text-gray-400")}>
+        {Icon && <Icon className="h-3.5 w-3.5" aria-hidden="true" />}
+        {label}
+      </dt>
+      <dd className={cn("text-sm", tone === "error" ? "text-error" : "text-navy")}>{value}</dd>
+    </div>
+  );
+}
+```
+
 ---
 
 ## 8. Layout System
@@ -958,7 +1008,7 @@ The `<CopyrightFooter />` shared component (`@shared/components/CopyrightFooter.
 | Width          | Tailwind                   | Use case                          |
 | -------------- | -------------------------- | --------------------------------- |
 | Form / detail  | `max-w-md`                 | Auth card                         |
-| Detail view    | `max-w-3xl`                | UserDetail, single-record screens |
+| Detail view    | `max-w-4xl`                | UserDetail, single-record screens |
 | Settings       | `max-w-4xl`                | Settings, verification            |
 | Verification   | `max-w-3xl` to `max-w-4xl` | VerifyCredential (public)         |
 | Batch forms    | `max-w-6xl`                | UserCreate, CredentialIssue       |

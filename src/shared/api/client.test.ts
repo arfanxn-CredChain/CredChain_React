@@ -8,7 +8,9 @@ describe("axios interceptor — 401 handling", () => {
 
   beforeEach(() => {
     unauthCalled = false;
-    configureAuthHandler(() => { unauthCalled = true; });
+    configureAuthHandler(() => {
+      unauthCalled = true;
+    });
   });
 
   it("retries /users/self after silent refresh succeeds", async () => {
@@ -19,11 +21,13 @@ describe("axios interceptor — 401 handling", () => {
         if (selfCallCount === 1) {
           return HttpResponse.json({ code: 401100, message: "Unauthorized" }, { status: 401 });
         }
-        return HttpResponse.json({ code: 100200, message: "OK", data: { id: "1", email: "a@b.com" } });
+        return HttpResponse.json({
+          code: 100200,
+          message: "OK",
+          data: { id: "1", email: "a@b.com" },
+        });
       }),
-      http.post("/api/auth/refresh", () =>
-        HttpResponse.json({ code: 100000, message: "OK" }),
-      ),
+      http.post("/api/auth/refresh", () => HttpResponse.json({ code: 100000, message: "OK" })),
     );
 
     const response = await api.get("/users/self");
@@ -73,11 +77,13 @@ describe("axios interceptor — 401 handling", () => {
 
   it("maps 429 with Retry-After to system.rate_limited_with_retry", async () => {
     server.use(
-      http.get("/api/users", () =>
-        new HttpResponse(
-          JSON.stringify({ code: 429000, message: "Too many requests" }),
-          { status: 429, headers: { "Retry-After": "30" } },
-        ),
+      http.get(
+        "/api/users",
+        () =>
+          new HttpResponse(JSON.stringify({ code: 429000, message: "Too many requests" }), {
+            status: 429,
+            headers: { "Retry-After": "30" },
+          }),
       ),
     );
 

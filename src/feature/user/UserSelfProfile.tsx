@@ -61,28 +61,25 @@ export function UserSelfProfile() {
   const emailText = user?.email ?? empty;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="mx-auto max-w-4xl space-y-6">
       <BackLink />
       <PageHeader title={t("profile.title")} description={t("profile.description")} />
 
-      <Card className="p-6 sm:p-8 relative overflow-hidden shadow-lg shadow-gold/20 ring-1 ring-gold/10">
+      <Card className="relative overflow-hidden p-6 shadow-lg ring-1 shadow-gold/20 ring-gold/10 sm:p-8">
         <DecorBlob tone="gold" position="top-right" size="lg" />
-        <div className="relative z-10 flex flex-col items-center text-center gap-4">
+        <div className="relative z-10 flex flex-col items-center gap-4 text-center">
           <UserAvatar user={user} size="xl" />
-            <div className="space-y-2">
-            <div className="flex items-center justify-center gap-2 flex-wrap">
-              <h2 className="font-display text-2xl font-bold text-navy tracking-tight">
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <h2 className="font-display text-2xl font-bold tracking-tight text-navy">
                 {user?.name ?? empty}
               </h2>
               {user?.role && <UserRoleBadge role={user.role} />}
             </div>
             <div className="flex items-center justify-center gap-1">
-              <p className="text-sm text-gray-500 break-all">{emailText}</p>
+              <p className="text-sm break-all text-gray-500">{emailText}</p>
               {user?.email && (
-                <CopyInlineButton
-                  value={user.email}
-                  ariaLabel={t("user.copy.email")}
-                />
+                <CopyInlineButton value={user.email} ariaLabel={t("user.copy.email")} />
               )}
             </div>
           </div>
@@ -91,56 +88,53 @@ export function UserSelfProfile() {
 
       <Card className="p-6 sm:p-8">
         <EyebrowLabel className="mb-4">{t("profile.identity.heading")}</EyebrowLabel>
-        <dl className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <dl className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <div>
-            <dt className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+            <dt className="mb-1 text-xs font-bold tracking-wider text-gray-400 uppercase">
               {t("profile.field.number")}
             </dt>
             <dd className="flex items-center gap-2">
               <span
                 className={cn(
                   "text-sm font-bold",
-                  user?.number ? "text-navy" : "text-gray-400 font-normal italic",
+                  user?.number ? "text-navy" : "font-normal text-gray-400 italic",
                 )}
               >
                 {numberText}
               </span>
               {user?.number && (
-                <CopyInlineButton
-                  value={user.number}
-                  ariaLabel={t("profile.number.copy")}
-                />
+                <CopyInlineButton value={user.number} ariaLabel={t("profile.number.copy")} />
               )}
             </dd>
           </div>
           <div>
-            <dt className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+            <dt className="mb-1 text-xs font-bold tracking-wider text-gray-400 uppercase">
               {t("profile.field.birthDate")}
             </dt>
             <dd
               className={cn(
                 "text-sm font-bold",
-                user?.birth_date ? "text-navy" : "text-gray-400 font-normal italic",
+                user?.birth_date ? "text-navy" : "font-normal text-gray-400 italic",
               )}
             >
               {birthDateText}
             </dd>
           </div>
           <div>
-            <dt className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+            <dt className="mb-1 text-xs font-bold tracking-wider text-gray-400 uppercase">
               {t("profile.field.gender")}
             </dt>
             <dd
               className={cn(
                 "text-sm font-bold",
-                user?.gender ? "text-navy" : "text-gray-400 font-normal italic",
+                user?.gender ? "text-navy" : "font-normal text-gray-400 italic",
               )}
             >
               {user?.gender ? t(`user.field.gender.${user.gender}`) : empty}
             </dd>
           </div>
           <div>
-            <dt className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+            <dt className="mb-1 text-xs font-bold tracking-wider text-gray-400 uppercase">
               {t("profile.field.wallet")}
             </dt>
             <dd className="flex items-center gap-2">
@@ -176,14 +170,14 @@ export function UserSelfProfile() {
               {...form.register("phone_number")}
             />
             {phoneError ? (
-              <p className="text-xs text-error mt-1" role="alert">
+              <p className="mt-1 text-xs text-error" role="alert">
                 {t(phoneError)}
               </p>
             ) : (
-              <p className="text-xs text-gray-400 mt-1">{t("profile.phone.hint")}</p>
+              <p className="mt-1 text-xs text-gray-400">{t("profile.phone.hint")}</p>
             )}
           </div>
-          <div className="pt-4 border-t border-gray-100 flex justify-end">
+          <div className="flex justify-end border-t border-gray-100 pt-4">
             <Button
               type="submit"
               variant="primary"
@@ -201,7 +195,7 @@ export function UserSelfProfile() {
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-sm font-bold text-navy">{t("profile.field.email")}</p>
-            <p className="text-sm text-gray-500 break-all">{emailText}</p>
+            <p className="text-sm break-all text-gray-500">{emailText}</p>
           </div>
           <Button asChild variant="outline" size="sm">
             <Link to="/account/email" className="inline-flex items-center gap-2">

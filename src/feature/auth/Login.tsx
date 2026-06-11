@@ -10,16 +10,16 @@ export function Login() {
   const login = useGoogleLogin();
 
   const desktopBrand = (
-    <div className="flex flex-col items-center text-center gap-6">
-      <ShieldCheck className="w-24 h-24 text-gold drop-shadow-xl" aria-hidden="true" />
+    <div className="flex flex-col items-center gap-6 text-center">
+      <ShieldCheck className="h-24 w-24 text-gold drop-shadow-xl" aria-hidden="true" />
       <div>
-        <h1 className="font-display text-4xl md:text-5xl font-extrabold text-surface mb-4 tracking-tight text-balance">
+        <h1 className="mb-4 font-display text-4xl font-extrabold tracking-tight text-balance text-surface md:text-5xl">
           <Trans
             i18nKey="auth.welcome.title"
             components={{ brand: <span className="text-gold" /> }}
           />
         </h1>
-        <p className="text-lg text-gray-400 leading-relaxed text-pretty">
+        <p className="text-lg leading-relaxed text-pretty text-gray-400">
           {t("auth.welcome.tagline")}
         </p>
       </div>
@@ -27,28 +27,24 @@ export function Login() {
   );
 
   const mobileBrand = (
-    <div className="text-center py-[2dvh] px-6 shadow-md rounded-b-3xl">
-      <ShieldCheck className="w-16 h-16 text-gold mx-auto mb-3 drop-shadow-md" aria-hidden="true" />
-      <h2 className="font-display text-3xl font-extrabold text-gold tracking-tight">
-          CredChain
-        </h2>
-      <p className="text-sm text-gray-400 mt-2">{t("auth.welcome.mobileTagline")}</p>
+    <div className="rounded-b-3xl px-6 py-[2dvh] text-center shadow-md">
+      <ShieldCheck className="mx-auto mb-3 h-16 w-16 text-gold drop-shadow-md" aria-hidden="true" />
+      <h2 className="font-display text-3xl font-extrabold tracking-tight text-gold">CredChain</h2>
+      <p className="mt-2 text-sm text-gray-400">{t("auth.welcome.mobileTagline")}</p>
     </div>
   );
 
   return (
     <SplitLayout brandSlot={desktopBrand} mobileBrandSlot={mobileBrand}>
-      <div className="flex h-full w-full flex-col items-center justify-start lg:justify-center py-[2dvh] lg:py-0">
+      <div className="flex h-full w-full flex-col items-center justify-start py-[2dvh] lg:justify-center lg:py-0">
         <div className="flex w-full max-w-[min(448px,90vw)] flex-col">
           <BackLink className="mb-[2dvh]" />
 
-          <div className="bg-surface rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-6 sm:p-8">
-            <h3 className="font-display text-2xl font-bold text-navy mb-2 tracking-tight">
+          <div className="rounded-2xl border border-gray-100 bg-surface p-6 shadow-xl shadow-navy/20 sm:p-8">
+            <h3 className="mb-2 font-display text-2xl font-bold tracking-tight text-navy">
               {t("auth.signin.title")}
             </h3>
-            <p className="text-gray-500 text-sm mb-[2dvh]">
-              {t("auth.signin.subtitle")}
-            </p>
+            <p className="mb-[2dvh] text-sm text-gray-500">{t("auth.signin.subtitle")}</p>
 
             <div className="space-y-5">
               <div className="flex w-full justify-center">
@@ -74,14 +70,14 @@ export function Login() {
                 )}
               </div>
 
-              <div className="pt-4 border-t border-gray-100">
-                <p className="text-xs text-gray-400 text-center font-mono leading-relaxed">
+              <div className="border-t border-gray-100 pt-4">
+                <p className="text-center font-mono text-xs leading-relaxed text-gray-400">
                   {t("auth.signin.terms")}
                 </p>
               </div>
             </div>
           </div>
-          <p className="mt-[2dvh] text-center text-sm text-gray-500 font-medium safe-area-bottom">
+          <p className="safe-area-bottom mt-[2dvh] text-center text-sm font-medium text-gray-500">
             {t("auth.welcome.securedBy")}
           </p>
         </div>

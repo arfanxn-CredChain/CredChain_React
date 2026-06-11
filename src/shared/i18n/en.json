@@ -434,5 +434,171 @@
   "error_transfer_super_admin_self_target_forbidden": "Cannot transfer super admin role to yourself.",
   "error_transfer_super_admin_target_not_found": "Target user not found.",
   "error_transfer_super_admin_trashed_forbidden": "Cannot transfer super admin role to a deleted user.",
-  "error_transfer_super_admin_blockchain_sync_failed": "Failed to transfer super admin role on blockchain."
+  "error_transfer_super_admin_blockchain_sync_failed": "Failed to transfer super admin role on blockchain.",
+  "not_found": {
+    "code": "404",
+    "title": "Page not found",
+    "description": "The page you are looking for does not exist or has been moved.",
+    "goDashboard": "Back to Dashboard",
+    "signIn": "Sign in"
+  },
+  "offline": {
+    "banner": "You are currently offline. Some actions may fail until connection is restored."
+  },
+  "error_boundary": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred. Please try refreshing the page.",
+    "notFoundTitle": "Page not found",
+    "notFoundDescription": "The page you are looking for does not exist.",
+    "reload": "Reload",
+    "goDashboard": "Dashboard"
+  },
+  "user.detail": {
+    "title": "User Profile",
+    "identity": "Identity",
+    "unnamed": "Unnamed entity",
+    "email": "Email",
+    "phone": "Phone",
+    "number": "Number",
+    "birthDate": "Birth date",
+    "onChain": "On-chain identity",
+    "audit": "Audit",
+    "created": "Created",
+    "updated": "Updated",
+    "deleted": "Deleted",
+    "metadata": "Metadata",
+    "notFound": {
+      "title": "User not found",
+      "body": "This user does not exist or has been removed."
+    }
+  },
+  "user.status": {
+    "active": "Active",
+    "trashed": "Trashed"
+  },
+  "cred": {
+    "list": {
+      "title": "Credentials Ledger",
+      "description": "Review all issued and revoked verifiable credentials across the network.",
+      "searchPlaceholder": "Search by ID, type, or title...",
+      "searchAriaLabel": "Search credentials",
+      "count_one": "{{count}} record",
+      "count_other": "{{count}} records",
+      "error": "Failed to load credentials. Please try again.",
+      "empty": {
+        "none": { "title": "No credentials yet", "body": "Issued credentials will appear here." },
+        "search": {
+          "title": "No credentials match your search",
+          "body": "Try a different search term."
+        }
+      },
+      "pagination": {
+        "previous": "Previous",
+        "next": "Next",
+        "page": "Page {{page}} of {{total}}"
+      },
+      "issueCta": "Issue New",
+      "revokeSelected": "Revoke Selected",
+      "revokeSelectedCount": "Revoke Selected ({{count}})"
+    },
+    "detail": {
+      "title": "Credential Detail",
+      "notFound": {
+        "title": "Credential not found",
+        "body": "This credential does not exist or has been removed."
+      },
+      "status": "Status",
+      "issued": "Issued",
+      "expires": "Expires",
+      "publicVerify": "Public verification",
+      "subjectAuthority": "Subject & Authority",
+      "holder": "Holder",
+      "issuer": "Issuer",
+      "description": "Description",
+      "cryptoHash": "Cryptographic Hash",
+      "metadataAttachment": "Metadata Attachment",
+      "audit": "Audit",
+      "created": "Created",
+      "lastUpdated": "Last updated"
+    },
+    "issue": {
+      "title": "Issue Credentials",
+      "description": "Generate and distribute verifiable records to network entities.",
+      "addAnother": "Add another record",
+      "submit": "Issue Credentials",
+      "submitting": "Issuing..."
+    },
+    "verify": {
+      "title": "Credential Verification",
+      "description": "Cryptographically verify the authenticity of a digital document against the on-chain ledger.",
+      "loading": "Loading...",
+      "notFound": {
+        "title": "Record Not Found",
+        "body": "The requested credential identifier does not exist or has been permanently removed from the ledger.",
+        "returnHome": "Return Home"
+      },
+      "credentialType": "Credential Type",
+      "blockchainHash": "Blockchain Hash Signature",
+      "issuingAuthority": "Issuing Authority",
+      "dateOfIssuance": "Date of Issuance",
+      "validUntil": "Valid Until",
+      "verificationDisabled": "Verification Disabled",
+      "revokedDesc": "This record has been explicitly revoked and can no longer be cryptographically asserted.",
+      "verifyDoc": "Verify Source Document",
+      "verifyDocDesc": "Upload the original file to compute a local SHA-256 hash and compare it against the ledger.",
+      "selectFile": "Select File for Verification",
+      "processing": "Processing...",
+      "uploadAriaLabel": "Upload file for verification",
+      "success": "Verification Successful",
+      "successDesc": "The provided document is authentic. Its computed hash matches the official ledger signature precisely.",
+      "failed": "Verification Failed",
+      "failedDesc": "The document does NOT match the signature on the ledger. It may have been altered or is an incorrect file.",
+      "computedHash": "Computed Local Hash"
+    },
+    "mine": {
+      "title": "My Credentials",
+      "description": "Manage and view your personal verifiable digital records.",
+      "empty": {
+        "title": "No credentials yet",
+        "body": "Issued credentials linked to your wallet will appear here."
+      },
+      "error": {
+        "title": "Couldn't load your credentials",
+        "body": "Please try again in a moment."
+      }
+    },
+    "card": {
+      "viewDetails": "View Details",
+      "noDescription": "No description provided.",
+      "holder": "Holder:",
+      "issued": "Issued:",
+      "expires": "Expires:",
+      "select": "Select credential",
+      "deselect": "Deselect credential"
+    },
+    "status": { "active": "Active", "revoked": "Revoked" },
+    "field": {
+      "recipient": "Recipient (holder)",
+      "type": "Credential type",
+      "title": "Title",
+      "description": "Description",
+      "uri": "Metadata URI",
+      "uriHint": "ipfs:// or https:// link to credential metadata",
+      "validUntil": "Valid until",
+      "optional": "(optional)",
+      "hashNote": "Hash will be computed and committed on-chain when issued.",
+      "selectRecipient": "Select recipient...",
+      "selectType": "Select type...",
+      "noHolders": "No holders found.",
+      "titlePlaceholder": "Bachelor of Science in Computer Science",
+      "descriptionPlaceholder": "Awarded for completing the undergraduate degree requirements.",
+      "uriPlaceholder": "ipfs://Qm..."
+    },
+    "revoke": {
+      "confirmTitle": "Revoke {{count}} credential?",
+      "confirmTitle_plural": "Revoke {{count}} credentials?",
+      "confirmBody": "This action revokes the credential on-chain and cannot be undone. Holders will lose verification.",
+      "confirmAction": "Revoke"
+    }
+  }
 }

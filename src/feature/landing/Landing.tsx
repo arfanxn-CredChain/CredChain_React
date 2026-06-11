@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 import { useStore } from "@app/store";
 import { Button } from "@ui/button";
+import { cn } from "@shared/lib/cn";
 import { SplitLayout } from "@shared/components/layout/SplitLayout";
 
 interface AttestationStampProps {
@@ -12,7 +13,12 @@ interface AttestationStampProps {
   className?: string;
 }
 
-function AttestationStamp({ verified, theme = "light", size = "full", className }: AttestationStampProps) {
+function AttestationStamp({
+  verified,
+  theme = "light",
+  size = "full",
+  className,
+}: AttestationStampProps) {
   const isMini = size === "mini";
   const isDark = theme === "dark";
 
@@ -30,13 +36,17 @@ function AttestationStamp({ verified, theme = "light", size = "full", className 
 
   return (
     <div
-      className={`relative aspect-square ${containerSize} max-w-full mx-auto select-none flex-shrink-0 ${className ?? ""}`}
+      className={cn(
+        "relative mx-auto aspect-square max-w-full shrink-0 select-none",
+        containerSize,
+        className,
+      )}
       aria-hidden="true"
     >
       {/* Rotating inscription ring */}
       <svg
         viewBox="0 0 340 340"
-        className="absolute inset-0 w-full h-full animate-[spin_50s_linear_infinite] motion-reduce:animate-none"
+        className="absolute inset-0 h-full w-full animate-[spin_50s_linear_infinite] motion-reduce:animate-none"
       >
         <defs>
           <path
@@ -54,7 +64,7 @@ function AttestationStamp({ verified, theme = "light", size = "full", className 
       </svg>
 
       {/* Static rings + tick marks */}
-      <svg viewBox="0 0 340 340" className="absolute inset-0 w-full h-full">
+      <svg viewBox="0 0 340 340" className="absolute inset-0 h-full w-full">
         <circle
           cx="170"
           cy="170"
@@ -81,24 +91,55 @@ function AttestationStamp({ verified, theme = "light", size = "full", className 
             <line x1="22" y1="170" x2="34" y2="170" stroke="#C9A227" strokeWidth="1.5" />
             <line x1="306" y1="170" x2="318" y2="170" stroke="#C9A227" strokeWidth="1.5" />
             <line x1="65" y1="65" x2="73" y2="73" stroke="#C9A227" strokeWidth="1" opacity="0.5" />
-            <line x1="267" y1="65" x2="275" y2="73" stroke="#C9A227" strokeWidth="1" opacity="0.5" />
-            <line x1="65" y1="267" x2="73" y2="275" stroke="#C9A227" strokeWidth="1" opacity="0.5" />
-            <line x1="267" y1="267" x2="275" y2="275" stroke="#C9A227" strokeWidth="1" opacity="0.5" />
+            <line
+              x1="267"
+              y1="65"
+              x2="275"
+              y2="73"
+              stroke="#C9A227"
+              strokeWidth="1"
+              opacity="0.5"
+            />
+            <line
+              x1="65"
+              y1="267"
+              x2="73"
+              y2="275"
+              stroke="#C9A227"
+              strokeWidth="1"
+              opacity="0.5"
+            />
+            <line
+              x1="267"
+              y1="267"
+              x2="275"
+              y2="275"
+              stroke="#C9A227"
+              strokeWidth="1"
+              opacity="0.5"
+            />
           </>
         )}
       </svg>
 
       {/* Center mark */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-2">
-        <div className={`${innerMedallion} rounded-full ${medallionBg} border ${medallionBorder} flex items-center justify-center`}>
-          <ShieldCheck className={`${shieldSize} ${shieldColor}`} strokeWidth={1.25} />
+      <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2">
+        <div
+          className={cn(
+            innerMedallion,
+            "flex items-center justify-center rounded-full border",
+            medallionBg,
+            medallionBorder,
+          )}
+        >
+          <ShieldCheck className={cn(shieldSize, shieldColor)} strokeWidth={1.25} />
         </div>
         {!isMini && (
           <>
-            <div className={`font-mono text-[10px] ${hashColor} tracking-wider`}>
+            <div className={cn("font-mono text-[10px] tracking-wider", hashColor)}>
               0x7099···79C8
             </div>
-            <div className={`font-mono text-[9px] ${stampColor} uppercase tracking-[0.32em]`}>
+            <div className={cn("font-mono text-[9px] tracking-[0.32em] uppercase", stampColor)}>
               {verified} · 2026
             </div>
           </>
@@ -117,29 +158,19 @@ export function Landing() {
 
   const desktopBrand = (
     <div className="flex flex-col items-center gap-8 text-center">
-      <AttestationStamp
-        verified={t("landing.stamp.verified")}
-        theme="dark"
-        size="full"
-      />
-      <span className="font-display text-5xl lg:text-6xl font-extrabold text-gold tracking-tight">
+      <AttestationStamp verified={t("landing.stamp.verified")} theme="dark" size="full" />
+      <span className="font-display text-5xl font-extrabold tracking-tight text-gold lg:text-6xl">
         CredChain
       </span>
     </div>
   );
 
   const mobileBrand = (
-    <div className="text-center py-[2dvh] px-6 shadow-md rounded-b-3xl">
+    <div className="rounded-b-3xl px-6 py-[2dvh] text-center shadow-md">
       <div className="mx-auto mb-[1dvh] w-fit max-w-[min(160px,18vh)]">
-        <AttestationStamp
-          verified={t("landing.stamp.verified")}
-          theme="dark"
-          size="mini"
-        />
+        <AttestationStamp verified={t("landing.stamp.verified")} theme="dark" size="mini" />
       </div>
-      <h2 className="font-display text-3xl font-extrabold text-gold tracking-tight">
-        CredChain
-      </h2>
+      <h2 className="font-display text-3xl font-extrabold tracking-tight text-gold">CredChain</h2>
     </div>
   );
 
@@ -147,18 +178,18 @@ export function Landing() {
     <SplitLayout brandSlot={desktopBrand} mobileBrandSlot={mobileBrand}>
       <section
         aria-labelledby="landing-title"
-        className="relative self-center flex h-full max-w-[min(36rem,90vw)] flex-col items-start justify-center py-[2dvh] lg:py-0 space-y-[1.5dvh] sm:space-y-[2dvh]"
+        className="relative flex h-full max-w-[min(36rem,90vw)] flex-col items-start justify-center space-y-[1.5dvh] self-center py-[2dvh] sm:space-y-[2dvh] lg:py-0"
       >
         <div className="flex items-start gap-3">
-          <div className="h-px w-10 bg-gold shrink-0" aria-hidden="true" />
-          <span className="text-[0.6875rem] font-mono uppercase tracking-[0.22em] text-gold">
+          <div className="h-px w-10 shrink-0 bg-gold" aria-hidden="true" />
+          <span className="font-mono text-[0.6875rem] tracking-[0.22em] text-gold uppercase">
             {t("landing.eyebrow")}
           </span>
         </div>
 
         <h1
           id="landing-title"
-          className="font-display font-bold text-navy text-balance"
+          className="font-display font-bold text-balance text-navy"
           style={{
             fontSize: "clamp(1.25rem, 5.5vw, 4rem)",
             lineHeight: "1.04",
@@ -168,7 +199,7 @@ export function Landing() {
           {t("landing.title")}
         </h1>
 
-        <p className="max-w-lg text-base sm:text-lg leading-relaxed text-gray-600 text-pretty text-justify">
+        <p className="max-w-lg text-justify leading-relaxed text-pretty text-gray-600 sm:text-lg">
           {t("landing.subtitle")}
         </p>
 
@@ -181,14 +212,14 @@ export function Landing() {
           </Button>
           <Link
             to="/about"
-            className="text-sm font-semibold text-navy underline-offset-4 decoration-gold/40 decoration-2 hover:underline hover:text-gold transition-colors"
+            className="text-sm font-semibold text-navy decoration-gold/40 decoration-2 underline-offset-4 transition-colors hover:text-gold hover:underline"
           >
             {t("landing.cta.about")}
             <span aria-hidden="true"> →</span>
           </Link>
           <Link
             to="/help"
-            className="text-sm font-medium text-gray-400 hover:text-navy transition-colors"
+            className="text-sm font-medium text-gray-400 transition-colors hover:text-navy"
           >
             {t("landing.cta.help")}
           </Link>

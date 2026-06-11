@@ -39,14 +39,11 @@ export function UserSelfEmail() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="mx-auto max-w-2xl space-y-6">
       <BackLink />
-      <PageHeader
-        title={t("user.email.update.title")}
-        description={t("user.email.update.intro")}
-      />
+      <PageHeader title={t("user.email.update.title")} description={t("user.email.update.intro")} />
 
-      <Card className="p-6 sm:p-8 relative overflow-hidden shadow-lg shadow-gold/20 ring-1 ring-gold/10">
+      <Card className="relative overflow-hidden p-6 shadow-lg ring-1 shadow-gold/20 ring-gold/10 sm:p-8">
         <DecorBlob tone="gold" position="top-right" size="lg" />
         <div className="relative z-10 space-y-6">
           <div className="space-y-1">
@@ -56,12 +53,12 @@ export function UserSelfEmail() {
               leadingIcon={Mail}
               value={user?.email ?? ""}
               readOnly
-              className="bg-gray-100 cursor-not-allowed"
+              className="cursor-not-allowed bg-gray-100"
             />
           </div>
 
           <div className="flex flex-col items-center gap-4 py-6">
-            <p className="text-sm text-gray-500 text-center max-w-sm">
+            <p className="max-w-sm text-center text-sm text-gray-500">
               {t("user.email.update.instruction")}
             </p>
 

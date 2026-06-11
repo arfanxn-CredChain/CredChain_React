@@ -6,7 +6,7 @@ const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableE
     <div className="relative w-full overflow-x-auto">
       <table
         ref={ref}
-        className={cn("w-full caption-bottom text-sm divide-y divide-gray-100", className)}
+        className={cn("w-full caption-bottom divide-y divide-gray-100 text-sm", className)}
         {...props}
       />
     </div>
@@ -26,11 +26,7 @@ const TableBody = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
-  <tbody
-    ref={ref}
-    className={cn("bg-white divide-y divide-gray-50", className)}
-    {...props}
-  />
+  <tbody ref={ref} className={cn("divide-y divide-gray-50 bg-surface", className)} {...props} />
 ));
 TableBody.displayName = "TableBody";
 
@@ -38,7 +34,7 @@ const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTML
   ({ className, ...props }, ref) => (
     <tr
       ref={ref}
-      className={cn("transition-colors hover:bg-gray-50/50 group", className)}
+      className={cn("group transition-colors hover:bg-gray-50/50", className)}
       {...props}
     />
   ),
@@ -53,7 +49,7 @@ const TableHead = React.forwardRef<
     ref={ref}
     scope="col"
     className={cn(
-      "px-6 py-4 text-left text-xs font-bold text-navy uppercase tracking-wider",
+      "px-6 py-4 text-left text-xs font-bold tracking-wider text-navy uppercase",
       className,
     )}
     {...props}

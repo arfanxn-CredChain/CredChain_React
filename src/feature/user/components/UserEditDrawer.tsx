@@ -9,14 +9,8 @@ import { Role } from "@shared/auth/role";
 import { useConfirm } from "@ui/confirm-dialog";
 import { Button } from "@ui/button";
 import { Input } from "@ui/input";
-import { Label } from "@ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@ui/select";
+import { FormField } from "@ui/form-field";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/select";
 import { UserAvatar } from "@shared/components/UserAvatar";
 import { notify } from "@shared/lib/notify";
 import { isApiError } from "@shared/api/envelope";
@@ -198,7 +192,7 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
       direction="right"
     >
       <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 bg-black/40 z-40" />
+        <Drawer.Overlay className="fixed inset-0 z-40 bg-black/40" />
         <Drawer.Content
           className={cn(
             "fixed inset-y-0 right-0 z-50 flex w-full flex-col bg-surface shadow-2xl",
@@ -220,7 +214,7 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
               type="button"
               onClick={() => void handleClose()}
               aria-label={t("user.edit.close")}
-              className="rounded-md p-1 text-gray-400 hover:text-navy hover:bg-gray-100"
+              className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-navy focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none"
             >
               <X className="h-5 w-5" />
             </button>
@@ -228,19 +222,23 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
 
           <div className="flex-1 overflow-y-auto px-6 py-6">
             <form className="space-y-6" onSubmit={handleSave}>
-              <Field label={t("user.edit.fullName")} error={errors.name?.message}>
+              <FormField label={t("user.edit.fullName")} error={errors.name?.message}>
                 <Input leadingIcon={User} {...form.register("name")} />
-              </Field>
-              <Field label={t("user.edit.numberId")} error={errors.number?.message} optional>
+              </FormField>
+              <FormField label={t("user.edit.numberId")} error={errors.number?.message} optional>
                 <Input leadingIcon={Hash} {...form.register("number")} />
-              </Field>
-              <Field label={t("user.edit.phone")} error={errors.phone_number?.message} optional>
+              </FormField>
+              <FormField label={t("user.edit.phone")} error={errors.phone_number?.message} optional>
                 <Input type="tel" leadingIcon={Phone} {...form.register("phone_number")} />
-              </Field>
-              <Field label={t("user.edit.birthDate")} error={errors.birth_date?.message} optional>
+              </FormField>
+              <FormField
+                label={t("user.edit.birthDate")}
+                error={errors.birth_date?.message}
+                optional
+              >
                 <Input type="date" leadingIcon={Calendar} {...form.register("birth_date")} />
-              </Field>
-              <Field label={t("user.field.gender")} error={errors.gender?.message} optional>
+              </FormField>
+              <FormField label={t("user.field.gender")} error={errors.gender?.message} optional>
                 <Select
                   value={form.watch("gender") ?? "__none__"}
                   onValueChange={(v) =>
@@ -261,19 +259,21 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
                     <SelectItem value="other">{t("user.field.gender.other")}</SelectItem>
                   </SelectContent>
                 </Select>
-              </Field>
-              <Field label={t("user.edit.email")} error={errors.email?.message}>
+              </FormField>
+              <FormField label={t("user.edit.email")} error={errors.email?.message}>
                 <Input type="email" leadingIcon={Mail} {...form.register("email")} />
                 {form.formState.dirtyFields.email && (
-                  <p className="text-xs text-warning mt-1" role="alert">
+                  <p className="mt-1 text-xs text-warning" role="alert">
                     {t("user.email.update.warning")}
                   </p>
                 )}
-              </Field>
-              <Field label={t("user.edit.role")} error={errors.role?.message}>
+              </FormField>
+              <FormField label={t("user.edit.role")} error={errors.role?.message}>
                 <Select
                   value={form.watch("role")}
-                  onValueChange={(v) => form.setValue("role", v as "admin" | "issuer" | "holder", { shouldDirty: true })}
+                  onValueChange={(v) =>
+                    form.setValue("role", v as "admin" | "issuer" | "holder", { shouldDirty: true })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder={t("user.edit.role.placeholder")} />
@@ -284,12 +284,12 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
                     <SelectItem value={Role.ADMIN}>{t("user.edit.role.admin")}</SelectItem>
                   </SelectContent>
                 </Select>
-              </Field>
+              </FormField>
               <MetaEditor control={form.control} />
             </form>
           </div>
 
-          <div className="border-t border-gray-100 px-6 py-4 flex justify-end gap-3">
+          <div className="flex justify-end gap-3 border-t border-gray-100 px-6 py-4">
             <Button variant="outline" type="button" onClick={() => void handleClose()}>
               {t("common.cancel")}
             </Button>
@@ -306,30 +306,5 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
       </Drawer.Portal>
       {dialog}
     </Drawer.Root>
-  );
-}
-
-interface FieldProps {
-  label: string;
-  error?: string;
-  optional?: boolean;
-  children: React.ReactNode;
-}
-
-function Field({ label, error, optional, children }: FieldProps) {
-  const { t } = useTranslation();
-  return (
-    <div className="space-y-1">
-      <Label>
-        {label}
-        {optional && <span className="ml-1 text-gray-400 font-normal">{t("common.optional")}</span>}
-      </Label>
-      {children}
-      {error && (
-        <p className="text-xs text-error mt-1" role="alert">
-          {t(error)}
-        </p>
-      )}
-    </div>
   );
 }

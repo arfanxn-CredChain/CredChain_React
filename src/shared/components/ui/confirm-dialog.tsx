@@ -52,12 +52,7 @@ export function ConfirmDialog({
               {cancelLabel}
             </Button>
           </DialogPrimitive.Close>
-          <Button
-            autoFocus
-            variant={tone}
-            onClick={() => void onConfirm()}
-            disabled={loading}
-          >
+          <Button autoFocus variant={tone} onClick={() => void onConfirm()} disabled={loading}>
             {loading ? "Working..." : confirmLabel}
           </Button>
         </DialogFooter>
@@ -66,10 +61,7 @@ export function ConfirmDialog({
   );
 }
 
-type ConfirmOptions = Omit<
-  ConfirmDialogProps,
-  "open" | "onConfirm" | "onCancel" | "loading"
->;
+type ConfirmOptions = Omit<ConfirmDialogProps, "open" | "onConfirm" | "onCancel" | "loading">;
 
 interface ConfirmState {
   open: boolean;

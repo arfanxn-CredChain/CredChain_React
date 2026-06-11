@@ -94,7 +94,7 @@ export function NavbarDashboard({ onMenuClick }: NavbarDashboardProps) {
                 {showDropdown && searchResults.length > 0 && (
                   <div
                     role="menu"
-                    className="absolute top-full right-0 left-0 z-50 mt-1 w-64 rounded-md border bg-popover p-1 text-popover-foreground shadow-md"
+                    className="absolute top-full right-0 left-0 z-50 mt-1 w-64 rounded-md border bg-popover p-1 text-popover-foreground shadow-md shadow-navy/20"
                   >
                     {searchResults.map((item) => (
                       <button

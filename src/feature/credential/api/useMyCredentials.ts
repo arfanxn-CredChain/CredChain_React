@@ -1,10 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@shared/api/client";
 import { useStore } from "@app/store";
-import type {
-  CredentialDTO,
-  PaginatedResponse,
-} from "@shared/types/api";
+import type { CredentialDTO, PaginatedResponse } from "@shared/types/api";
 import { credentialKeys } from "./keys";
 
 export function useMyCredentials() {

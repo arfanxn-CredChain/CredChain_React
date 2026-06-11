@@ -29,7 +29,7 @@ export function SortMenu({ sort, order, onChange }: SortMenuProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm">
-          <ArrowUpDown className="h-4 w-4 mr-2" />
+          <ArrowUpDown className="mr-2 h-4 w-4" />
           {t("user.sort.label")}
         </Button>
       </DropdownMenuTrigger>
@@ -40,7 +40,7 @@ export function SortMenu({ sort, order, onChange }: SortMenuProps) {
             <DropdownMenuItem
               key={opt.key}
               onClick={() => onChange(opt.sort, opt.order)}
-              className="flex items-center justify-between cursor-pointer"
+              className="flex cursor-pointer items-center justify-between"
             >
               <span className={active ? "font-bold" : ""}>{opt.label}</span>
               {active && <Check className="h-4 w-4 text-gold" aria-hidden="true" />}

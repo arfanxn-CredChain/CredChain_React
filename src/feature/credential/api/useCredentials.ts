@@ -1,10 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@shared/api/client";
-import type {
-  CredentialDTO,
-  PaginatedResponse,
-  PaginationParams,
-} from "@shared/types/api";
+import type { CredentialDTO, PaginatedResponse, PaginationParams } from "@shared/types/api";
 import { credentialKeys } from "./keys";
 
 export interface CredentialListParams extends PaginationParams {

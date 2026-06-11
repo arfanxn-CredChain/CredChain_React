@@ -10,7 +10,7 @@ export function Toaster() {
       toastOptions={{
         classNames: {
           toast:
-            "group toast bg-surface text-navy border border-gray-100 shadow-xl shadow-gray-200/50 rounded-2xl",
+            "group toast bg-surface text-navy border border-gray-100 shadow-xl shadow-navy/20 rounded-2xl",
           title: "font-bold text-sm",
           description: "text-gray-500 text-sm",
           actionButton: "bg-navy text-surface rounded-xl px-3 py-1 text-xs font-bold",

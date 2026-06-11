@@ -58,9 +58,7 @@ describe("UserEditDrawer", () => {
     const user = mockUserWithMeta({ name: "Test User", meta: null });
     render(<UserEditDrawer user={user} onClose={onClose} />, { wrapper: TestProviders });
     // Wait for form to be reset (isDirty = false) before clicking
-    await waitFor(() =>
-      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByDisplayValue("Test User")).toBeInTheDocument());
     await userEvent.click(screen.getByRole("button", { name: /close/i }));
     expect(onClose).toHaveBeenCalled();
   });

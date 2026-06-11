@@ -9,9 +9,11 @@ export function Dashboard() {
   const { t } = useTranslation();
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="mx-auto max-w-7xl space-y-6">
       <PageHeader
-        title={t("dashboard.welcome", { name: user?.name?.split(" ")[0] ?? t("dashboard.fallbackName") })}
+        title={t("dashboard.welcome", {
+          name: user?.name?.split(" ")[0] ?? t("dashboard.fallbackName"),
+        })}
         description={t("dashboard.overview")}
       />
 
