@@ -14,7 +14,7 @@ declare const __APP_VERSION__: string;
 export function About() {
   const { t } = useTranslation();
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6">
       <BackLink />
 
       <PageHeader

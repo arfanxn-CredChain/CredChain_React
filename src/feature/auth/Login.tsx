@@ -39,50 +39,52 @@ export function Login() {
   return (
     <SplitLayout brandSlot={desktopBrand} mobileBrandSlot={mobileBrand}>
       <div className="flex h-full w-full flex-col items-center justify-start lg:justify-center py-[2dvh] lg:py-0">
-        <BackLink className="mb-[2dvh] self-start" />
+        <div className="flex w-full max-w-[min(448px,90vw)] flex-col">
+          <BackLink className="mb-[2dvh]" />
 
-        <div className="bg-surface rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-6 sm:p-8">
-          <h3 className="font-display text-2xl font-bold text-navy mb-2 tracking-tight">
-            {t("auth.signin.title")}
-          </h3>
-          <p className="text-gray-500 text-sm mb-[2dvh]">
-            {t("auth.signin.subtitle")}
-          </p>
+          <div className="bg-surface rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-6 sm:p-8">
+            <h3 className="font-display text-2xl font-bold text-navy mb-2 tracking-tight">
+              {t("auth.signin.title")}
+            </h3>
+            <p className="text-gray-500 text-sm mb-[2dvh]">
+              {t("auth.signin.subtitle")}
+            </p>
 
-          <div className="space-y-5">
-            <div className="flex justify-center">
-              {login.isPending ? (
-                <div className="text-sm text-gray-500" role="status">
-                  {t("auth.login.success")}...
-                </div>
-              ) : (
-                <GoogleLogin
-                  onSuccess={(credentialResponse) => {
-                    if (credentialResponse.credential) {
-                      login.mutate({ id_token: credentialResponse.credential });
-                    }
-                  }}
-                  onError={() => {
-                    /* handled by useGoogleLogin onError */
-                  }}
-                  theme="outline"
-                  size="large"
-                  shape="pill"
-                  width="320"
-                />
-              )}
-            </div>
+            <div className="space-y-5">
+              <div className="flex w-full justify-center">
+                {login.isPending ? (
+                  <div className="text-sm text-gray-500" role="status">
+                    {t("auth.login.success")}...
+                  </div>
+                ) : (
+                  <GoogleLogin
+                    onSuccess={(credentialResponse) => {
+                      if (credentialResponse.credential) {
+                        login.mutate({ id_token: credentialResponse.credential });
+                      }
+                    }}
+                    onError={() => {
+                      /* handled by useGoogleLogin onError */
+                    }}
+                    theme="outline"
+                    size="large"
+                    shape="pill"
+                    width="320"
+                  />
+                )}
+              </div>
 
-            <div className="pt-4 border-t border-gray-100">
-              <p className="text-xs text-gray-400 text-center font-mono leading-relaxed">
-                {t("auth.signin.terms")}
-              </p>
+              <div className="pt-4 border-t border-gray-100">
+                <p className="text-xs text-gray-400 text-center font-mono leading-relaxed">
+                  {t("auth.signin.terms")}
+                </p>
+              </div>
             </div>
           </div>
+          <p className="mt-[2dvh] text-center text-sm text-gray-500 font-medium safe-area-bottom">
+            {t("auth.welcome.securedBy")}
+          </p>
         </div>
-        <p className="mt-8 mb-8 text-center text-sm text-gray-500 font-medium safe-area-bottom">
-          {t("auth.welcome.securedBy")}
-        </p>
       </div>
     </SplitLayout>
   );

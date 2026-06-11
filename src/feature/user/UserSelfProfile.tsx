@@ -61,7 +61,7 @@ export function UserSelfProfile() {
   const emailText = user?.email ?? empty;
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6">
       <BackLink />
       <PageHeader title={t("profile.title")} description={t("profile.description")} />
 

@@ -8,7 +8,7 @@ export function CopyrightFooter({ className }: CopyrightFooterProps) {
   return (
     <footer
       className={cn(
-        "safe-area-bottom no-print mt-auto bg-transparent py-4 text-center text-xs text-gray-400",
+        "mx-auto max-w-7xl safe-area-bottom no-print mt-auto bg-transparent py-4 text-center text-xs text-gray-400",
         className,
       )}
     >

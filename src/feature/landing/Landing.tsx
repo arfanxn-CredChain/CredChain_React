@@ -147,7 +147,7 @@ export function Landing() {
     <SplitLayout brandSlot={desktopBrand} mobileBrandSlot={mobileBrand}>
       <section
         aria-labelledby="landing-title"
-        className="relative mx-auto flex h-full max-w-xl flex-col items-start justify-center py-[2dvh] lg:py-0 space-y-[1.5dvh] sm:space-y-[2dvh]"
+        className="relative self-center flex h-full max-w-[min(36rem,90vw)] flex-col items-start justify-center py-[2dvh] lg:py-0 space-y-[1.5dvh] sm:space-y-[2dvh]"
       >
         <div className="flex items-start gap-3">
           <div className="h-px w-10 bg-gold shrink-0" aria-hidden="true" />
@@ -168,11 +168,11 @@ export function Landing() {
           {t("landing.title")}
         </h1>
 
-        <p className="max-w-lg text-base sm:text-lg leading-relaxed text-gray-600 text-pretty">
+        <p className="max-w-lg text-base sm:text-lg leading-relaxed text-gray-600 text-pretty text-justify">
           {t("landing.subtitle")}
         </p>
 
-        <div className="flex flex-wrap items-start gap-x-6 gap-y-3 pt-1">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-1">
           <Button asChild variant="gold" size="lg">
             <Link to={primaryHref} className="inline-flex items-center gap-2">
               {primaryLabel}

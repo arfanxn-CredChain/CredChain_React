@@ -82,7 +82,7 @@ export function VerifyCredential() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8 py-12 px-4 sm:px-6">
+    <div className="max-w-4xl mx-auto space-y-8 py-12 px-4 sm:px-6">
       <div className="text-center space-y-4">
         <div className="inline-flex items-center justify-center p-3 bg-navy rounded-2xl mb-2 shadow-lg shadow-navy/20">
           <ShieldCheck className="h-10 w-10 text-gold" aria-hidden="true" />

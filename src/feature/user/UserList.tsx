@@ -189,7 +189,8 @@ export function UserList() {
           />
         ) : (
           <>
-            <Table>
+            <div className="overflow-x-auto">
+              <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>{t("user.column.entity")}</TableHead>
@@ -394,6 +395,7 @@ export function UserList() {
                     ))}
               </TableBody>
             </Table>
+            </div>
 
             {total > 0 && !isLoading && (
               <div className="flex flex-col gap-3 p-4 sm:p-6 border-t border-gray-50 sm:flex-row sm:items-center sm:justify-between">

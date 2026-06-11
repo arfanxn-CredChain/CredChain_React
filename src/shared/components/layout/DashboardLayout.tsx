@@ -10,7 +10,7 @@ export function DashboardLayout() {
   useScrollToTop();
 
   return (
-    <div className="flex min-h-screen bg-gray-100 font-sans">
+    <div className="flex min-h-dvh bg-base font-sans">
       {/* Mobile backdrop */}
       {sidebarOpen && (
         <div
@@ -24,7 +24,7 @@ export function DashboardLayout() {
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-50 w-72 shadow-2xl transition-transform duration-300",
-          "sm:sticky sm:top-0 sm:h-screen sm:flex-shrink-0 sm:translate-x-0",
+          "sm:sticky sm:top-0 sm:h-dvh sm:flex-shrink-0 sm:translate-x-0",
           sidebarOpen ? "translate-x-0" : "-translate-x-full",
         )}
         aria-label="Sidebar"
@@ -33,7 +33,7 @@ export function DashboardLayout() {
       </aside>
 
       {/* Main */}
-      <div className="flex min-w-0 flex-1 flex-col bg-[#F4F7F6]">
+      <div className="flex min-w-0 flex-1 flex-col bg-base">
         <NavbarDashboard onMenuClick={() => setSidebarOpen(true)} />
 
         <main
