@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import {
   Plus,
   Search,
-  Filter,
   Pencil,
   UserCircle,
   MoreVertical,
@@ -32,7 +31,6 @@ import { Button } from "@ui/button";
 import { Card } from "@ui/card";
 import { Input } from "@ui/input";
 import { Skeleton } from "@ui/skeleton";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/select";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,6 +43,9 @@ import { UserRoleBadge } from "@shared/components/UserRoleBadge";
 import { UserStatusBadge } from "./components/UserStatusBadge";
 import { SortMenu } from "./components/SortMenu";
 import { RoleFilterMenu } from "./components/RoleFilterMenu";
+import { StatusFilterMenu } from "./components/StatusFilterMenu";
+import { PageSizeMenu } from "./components/PageSizeMenu";
+import { PaginationBar } from "@shared/components/PaginationBar";
 import { CopyInlineButton } from "@shared/components/CopyInlineButton";
 import { UserEditDrawer } from "./components/UserEditDrawer";
 import { truncateAddress, relativeTime } from "@shared/lib/format";
@@ -111,39 +112,9 @@ export function UserList() {
                 order={params.order}
                 onChange={(s, o) => setMany({ sort: s, order: o })}
               />
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Filter className="mr-2 h-4 w-4" /> {t("user.filter.status")}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem onClick={() => setParam("deleted", "all")}>
-                    {t("user.filter.all")} {params.deleted === "all" && "✓"}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setParam("deleted", "none")}>
-                    {t("user.filter.active")} {params.deleted === "none" && "✓"}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setParam("deleted", "only")}>
-                    {t("user.filter.trashed")} {params.deleted === "only" && "✓"}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <StatusFilterMenu value={params.deleted} onChange={(v) => setParam("deleted", v)} />
               <RoleFilterMenu value={params.role} onChange={(r) => setParam("role", r)} />
-              <Select
-                value={String(params.limit)}
-                onValueChange={(v) => setParam("limit", parseInt(v, 10))}
-              >
-                <SelectTrigger className="h-8 w-[88px] bg-surface px-3 py-1 text-xs" aria-label={t("user.list.limitLabel")}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="20">20</SelectItem>
-                  <SelectItem value="50">50</SelectItem>
-                  <SelectItem value="100">100</SelectItem>
-                </SelectContent>
-              </Select>
+              <PageSizeMenu value={params.limit} onChange={(v) => setParam("limit", v)} />
             </div>
           </div>
         </div>
@@ -208,6 +179,7 @@ export function UserList() {
                         <TableRow
                           key={user.id}
                           className={cn("cursor-pointer", user.deleted_at && "bg-error/5")}
+                          // TODO: navigate to UserDetail on row click
                         >
                           <TableCell>
                             <div className="flex items-center">
@@ -390,7 +362,11 @@ export function UserList() {
             </div>
 
             {total > 0 && !isLoading && (
-              <div className="flex flex-col gap-3 border-t border-gray-50 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+              <PaginationBar
+                page={params.page}
+                totalPages={totalPages}
+                onPageChange={(page) => setParam("page", page)}
+              >
                 <span className="text-xs text-gray-500 sm:text-sm">
                   {t("user.pagination.showing", {
                     from: Math.min((params.page - 1) * params.limit + 1, total),
@@ -399,25 +375,7 @@ export function UserList() {
                     label: t("user.list.count", { count: total }).split(" ").slice(1).join(" "),
                   })}
                 </span>
-                <div className="flex items-center gap-2 sm:justify-end">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={params.page <= 1}
-                    onClick={() => setParam("page", params.page - 1)}
-                  >
-                    {t("common.previous")}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={params.page >= totalPages}
-                    onClick={() => setParam("page", params.page + 1)}
-                  >
-                    {t("common.next")}
-                  </Button>
-                </div>
-              </div>
+              </PaginationBar>
             )}
           </>
         )}

@@ -16,6 +16,7 @@ import { Card } from "@ui/card";
 import { Input } from "@ui/input";
 import { Skeleton } from "@ui/skeleton";
 import { useConfirm } from "@ui/confirm-dialog";
+import { PaginationBar } from "@shared/components/PaginationBar";
 
 import { CredentialCard } from "./components/CredentialCard";
 
@@ -157,29 +158,16 @@ export function CredentialList() {
         </div>
 
         {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-gray-50 p-4 sm:p-6">
+          <PaginationBar
+            page={page}
+            totalPages={totalPages}
+            onPageChange={(p) => setPage(p)}
+            isLoading={isLoading}
+          >
             <span className="text-sm text-gray-500">
               {t("cred.list.pagination.page", { page, total: totalPages })}
             </span>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page <= 1 || isLoading}
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-              >
-                {t("cred.list.pagination.previous")}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page >= totalPages || isLoading}
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              >
-                {t("cred.list.pagination.next")}
-              </Button>
-            </div>
-          </div>
+          </PaginationBar>
         )}
       </Card>
 
