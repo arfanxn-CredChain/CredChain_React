@@ -47,10 +47,10 @@ import { SortMenu } from "./components/SortMenu";
 import { RoleFilterMenu } from "./components/RoleFilterMenu";
 import { CopyInlineButton } from "@shared/components/CopyInlineButton";
 import { UserEditDrawer } from "./components/UserEditDrawer";
-import { truncateAddress } from "@shared/lib/format";
+import { truncateAddress, relativeTime } from "@shared/lib/format";
 
 export function UserList() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { params, setParam, setMany } = useUserListParams();
   const debouncedSearch = useDebouncedValue(params.search, 300);
   const [editingUser, setEditingUser] = useState<UserDTO | null>(null);
@@ -114,7 +114,7 @@ export function UserList() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm">
-                    <Filter className="mr-2 h-4 w-4" /> {t("user.filter.label")}
+                    <Filter className="mr-2 h-4 w-4" /> {t("user.filter.status")}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
@@ -122,10 +122,10 @@ export function UserList() {
                     {t("user.filter.all")} {params.deleted === "all" && "✓"}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setParam("deleted", "none")}>
-                    {t("user.filter.live")} {params.deleted === "none" && "✓"}
+                    {t("user.filter.active")} {params.deleted === "none" && "✓"}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setParam("deleted", "only")}>
-                    {t("user.filter.deleted")} {params.deleted === "only" && "✓"}
+                    {t("user.filter.trashed")} {params.deleted === "only" && "✓"}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -134,10 +134,14 @@ export function UserList() {
                 value={String(params.limit)}
                 onValueChange={(v) => setParam("limit", parseInt(v, 10))}
               >
-                <SelectTrigger className="h-9 w-[88px] py-2" aria-label={t("user.list.limitLabel")}>
+                <SelectTrigger className="h-8 w-[88px] bg-surface px-3 py-1 text-xs" aria-label={t("user.list.limitLabel")}>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent
+                  onPointerDownOutside={(event) => {
+                    event.preventDefault();
+                  }}
+                >
                   <SelectItem value="10">10</SelectItem>
                   <SelectItem value="20">20</SelectItem>
                   <SelectItem value="50">50</SelectItem>
@@ -146,11 +150,6 @@ export function UserList() {
               </Select>
             </div>
           </div>
-          {!isLoading && (
-            <div className="mt-3 text-xs font-bold tracking-wider text-gray-400 uppercase">
-              {t("user.list.count", { count: total })}
-            </div>
-          )}
         </div>
 
         {isError ? (
@@ -198,7 +197,11 @@ export function UserList() {
                             <Skeleton className="h-5 w-20" />
                           </TableCell>
                           <TableCell>
-                            <Skeleton className="h-4 w-32" />
+                            <div className="space-y-1">
+                              <Skeleton className="h-4 w-32" />
+                              <Skeleton className="h-5 w-20" />
+                              <Skeleton className="h-3 w-24" />
+                            </div>
                           </TableCell>
                           <TableCell>
                             <Skeleton className="ml-auto h-4 w-16" />
@@ -271,6 +274,13 @@ export function UserList() {
                               )}
                             </div>
                             <UserStatusBadge deletedAt={user.deleted_at} />
+                            <div className="mt-1 text-[10px] text-gray-400">
+                              {user.deleted_at
+                                ? t("user.list.trashed", { time: relativeTime(user.deleted_at, i18n.language) })
+                                : user.updated_at !== user.created_at
+                                  ? t("user.list.updated", { time: relativeTime(user.updated_at, i18n.language) })
+                                  : t("user.list.created", { time: relativeTime(user.created_at, i18n.language) })}
+                            </div>
                           </TableCell>
                           <TableCell className="text-right">
                             <DropdownMenu>

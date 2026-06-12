@@ -35,3 +35,17 @@ export function formatDateTime(value: string | number | Date | null, locale = "e
     minute: "2-digit",
   }).format(date);
 }
+
+export function relativeTime(value: string | number | Date, locale = "en"): string {
+  const now = Date.now();
+  const then = new Date(value).getTime();
+  const diffMs = now - then;
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHrs = Math.floor(diffMin / 60);
+
+  if (diffMin < 1) return locale === "id" ? "Baru saja" : "Just now";
+  if (diffMin < 60) return locale === "id" ? `${diffMin}m lalu` : `${diffMin}m ago`;
+  if (diffHrs < 24) return locale === "id" ? `${diffHrs}j lalu` : `${diffHrs}h ago`;
+  return formatDate(value, locale);
+}

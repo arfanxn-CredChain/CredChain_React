@@ -197,6 +197,7 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
           className={cn(
             "fixed inset-y-0 right-0 z-50 flex w-full flex-col bg-surface shadow-2xl",
             "sm:max-w-lg md:max-w-xl",
+            "focus-visible:outline-none",
           )}
         >
           <Drawer.Title className="sr-only">{t("user.edit.title")}</Drawer.Title>

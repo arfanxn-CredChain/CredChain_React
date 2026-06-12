@@ -73,7 +73,7 @@ describe("UserList", () => {
     renderUserList();
 
     await waitFor(() => {
-      expect(screen.getByText(/^5 users$/i)).toBeInTheDocument();
+      expect(screen.getByText(/5 users$/i)).toBeInTheDocument();
     });
   });
 
@@ -105,14 +105,14 @@ describe("UserList", () => {
     expect(search).toHaveValue("admin");
   });
 
-  it("filter dropdown updates URL when selecting Live only", async () => {
+  it("filter dropdown updates URL when selecting Active only", async () => {
     const user = userEvent.setup();
     renderUserList();
     await screen.findByText("User Directory");
 
-    await user.click(screen.getByRole("button", { name: /filter/i }));
-    const liveItem = await screen.findByRole("menuitem", { name: /live only/i });
-    await user.click(liveItem);
+    await user.click(screen.getByRole("button", { name: /status/i }));
+    const activeItem = await screen.findByRole("menuitem", { name: /active only/i });
+    await user.click(activeItem);
 
     await waitFor(() => {
       expect(screen.getByTestId("location-search").textContent).toContain("deleted=none");
@@ -260,7 +260,7 @@ describe("UserList", () => {
     });
   });
 
-  it("shows Delete option for a live user", async () => {
+  it("shows Delete option for an active user", async () => {
     const user = userEvent.setup();
     renderUserList();
     await waitFor(() => expect(screen.getByText("Default Issuer")).toBeInTheDocument());
@@ -271,7 +271,7 @@ describe("UserList", () => {
     expect(await screen.findByRole("menuitem", { name: /delete/i })).toBeInTheDocument();
   });
 
-  it("shows Restore option for a deleted user", async () => {
+  it("shows Restore option for a trashed user", async () => {
     const user = userEvent.setup();
     renderUserList();
     await waitFor(() => expect(screen.getByText("Trashed User")).toBeInTheDocument());
