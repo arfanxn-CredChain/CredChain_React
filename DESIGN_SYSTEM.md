@@ -1,6 +1,8 @@
 # CredChain React - Design System & Engineering Specification
 
-> For AI assistants and engineers building CredChain_React/. This document is the single source of truth for the production frontend. It supersedes CredChain_React_Demo/ (reference only - do not import from it).
+> For AI assistants and engineers building CredChain_React/. This document is the single source of truth for the production frontend's design and engineering decisions. It supersedes CredChain_React_Demo/ (reference only - do not import from it).
+>
+> **Document responsibilities:** For operational instructions (commands, patterns, conventions, checklists, pitfalls), see `AGENTS.md`. This file owns design decisions — tokens, typography, layout, component recipes, visual philosophy, accessibility. When updating design decisions, update this file; when updating how to work in the repo, update `AGENTS.md`.
 
 Status: Draft v1.6 | Last updated: 2026-06-11 | Related: ../AGENTS.md, ../CredChain_Golang/
 
@@ -349,26 +351,26 @@ body {
 
 ### 5.1 Color Usage Rules
 
-| Context                             | Token to use                                                                               |
-| ----------------------------------- | ------------------------------------------------------------------------------------------ |
-| Page background                     | `bg-base`                                                                                  |
-| Card / panel background             | `bg-surface`                                                                               |
-| Primary CTA background              | `bg-navy`                                                                                  |
-| Premium / positive CTA              | `bg-gold`                                                                                  |
-| Destructive action                  | `bg-error`                                                                                 |
-| Body text                           | `text-navy`                                                                                |
-| Muted / helper text                 | `text-gray-500`                                                                            |
-| Eyebrow / meta labels               | `text-gray-400`                                                                            |
-| Mono identifiers                    | `text-gray-500` (or `text-gray-600`)                                                       |
-| Card border                         | `border-gray-100`                                                                          |
-| Input border                        | `border-gray-200`                                                                          |
-| Focus ring                          | `ring-gold` (via `focus:ring-2 focus:ring-gold`)                                           |
-| DashboardSidebar background         | `bg-navy`                                                                                  |
-| DashboardSidebar text               | `text-gray-300` (inactive), `text-surface` (active)                                        |
-| Brand mark (shield icon + wordmark) | `text-gold` — always, on every chrome (DashboardSidebar, PublicLayout, mobile NavbarDashboard) |
-| DashboardLayout desktop top area    | transparent over page background; no static title — each page renders its own `PageHeader` |
-| NavbarDashboard search input (resting) | `bg-gray-50 text-navy placeholder-gray-400 border-gray-200 rounded-full`                   |
-| NavbarDashboard search input (focus) | `bg-white ring-2 ring-gold border-transparent`                                             |
+| Context                                | Token to use                                                                                   |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Page background                        | `bg-base`                                                                                      |
+| Card / panel background                | `bg-surface`                                                                                   |
+| Primary CTA background                 | `bg-navy`                                                                                      |
+| Premium / positive CTA                 | `bg-gold`                                                                                      |
+| Destructive action                     | `bg-error`                                                                                     |
+| Body text                              | `text-navy`                                                                                    |
+| Muted / helper text                    | `text-gray-500`                                                                                |
+| Eyebrow / meta labels                  | `text-gray-400`                                                                                |
+| Mono identifiers                       | `text-gray-500` (or `text-gray-600`)                                                           |
+| Card border                            | `border-gray-100`                                                                              |
+| Input border                           | `border-gray-200`                                                                              |
+| Focus ring                             | `ring-gold` (via `focus:ring-2 focus:ring-gold`)                                               |
+| DashboardSidebar background            | `bg-navy`                                                                                      |
+| DashboardSidebar text                  | `text-gray-300` (inactive), `text-surface` (active)                                            |
+| Brand mark (shield icon + wordmark)    | `text-gold` — always, on every chrome (DashboardSidebar, PublicLayout, mobile NavbarDashboard) |
+| DashboardLayout desktop top area       | transparent over page background; no static title — each page renders its own `PageHeader`     |
+| NavbarDashboard search input (resting) | `bg-gray-50 text-navy placeholder-gray-400 border-gray-200 rounded-full`                       |
+| NavbarDashboard search input (focus)   | `bg-white ring-2 ring-gold border-transparent`                                                 |
 
 ### 5.2 Role-Color Mapping
 
@@ -431,19 +433,19 @@ Fraunces uses optical sizing (`opsz`) — at large display sizes (28px+) it rend
 
 > For the design philosophy behind these choices, see Section 6.5 Visual Language Principles.
 
-| Tier            | Tailwind                                                               | Use case                               |
-| --------------- | ---------------------------------------------------------------------- | -------------------------------------- |
-| Hero            | `font-display text-4xl md:text-5xl font-extrabold tracking-tight`      | Auth landing, public verification page |
-| Page title (H2) | `font-display text-2xl md:text-3xl font-bold text-navy tracking-tight` | All page titles                        |
-| Section (H3)    | `font-display text-xl font-semibold text-navy tracking-tight`          | Card section headers                   |
-| Card title      | `font-sans text-lg font-bold text-navy`                                | Credential cards, settings, CardTitle primitive       |
-| Stat value      | `font-display text-4xl font-extrabold tracking-tight`                  | Dashboard metrics                      |
-| Body            | `font-sans text-sm text-navy`                                          | Default body                           |
-| Label           | `font-sans text-sm font-semibold text-gray-700`                        | Form labels                            |
-| Eyebrow         | `font-sans text-xs font-bold uppercase tracking-wider text-gray-400`   | Meta labels above values               |
-| Status pill     | `font-sans text-xs font-bold uppercase tracking-wider`                 | Badge text                             |
-| Helper          | `font-sans text-xs text-gray-500`                                      | Subtitles, muted helper text           |
-| Mono            | `font-mono text-xs`                                                    | Hashes, IDs, addresses                 |
+| Tier            | Tailwind                                                               | Use case                                        |
+| --------------- | ---------------------------------------------------------------------- | ----------------------------------------------- |
+| Hero            | `font-display text-4xl md:text-5xl font-extrabold tracking-tight`      | Auth landing, public verification page          |
+| Page title (H2) | `font-display text-2xl md:text-3xl font-bold text-navy tracking-tight` | All page titles                                 |
+| Section (H3)    | `font-display text-xl font-semibold text-navy tracking-tight`          | Card section headers                            |
+| Card title      | `font-sans text-lg font-bold text-navy`                                | Credential cards, settings, CardTitle primitive |
+| Stat value      | `font-display text-4xl font-extrabold tracking-tight`                  | Dashboard metrics                               |
+| Body            | `font-sans text-sm text-navy`                                          | Default body                                    |
+| Label           | `font-sans text-sm font-semibold text-gray-700`                        | Form labels                                     |
+| Eyebrow         | `font-sans text-xs font-bold uppercase tracking-wider text-gray-400`   | Meta labels above values                        |
+| Status pill     | `font-sans text-xs font-bold uppercase tracking-wider`                 | Badge text                                      |
+| Helper          | `font-sans text-xs text-gray-500`                                      | Subtitles, muted helper text                    |
+| Mono            | `font-mono text-xs`                                                    | Hashes, IDs, addresses                          |
 
 **Pairing rules:**
 
@@ -475,13 +477,13 @@ export function PageHeader({ title, description, action, onBack }: PageHeaderPro
             size="icon"
             onClick={onBack}
             aria-label="Go back"
-            className="h-8 w-8 shrink-0 sm:h-10 sm:w-10 text-gray-400 hover:text-navy hover:bg-white rounded-full"
+            className="h-8 w-8 shrink-0 rounded-full text-gray-400 hover:bg-white hover:text-navy sm:h-10 sm:w-10"
           >
-            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+            <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
         )}
         <div>
-          <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-navy">
+          <h2 className="font-display text-2xl font-bold tracking-tight text-navy md:text-3xl">
             {title}
           </h2>
           {description && <p className="mt-1 text-sm text-gray-500">{description}</p>}
@@ -670,11 +672,13 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: "bg-navy text-surface shadow-md shadow-navy/20 hover:bg-navy/90 focus-visible:ring-gold",
+        primary:
+          "bg-navy text-surface shadow-md shadow-navy/20 hover:bg-navy/90 focus-visible:ring-gold",
         gold: "bg-gold text-navy shadow-md shadow-gold/20 hover:bg-gold/90 focus-visible:ring-gold",
         destructive:
           "bg-error text-surface shadow-md shadow-error/20 hover:bg-error/90 focus-visible:ring-error",
-        outline: "border border-gray-200 bg-surface text-navy hover:bg-gray-50 focus-visible:ring-gold",
+        outline:
+          "border border-gray-200 bg-surface text-navy hover:bg-gray-50 focus-visible:ring-gold",
         ghost: "text-navy hover:bg-gray-100 focus-visible:ring-gold",
         dashed:
           "border-2 border-dashed border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 hover:border-gray-300 focus-visible:ring-gold",
@@ -934,8 +938,18 @@ Extracted from three duplicated inline implementations in UserCreateRow, Credent
 
 ```tsx
 // shared/components/ui/form-field.tsx
-export function FormField({ label, hint, error, optional, children }: {
-  label: string; hint?: string; error?: string; optional?: boolean; children: React.ReactNode;
+export function FormField({
+  label,
+  hint,
+  error,
+  optional,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  error?: string;
+  optional?: boolean;
+  children: React.ReactNode;
 }) {
   const { t } = useTranslation();
   return (
@@ -946,7 +960,9 @@ export function FormField({ label, hint, error, optional, children }: {
       </Label>
       {children}
       {error ? (
-        <p className="mt-1 text-xs text-error" role="alert">{t(error)}</p>
+        <p className="mt-1 text-xs text-error" role="alert">
+          {t(error)}
+        </p>
       ) : hint ? (
         <p className="mt-1 text-xs text-gray-400">{hint}</p>
       ) : null}
@@ -961,13 +977,27 @@ Extracted from the repeated `<dt>`/`<dd>` pattern in UserDetail, UserSelfProfile
 
 ```tsx
 // shared/components/DetailRow.tsx
-export function DetailRow({ label, value, icon: Icon, tone = "default", className }: {
-  label: string; value: React.ReactNode; icon?: LucideIcon; tone?: "default" | "error"; className?: string;
+export function DetailRow({
+  label,
+  value,
+  icon: Icon,
+  tone = "default",
+  className,
+}: {
+  label: string;
+  value: React.ReactNode;
+  icon?: LucideIcon;
+  tone?: "default" | "error";
+  className?: string;
 }) {
   return (
     <div className={className}>
-      <dt className={cn("mb-1 flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase",
-        tone === "error" ? "text-error" : "text-gray-400")}>
+      <dt
+        className={cn(
+          "mb-1 flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase",
+          tone === "error" ? "text-error" : "text-gray-400",
+        )}
+      >
         {Icon && <Icon className="h-3.5 w-3.5" aria-hidden="true" />}
         {label}
       </dt>
@@ -983,12 +1013,12 @@ export function DetailRow({ label, value, icon: Icon, tone = "default", classNam
 
 ### 8.1 Three Layout Shells
 
-| Layout            | Used by                   | Pattern                                                                                                                                                                                                                                                                                                                                                                                                    |
-| ----------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `PublicLayout`    | `/credentials/verify/:id` | Navy header (`min-h-[64px]` flat, no `sm:` breakpoint) with **gold brand mark** + gold underline, white card body, `<CopyrightFooter />` strip (transparent background — see §8.1.1). Container is `min-h-dvh` (NOT `min-h-screen`) so the footer stays anchored to the *visible* viewport on mobile — `100vh` over-counts on mobile browsers (chrome collapse/expand) and pushes the footer below the fold or under the bottom bar. `<main>` has `mx-auto max-w-7xl` so the public content area (About/Help/VerifyCredential, which are `max-w-4xl`) centers within a 1280px band that aligns with the `NavbarPublic` width. `<main>` padding `px-4 pt-4 pb-12 sm:px-8` mirrors `DashboardLayout` so unauthed Help/About sit identically to their authed counterparts.                                                                                                                                                                                                                                                                                                                  |
+| Layout            | Used by                   | Pattern                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ----------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PublicLayout`    | `/credentials/verify/:id` | Navy header (`min-h-[64px]` flat, no `sm:` breakpoint) with **gold brand mark** + gold underline, white card body, `<CopyrightFooter />` strip (transparent background — see §8.1.1). Container is `min-h-dvh` (NOT `min-h-screen`) so the footer stays anchored to the _visible_ viewport on mobile — `100vh` over-counts on mobile browsers (chrome collapse/expand) and pushes the footer below the fold or under the bottom bar. `<main>` has `mx-auto max-w-7xl` so the public content area (About/Help/VerifyCredential, which are `max-w-4xl`) centers within a 1280px band that aligns with the `NavbarPublic` width. `<main>` padding `px-4 pt-4 pb-12 sm:px-8` mirrors `DashboardLayout` so unauthed Help/About sit identically to their authed counterparts.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `SplitLayout`     | `/` (Landing), `/login`   | Fixed 100dvh — no scrollbars. Outer container and right panel both use `h-dvh overflow-hidden`. Mobile: 33/67 vertical split — navy brand band `h-[33dvh]` with `flex items-center justify-center` to center brand content; white content area `flex-1` fills remaining 67dvh. Desktop: 50/50 horizontal split with navy brand panel left + light content right, gold + blue `<DecorBlob>`s. Mobile: navy band on top + content below, no blobs (too cramped). `AttestationStamp` now accepts a `className` prop for responsive sizing; mobile brand band renders it with `max-w-[min(160px,18vh)]` to scale down on short screens instead of hiding. Landing content vertically centered (`flex items-center justify-center`). Login content top-aligned on mobile (`justify-start`) and centered on desktop (`lg:justify-center`). Login `<BackLink>` uses `self-start` to align left within the card. Language switcher floats top-right on desktop (light variant), inside the navy band on mobile (dark variant). No copyright footer (Landing/Login are conversion surfaces). Landing/Login content refactored to viewport-relative units: `py-[2dvh]`, `space-y-[1.5dvh]`, card padding `p-6 sm:p-8`. Forced `min-h-[Xlh]` removed from headings and subtitles so content can shrink to fit short viewports. |
-| `DashboardLayout` | All authenticated routes  | Fixed navy sidebar (`w-72`) with **gold brand mark cluster**, transparent top navbar (`min-h-[64px]` flat, no `sm:` breakpoint) with `mx-auto max-w-7xl` content row so menu/search/avatar align with the widest page content below, scrollable `main` (`flex-1 overflow-y-scroll [scrollbar-gutter:stable]` so route-switches with differing content heights don't reflow the navbar). Container is `min-h-dvh` (NOT `min-h-screen`) with `bg-base` (NOT `bg-gray-100` or hardcoded `bg-[#F4F7F6]`) so the page background matches `PublicLayout`. Sidebar uses `sm:h-dvh` (NOT `sm:h-screen`) to match the container. On every route change, `useScrollToTop()` resets both the window scroller and the `#main` overflow container to the top so the next page never opens mid-scroll inherited from the previous one. Mobile: hand-rolled CSS-transform slide (`-translate-x-full` ↔ `translate-x-0`) with `bg-navy/80` click backdrop. `<main>` padding `px-4 pt-4 pb-12 sm:px-8` (full width — no `max-w-7xl` on the main wrapper; the sidebar takes the fixed `w-72` and the content area fills the remaining space). No copyright footer (authenticated chrome; brand presence is the sidebar).                                                                                                                                                                                                                                 |
-| `AdaptiveLayout`  | `/help`, `/about`         | Renders `DashboardLayout` if `isAuthenticated`, `PublicLayout` otherwise. Because both layouts use identical `<main>` padding (`px-4 pt-4 pb-12 sm:px-8`) and matching header heights, unauthed and authed Help/About pages render identically — the only delta is the copyright strip, which appears only on the unauthenticated `PublicLayout` branch.                                                                                                                                                                                                                                                                                                                                                                 |
+| `DashboardLayout` | All authenticated routes  | Fixed navy sidebar (`w-72`) with **gold brand mark cluster**, transparent top navbar (`min-h-[64px]` flat, no `sm:` breakpoint) with `mx-auto max-w-7xl` content row so menu/search/avatar align with the widest page content below, scrollable `main` (`flex-1 overflow-y-scroll [scrollbar-gutter:stable]` so route-switches with differing content heights don't reflow the navbar). Container is `min-h-dvh` (NOT `min-h-screen`) with `bg-base` (NOT `bg-gray-100` or hardcoded `bg-[#F4F7F6]`) so the page background matches `PublicLayout`. Sidebar uses `sm:h-dvh` (NOT `sm:h-screen`) to match the container. On every route change, `useScrollToTop()` resets both the window scroller and the `#main` overflow container to the top so the next page never opens mid-scroll inherited from the previous one. Mobile: hand-rolled CSS-transform slide (`-translate-x-full` ↔ `translate-x-0`) with `bg-navy/80` click backdrop. `<main>` padding `px-4 pt-4 pb-12 sm:px-8` (full width — no `max-w-7xl` on the main wrapper; the sidebar takes the fixed `w-72` and the content area fills the remaining space). No copyright footer (authenticated chrome; brand presence is the sidebar).                                                                                                              |
+| `AdaptiveLayout`  | `/help`, `/about`         | Renders `DashboardLayout` if `isAuthenticated`, `PublicLayout` otherwise. Because both layouts use identical `<main>` padding (`px-4 pt-4 pb-12 sm:px-8`) and matching header heights, unauthed and authed Help/About pages render identically — the only delta is the copyright strip, which appears only on the unauthenticated `PublicLayout` branch.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 
 #### Copyright Footer
 
@@ -1103,12 +1133,12 @@ The icon color follows the active state via the `children` render prop (`isActiv
 
 Mobile-first using Tailwind defaults:
 
-| Breakpoint | Min width | Used for                                |
-| ---------- | --------- | --------------------------------------- |
-| `sm:`      | 640px     | Tables visible, side-by-side rows       |
-| `md:`      | 768px     | 2-column grids, search bar visibility   |
+| Breakpoint | Min width | Used for                                                   |
+| ---------- | --------- | ---------------------------------------------------------- |
+| `sm:`      | 640px     | Tables visible, side-by-side rows                          |
+| `md:`      | 768px     | 2-column grids, search bar visibility                      |
 | `lg:`      | 1024px    | Sidebar (DashboardSidebar) visible, split auth, 4-up grids |
-| `xl:`      | 1280px    | (rarely used) ultra-wide refinements    |
+| `xl:`      | 1280px    | (rarely used) ultra-wide refinements                       |
 
 ### 8.9 Responsive Design
 
@@ -1238,7 +1268,7 @@ The `md:` to `lg:` range needs explicit decisions:
 
 | Element          | md (tablet portrait)  | lg (tablet landscape / desktop) |
 | ---------------- | --------------------- | ------------------------------- |
-| DashboardSidebar          | Mobile drawer (Sheet) | Fixed `w-72`                    |
+| DashboardSidebar | Mobile drawer (Sheet) | Fixed `w-72`                    |
 | Navigation       | Hamburger menu        | Fixed sidebar                   |
 | Stat cards       | 2-up grid             | 4-up grid                       |
 | Credential cards | 2-up                  | 3-up                            |
@@ -2993,13 +3023,13 @@ Keep `Last updated` at the top current. Reviewers should reject PRs that introdu
 
 #### Changelog
 
-| Version | Date       | Changes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| ------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| v1.0    | 2026-05-29 | Initial draft. Sections 1-22 + Appendix A.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| v1.1    | 2026-05-29 | Typography migrated from system-ui to Fraunces + DM Sans + JetBrains Mono. Added Section 6.5 Visual Language Principles. Added Section 8.9 Responsive Design (touch targets, safe areas, mobile keyboards, reduced motion, container queries, tablet, print, orientation, dark mode hooks).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| v1.2    | 2026-05-31 | Dark mode removed from spec to match codebase (light-only).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| v1.3    | 2026-06-09 | As-built reconciliation pass. Design philosophy (§5 tokens, §6 typography, §6.5 visual language, §8.9 responsive) preserved verbatim — those still describe the intended design faithfully. Architectural sections updated to match codebase: §3 tech versions synced and `ethers` row removed; §3 install list replaced with the 12 actual primitives; §4.1 folder structure rewritten as as-built (single `store/index.ts`, `feature/landing/`, `AdaptiveLayout` + `SplitLayout`, no `AuthLayout`/`interceptors.ts`/`useConfirm.ts`); §7.9 `useConfirm` rewritten to match the real `{confirm, dialog}` shape in `@ui/confirm-dialog`; §8.1 layout shells table updated; **§8.7 mobile drawer rewritten** (hand-rolled CSS-transform `<aside>`, never adopted shadcn `Sheet`; `vaul` reserved for content drawers); §9.2 store consolidated to single-file shape with `partialize` + Indonesian default; §10.1/§10.2 axios example updated with `paramsSerializer`, `Accept-Language`, `refreshInFlight` dedup, `X-Retry: 1`, and 429 handling; §11.1 token strategy moved from "backend coordination required" to "implemented" (Go side ships cookies). |
-| v1.4    | 2026-06-10 | `SplitLayout` forced to exactly 100dvh with no scrollbars. §8.1 table updated: outer container and right panel use `h-dvh overflow-hidden`; mobile brand band uses `h-[33dvh] flex items-center justify-center`; content area `flex-1` fills remaining 67dvh with `min-h-0 overflow-hidden`. `AttestationStamp` now accepts `className` prop for responsive sizing; mobile brand band renders it with `max-w-[min(160px,18vh)]` instead of hiding. Landing content vertically centered (`flex items-center justify-center`); Login content top-aligned on mobile (`justify-start`) and centered on desktop (`lg:justify-center`). Login `<BackLink>` uses `self-start` for left alignment. Landing/Login content refactored to viewport-relative units (`py-[2dvh]`, `space-y-[1.5dvh]`, card padding `p-6 sm:p-8`). Removed forced `min-h-[Xlh]` from headings/subtitles so content shrinks to fit short viewports. Added `SplitLayout.test.tsx` (5 tests). |
+| Version | Date       | Changes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| v1.0    | 2026-05-29 | Initial draft. Sections 1-22 + Appendix A.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| v1.1    | 2026-05-29 | Typography migrated from system-ui to Fraunces + DM Sans + JetBrains Mono. Added Section 6.5 Visual Language Principles. Added Section 8.9 Responsive Design (touch targets, safe areas, mobile keyboards, reduced motion, container queries, tablet, print, orientation, dark mode hooks).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| v1.2    | 2026-05-31 | Dark mode removed from spec to match codebase (light-only).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| v1.3    | 2026-06-09 | As-built reconciliation pass. Design philosophy (§5 tokens, §6 typography, §6.5 visual language, §8.9 responsive) preserved verbatim — those still describe the intended design faithfully. Architectural sections updated to match codebase: §3 tech versions synced and `ethers` row removed; §3 install list replaced with the 12 actual primitives; §4.1 folder structure rewritten as as-built (single `store/index.ts`, `feature/landing/`, `AdaptiveLayout` + `SplitLayout`, no `AuthLayout`/`interceptors.ts`/`useConfirm.ts`); §7.9 `useConfirm` rewritten to match the real `{confirm, dialog}` shape in `@ui/confirm-dialog`; §8.1 layout shells table updated; **§8.7 mobile drawer rewritten** (hand-rolled CSS-transform `<aside>`, never adopted shadcn `Sheet`; `vaul` reserved for content drawers); §9.2 store consolidated to single-file shape with `partialize` + Indonesian default; §10.1/§10.2 axios example updated with `paramsSerializer`, `Accept-Language`, `refreshInFlight` dedup, `X-Retry: 1`, and 429 handling; §11.1 token strategy moved from "backend coordination required" to "implemented" (Go side ships cookies).                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| v1.4    | 2026-06-10 | `SplitLayout` forced to exactly 100dvh with no scrollbars. §8.1 table updated: outer container and right panel use `h-dvh overflow-hidden`; mobile brand band uses `h-[33dvh] flex items-center justify-center`; content area `flex-1` fills remaining 67dvh with `min-h-0 overflow-hidden`. `AttestationStamp` now accepts `className` prop for responsive sizing; mobile brand band renders it with `max-w-[min(160px,18vh)]` instead of hiding. Landing content vertically centered (`flex items-center justify-center`); Login content top-aligned on mobile (`justify-start`) and centered on desktop (`lg:justify-center`). Login `<BackLink>` uses `self-start` for left alignment. Landing/Login content refactored to viewport-relative units (`py-[2dvh]`, `space-y-[1.5dvh]`, card padding `p-6 sm:p-8`). Removed forced `min-h-[Xlh]` from headings/subtitles so content shrinks to fit short viewports. Added `SplitLayout.test.tsx` (5 tests).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | v1.5    | 2026-06-11 | Layout max-width alignment pass. **§8.1 table** updated: `PublicLayout` `<main>` now has `mx-auto max-w-7xl` so the public content area (About/Help/VerifyCredential, which are `max-w-4xl`) centers within a 1280px band that aligns with `NavbarPublic` width. `DashboardLayout` row expanded: container is now `min-h-dvh bg-base` (was `min-h-screen bg-gray-100` with the inner wrapper at hardcoded `bg-[#F4F7F6]`), sidebar uses `sm:h-dvh` (was `sm:h-screen`), `<main>` drops to `flex-1 overflow-y-scroll` with **no** `max-w-7xl` (the sidebar takes the fixed `w-72` and the content area fills the remaining space — adding `max-w-7xl` would double-constrain list pages like UserList). Navbar row now documents `mx-auto max-w-7xl` on the dashboard navbar's flex row (the `<header>` background still spans full width but menu/search/avatar are centered at 1280px and align with the widest page content below). **§8.1.1 CopyrightFooter** updated: footer now carries `mx-auto max-w-7xl` so footer text centers within the same 1280px band as the navbar and `<main>`. **Page-width standardization** per §8.2: `UserDetail` and `UserSelfProfile` (was `max-w-3xl`) + `About` and `VerifyCredential` (was `max-w-3xl`) bumped to `max-w-4xl` so all detail/settings pages share the same reading width. **UserList table** wrapped in `<div className="overflow-x-auto">` so the 4-column table (entity, role, wallet/status, actions) scrolls horizontally on narrow viewports instead of squishing columns past their `truncate max-w-[12rem]/[14rem]` limits. |
 
 ---
