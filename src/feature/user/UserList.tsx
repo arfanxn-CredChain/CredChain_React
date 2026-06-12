@@ -137,11 +137,7 @@ export function UserList() {
                 <SelectTrigger className="h-8 w-[88px] bg-surface px-3 py-1 text-xs" aria-label={t("user.list.limitLabel")}>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent
-                  onPointerDownOutside={(event) => {
-                    event.preventDefault();
-                  }}
-                >
+                <SelectContent>
                   <SelectItem value="10">10</SelectItem>
                   <SelectItem value="20">20</SelectItem>
                   <SelectItem value="50">50</SelectItem>
