@@ -111,8 +111,8 @@ export function UserList() {
 
       <Card className="p-0">
         <div className="border-b border-gray-50 p-4 sm:p-6">
-          <div className="flex flex-col gap-3">
-            <div className="w-full sm:w-1/2">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
+            <div className="w-full md:max-w-md md:flex-1">
               <Input
                 type="search"
                 inputMode="search"
@@ -131,7 +131,7 @@ export function UserList() {
                 aria-label={t("user.list.searchPlaceholder")}
               />
             </div>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 md:ml-auto md:shrink-0">
               <RoleFilterMenu value={params.role} onChange={(r) => setParam("role", r)} />
               <StatusFilterMenu value={params.status} onChange={(v) => setParam("status", v)} />
               <SortMenu
