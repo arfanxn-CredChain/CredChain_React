@@ -76,8 +76,8 @@ export function UserList() {
   const sortArray = params.sort ? [params.sort] : ["-updated_at"];
   const filterArray: string[] = [];
   if (params.role !== "all") filterArray.push(`role=${params.role}`);
-  if (params.status === "deleted_at") filterArray.push("deleted_at!_");
-  else if (params.status === "-deleted_at") filterArray.push("deleted_at_");
+  if (params.status === "deleted_at!_") filterArray.push("deleted_at!_");
+  else if (params.status === "deleted_at_") filterArray.push("deleted_at_");
 
   const { data, isLoading, isError } = useUsers({
     page: params.page,

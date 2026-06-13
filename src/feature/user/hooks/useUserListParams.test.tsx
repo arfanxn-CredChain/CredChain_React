@@ -98,8 +98,8 @@ describe("useUserListParams", () => {
 
   it("setMany updates multiple", () => {
     const { result } = renderHook(() => useUserListParams(), { wrapper: wrap() });
-    act(() => result.current.setMany({ sort: "name", status: "-deleted_at" }));
+    act(() => result.current.setMany({ sort: "name", status: "deleted_at_" }));
     expect(result.current.params.sort).toBe("name");
-    expect(result.current.params.status).toBe("-deleted_at");
+    expect(result.current.params.status).toBe("deleted_at_");
   });
 });
