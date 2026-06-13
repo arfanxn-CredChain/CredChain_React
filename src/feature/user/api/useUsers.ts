@@ -20,8 +20,5 @@ export function useUsers(params?: UserListParams) {
       const response = await api.get<PaginatedResponse<UserDTO>>("/users", { params: q });
       return response.data;
     },
-    staleTime: 0,
-    gcTime: 0,
-    refetchOnMount: "always",
   });
 }
