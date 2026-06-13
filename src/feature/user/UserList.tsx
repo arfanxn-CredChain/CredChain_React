@@ -53,7 +53,7 @@ import { truncateAddress, relativeTime } from "@shared/lib/format";
 
 export function UserList() {
   const { t, i18n } = useTranslation();
-  const { params, setParam, setMany } = useUserListParams();
+  const { params, setParam } = useUserListParams();
   const [inputValue, setInputValue] = useState(params.search);
   const searchTypedRef = useRef<string | null>(null);
   const debouncedSearch = useDebouncedValue(inputValue, 300);
@@ -73,10 +73,18 @@ export function UserList() {
   const currentUser = useStore((s) => s.user);
   const canManageUsers = canAccessAny(currentUser?.role, [Role.ADMIN, Role.SUPER_ADMIN]);
 
+  const sortArray = params.sort ? [params.sort] : ["-updated_at"];
+  const filterArray: string[] = [];
+  if (params.role !== "all") filterArray.push(`role=${params.role}`);
+  if (params.status === "trashed-only") filterArray.push("deleted_at!_");
+  else if (params.status === "active-only") filterArray.push("deleted_at_");
+
   const { data, isLoading, isError } = useUsers({
-    ...params,
+    page: params.page,
+    limit: params.limit,
     search: debouncedSearch || undefined,
-    role: params.role === "all" ? undefined : params.role,
+    sorts: sortArray,
+    filters: filterArray.length > 0 ? filterArray : undefined,
   });
 
   const users = data?.items ?? [];
@@ -122,11 +130,10 @@ export function UserList() {
             </div>
             <div className="flex flex-wrap items-center gap-2 md:ml-auto md:shrink-0">
               <RoleFilterMenu value={params.role} onChange={(r) => setParam("role", r)} />
-              <StatusFilterMenu value={params.deleted} onChange={(v) => setParam("deleted", v)} />
+              <StatusFilterMenu value={params.status} onChange={(v) => setParam("status", v)} />
               <SortMenu
-                sort={params.sort}
-                order={params.order}
-                onChange={(s, o) => setMany({ sort: s, order: o })}
+                value={params.sort}
+                onChange={(sortString) => setParam("sort", sortString)}
               />
               <PageSizeMenu value={params.limit} onChange={(v) => setParam("limit", v)} />
             </div>

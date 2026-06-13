@@ -7,8 +7,7 @@ export interface UserListParams {
   page: number;
   search: string;
   sort: string;
-  order: "asc" | "desc";
-  deleted: "all" | "only" | "none";
+  status: "all" | "active-only" | "trashed-only";
   role: RoleFilter;
   limit: number;
 }
@@ -16,9 +15,8 @@ export interface UserListParams {
 const DEFAULTS: UserListParams = {
   page: 1,
   search: "",
-  sort: "created_at",
-  order: "desc",
-  deleted: "all",
+  sort: "-updated_at",
+  status: "all",
   role: "all",
   limit: 10,
 };
@@ -28,8 +26,7 @@ const ALLOWED_LIMITS = [10, 20, 50, 100] as const;
 const PAGE_RESET_KEYS: (keyof UserListParams)[] = [
   "search",
   "sort",
-  "order",
-  "deleted",
+  "status",
   "role",
   "limit",
 ];
@@ -44,12 +41,8 @@ function parseLimit(raw: string | null): number {
   return (ALLOWED_LIMITS as readonly number[]).includes(n) ? n : DEFAULTS.limit;
 }
 
-function parseOrder(raw: string | null): "asc" | "desc" {
-  return raw === "asc" ? "asc" : "desc";
-}
-
-function parseDeleted(raw: string | null): "all" | "only" | "none" {
-  if (raw === "only" || raw === "none") return raw;
+function parseStatus(raw: string | null): "all" | "active-only" | "trashed-only" {
+  if (raw === "active-only" || raw === "trashed-only") return raw;
   return "all";
 }
 
@@ -72,8 +65,7 @@ export function useUserListParams() {
     page: parsePage(searchParams.get("page")),
     search: searchParams.get("search") ?? DEFAULTS.search,
     sort: searchParams.get("sort") ?? DEFAULTS.sort,
-    order: parseOrder(searchParams.get("order")),
-    deleted: parseDeleted(searchParams.get("deleted")),
+    status: parseStatus(searchParams.get("status")),
     role: parseRole(searchParams.get("role")),
     limit: parseLimit(searchParams.get("limit")),
   };

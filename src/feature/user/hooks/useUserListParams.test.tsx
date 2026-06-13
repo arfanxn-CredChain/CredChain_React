@@ -15,9 +15,8 @@ describe("useUserListParams", () => {
     expect(result.current.params).toEqual({
       page: 1,
       search: "",
-      sort: "created_at",
-      order: "desc",
-      deleted: "all",
+      sort: "-updated_at",
+      status: "all",
       role: "all",
       limit: 10,
     });
@@ -99,8 +98,8 @@ describe("useUserListParams", () => {
 
   it("setMany updates multiple", () => {
     const { result } = renderHook(() => useUserListParams(), { wrapper: wrap() });
-    act(() => result.current.setMany({ sort: "name", order: "asc" }));
+    act(() => result.current.setMany({ sort: "name", status: "active-only" }));
     expect(result.current.params.sort).toBe("name");
-    expect(result.current.params.order).toBe("asc");
+    expect(result.current.params.status).toBe("active-only");
   });
 });

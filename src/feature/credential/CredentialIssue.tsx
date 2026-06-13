@@ -23,7 +23,7 @@ export function CredentialIssue() {
   const { t } = useTranslation();
 
   const { data: holdersData } = useUsers({
-    role: Role.HOLDER,
+    filters: [`role=${Role.HOLDER}`],
     limit: 100,
   });
   const holders = holdersData?.items ?? [];

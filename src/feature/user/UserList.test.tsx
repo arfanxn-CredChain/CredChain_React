@@ -115,7 +115,7 @@ describe("UserList", () => {
     await user.click(activeItem);
 
     await waitFor(() => {
-      expect(screen.getByTestId("location-search").textContent).toContain("deleted=none");
+      expect(screen.getByTestId("location-search").textContent).toContain("status=active-only");
     });
   });
 
@@ -133,7 +133,6 @@ describe("UserList", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("location-search").textContent).toContain("sort=name");
-      expect(screen.getByTestId("location-search").textContent).toContain("order=asc");
     });
   });
 

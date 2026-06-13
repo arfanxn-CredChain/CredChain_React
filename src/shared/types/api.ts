@@ -75,6 +75,7 @@ export interface PaginationParams {
   page?: number;
   limit?: number;
   search?: string;
-  sort?: string;
-  order?: "asc" | "desc";
+  sorts?: string[];
+  filters?: string[];
+  includes?: string[];
 }

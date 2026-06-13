@@ -9,23 +9,22 @@ import {
 } from "@ui/dropdown-menu";
 
 interface SortMenuProps {
-  sort: string;
-  order: "asc" | "desc";
-  onChange: (sort: string, order: "asc" | "desc") => void;
+  value: string;
+  onChange: (sortString: string) => void;
 }
 
-export function SortMenu({ sort, order, onChange }: SortMenuProps) {
+export function SortMenu({ value, onChange }: SortMenuProps) {
   const { t } = useTranslation();
 
-  const options: { key: string; sort: string; order: "asc" | "desc"; label: string }[] = [
-    { key: "newest", sort: "created_at", order: "desc", label: t("user.sort.option.newest") },
-    { key: "oldest", sort: "created_at", order: "asc", label: t("user.sort.option.oldest") },
-    { key: "nameAZ", sort: "name", order: "asc", label: t("user.sort.option.nameAZ") },
-    { key: "nameZA", sort: "name", order: "desc", label: t("user.sort.option.nameZA") },
-    { key: "role", sort: "role", order: "asc", label: t("user.sort.option.role") },
+  const options: { key: string; sortString: string; label: string }[] = [
+    { key: "newest", sortString: "-updated_at", label: t("user.sort.option.newest") },
+    { key: "oldest", sortString: "updated_at", label: t("user.sort.option.oldest") },
+    { key: "nameAZ", sortString: "name", label: t("user.sort.option.nameAZ") },
+    { key: "nameZA", sortString: "-name", label: t("user.sort.option.nameZA") },
+    { key: "role", sortString: "role", label: t("user.sort.option.role") },
   ];
 
-  const activeOption = options.find((opt) => opt.sort === sort && opt.order === order);
+  const activeOption = options.find((opt) => opt.sortString === value);
 
   return (
     <DropdownMenu>
@@ -39,11 +38,11 @@ export function SortMenu({ sort, order, onChange }: SortMenuProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
         {options.map((opt) => {
-          const active = opt.sort === sort && opt.order === order;
+          const active = opt.sortString === value;
           return (
             <DropdownMenuItem
               key={opt.key}
-              onClick={() => onChange(opt.sort, opt.order)}
+              onClick={() => onChange(opt.sortString)}
               className="flex cursor-pointer items-center justify-between"
             >
               <span className={active ? "font-bold" : ""}>{opt.label}</span>
