@@ -111,8 +111,8 @@ export function UserList() {
 
       <Card className="p-0">
         <div className="border-b border-gray-50 p-4 sm:p-6">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
-            <div className="w-full md:max-w-md md:flex-1">
+          <div className="flex flex-col gap-3">
+            <div className="w-full">
               <Input
                 type="search"
                 inputMode="search"
@@ -131,7 +131,7 @@ export function UserList() {
                 aria-label={t("user.list.searchPlaceholder")}
               />
             </div>
-            <div className="flex flex-wrap items-center gap-2 md:ml-auto md:shrink-0">
+            <div className="flex flex-wrap items-center gap-2">
               <RoleFilterMenu value={params.role} onChange={(r) => setParam("role", r)} />
               <StatusFilterMenu value={params.status} onChange={(v) => setParam("status", v)} />
               <SortMenu
@@ -291,28 +291,31 @@ export function UserList() {
                                   <Eye className="mr-2 h-4 w-4" />
                                   {t("common.view")}
                                 </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => {
-                                    if (user.deleted_at) {
-                                      void (async () => {
-                                        const ok = await confirm({
-                                          title: t("user.edit.trashed.title"),
-                                          description: t("user.edit.trashed.body", {
-                                            name: user.name ?? user.email,
-                                          }),
-                                          confirmLabel: t("user.edit.trashed.action"),
-                                          cancelLabel: t("common.cancel"),
-                                        });
-                                        if (ok) restoreUsers.mutate([user.id]);
-                                      })();
-                                    } else {
-                                      setEditingUser(user);
-                                    }
-                                  }}
-                                >
-                                  <Pencil className="mr-2 h-4 w-4" />
-                                  {t("common.edit")}
-                                </DropdownMenuItem>
+                                {(user.role !== Role.SUPER_ADMIN ||
+                                  currentUser?.role === Role.SUPER_ADMIN) && (
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      if (user.deleted_at) {
+                                        void (async () => {
+                                          const ok = await confirm({
+                                            title: t("user.edit.trashed.title"),
+                                            description: t("user.edit.trashed.body", {
+                                              name: user.name ?? user.email,
+                                            }),
+                                            confirmLabel: t("user.edit.trashed.action"),
+                                            cancelLabel: t("common.cancel"),
+                                          });
+                                          if (ok) restoreUsers.mutate([user.id]);
+                                        })();
+                                      } else {
+                                        setEditingUser(user);
+                                      }
+                                    }}
+                                  >
+                                    <Pencil className="mr-2 h-4 w-4" />
+                                    {t("common.edit")}
+                                  </DropdownMenuItem>
+                                )}
                                 {currentUser?.role === Role.SUPER_ADMIN &&
                                   currentUser.id !== user.id &&
                                   user.role !== Role.SUPER_ADMIN &&
