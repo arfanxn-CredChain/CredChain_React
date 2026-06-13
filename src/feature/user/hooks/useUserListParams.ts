@@ -7,7 +7,7 @@ export interface UserListParams {
   page: number;
   search: string;
   sort: string;
-  status: "all" | "active-only" | "trashed-only";
+  status: "all" | "-deleted_at" | "deleted_at";
   role: RoleFilter;
   limit: number;
 }
@@ -41,8 +41,8 @@ function parseLimit(raw: string | null): number {
   return (ALLOWED_LIMITS as readonly number[]).includes(n) ? n : DEFAULTS.limit;
 }
 
-function parseStatus(raw: string | null): "all" | "active-only" | "trashed-only" {
-  if (raw === "active-only" || raw === "trashed-only") return raw;
+function parseStatus(raw: string | null): "all" | "-deleted_at" | "deleted_at" {
+  if (raw === "-deleted_at" || raw === "deleted_at") return raw;
   return "all";
 }
 

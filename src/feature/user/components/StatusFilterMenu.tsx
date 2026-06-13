@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@ui/dropdown-menu";
 
-export type StatusFilter = "all" | "active-only" | "trashed-only";
+export type StatusFilter = "all" | "-deleted_at" | "deleted_at";
 
 interface StatusFilterMenuProps {
   value: StatusFilter;
@@ -20,8 +20,8 @@ export function StatusFilterMenu({ value, onChange }: StatusFilterMenuProps) {
 
   const options: { key: StatusFilter; label: string }[] = [
     { key: "all", label: t("user.filter.all") },
-    { key: "active-only", label: t("user.filter.active") },
-    { key: "trashed-only", label: t("user.filter.trashed") },
+    { key: "-deleted_at", label: t("user.filter.active") },
+    { key: "deleted_at", label: t("user.filter.trashed") },
   ];
 
   const activeOption = options.find((opt) => opt.key === value);

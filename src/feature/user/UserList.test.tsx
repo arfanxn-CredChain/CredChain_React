@@ -115,7 +115,7 @@ describe("UserList", () => {
     await user.click(activeItem);
 
     await waitFor(() => {
-      expect(screen.getByTestId("location-search").textContent).toContain("status=active-only");
+      expect(screen.getByTestId("location-search").textContent).toContain("status=-deleted_at");
     });
   });
 
