@@ -112,7 +112,7 @@ export function UserList() {
       <Card className="p-0">
         <div className="border-b border-gray-50 p-4 sm:p-6">
           <div className="flex flex-col gap-3">
-            <div className="w-full">
+            <div className="w-full sm:w-1/2">
               <Input
                 type="search"
                 inputMode="search"
