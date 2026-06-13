@@ -117,6 +117,9 @@ export function UserList() {
                 type="search"
                 inputMode="search"
                 enterKeyHint="search"
+                autoCorrect="off"
+                autoComplete="off"
+                spellCheck={false}
                 leadingIcon={Search}
                 placeholder={t("user.list.searchPlaceholder")}
                 value={inputValue}
