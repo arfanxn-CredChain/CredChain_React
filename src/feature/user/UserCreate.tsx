@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Plus, Save } from "lucide-react";
 
+import { BackLink } from "@shared/components/BackLink";
 import { PageHeader } from "@shared/components/PageHeader";
 import { Button } from "@ui/button";
 import { Card } from "@ui/card";
@@ -47,7 +48,9 @@ export function UserCreate() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
-      <PageHeader title={t("userCreate.title")} description={t("userCreate.description")} onBack />
+      <BackLink />
+
+      <PageHeader title={t("userCreate.title")} description={t("userCreate.description")} />
 
       <Card className="p-0">
         <form onSubmit={onSubmit} className="space-y-8 p-6 sm:p-8">

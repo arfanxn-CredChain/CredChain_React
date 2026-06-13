@@ -1,12 +1,14 @@
+import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { Briefcase, Calendar, Hash, Mail, Phone, Trash2, User } from "lucide-react";
+import { Briefcase, Calendar, ChevronDown, Hash, Mail, Phone, Trash2, User } from "lucide-react";
 
 import { Button } from "@ui/button";
 import { Input } from "@ui/input";
 import { FormField } from "@ui/form-field";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/select";
 import { Role } from "@shared/auth/role";
+import { cn } from "@shared/lib/cn";
 
 import type { UserBatchStoreFormInput } from "../schemas/user";
 import { MetaEditor } from "./MetaEditor";
@@ -22,6 +24,7 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
   const errors = form.formState.errors.users?.[index];
   const role = form.watch(`users.${index}.role`);
   const gender = form.watch(`users.${index}.gender`);
+  const [customFieldsOpen, setCustomFieldsOpen] = useState(false);
 
   const roleOptions = [
     { value: Role.HOLDER, label: t("user.edit.role.holder") },
@@ -95,13 +98,15 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
           />
         </FormField>
 
-        <FormField label={t("user.edit.birthDate")} error={errors?.birth_date?.message} optional>
+        <div className="max-w-[13rem]">
+          <FormField label={t("user.edit.birthDate")} error={errors?.birth_date?.message} optional>
           <Input
             type="date"
             leadingIcon={Calendar}
             {...form.register(`users.${index}.birth_date`)}
           />
         </FormField>
+        </div>
 
         <FormField label={t("user.field.gender")} error={errors?.gender?.message} optional>
           <Select
@@ -154,14 +159,23 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
         </FormField>
       </div>
 
-      <details className="mt-2 sm:mt-4">
-        <summary className="cursor-pointer list-none py-2 text-sm font-medium text-gray-500 hover:text-navy">
-          + {t("userCreate.customFields.toggle")}
-        </summary>
-        <div className="mt-4 ml-2">
-          <MetaEditor control={form.control} name={`users.${index}.meta_entries`} />
-        </div>
-      </details>
+      <div className="mt-2 sm:mt-4">
+        <button
+          type="button"
+          onClick={() => setCustomFieldsOpen(!customFieldsOpen)}
+          className="flex items-center gap-1.5 py-2 text-sm font-medium text-gray-500 hover:text-navy"
+        >
+          {t("userCreate.customFields.toggle")}
+          <ChevronDown
+            className={cn("h-4 w-4 transition-transform", customFieldsOpen && "rotate-180")}
+          />
+        </button>
+        {customFieldsOpen && (
+          <div className="mt-4 ml-2">
+            <MetaEditor control={form.control} name={`users.${index}.meta_entries`} />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

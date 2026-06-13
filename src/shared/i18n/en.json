@@ -191,7 +191,7 @@
   "userCreate.field.phone.hint": "Use international format, e.g. +6281234567890",
   "userCreate.field.number.placeholder": "EMP-12345",
   "userCreate.field.number.hint": "Employee ID, student number, etc.",
-  "userCreate.customFields.toggle": "Add custom fields",
+  "userCreate.customFields.toggle": "Custom Fields",
   "common.optional": "(optional)",
   "meta.label": "Meta (custom fields)",
   "meta.empty": "No custom fields. Click Add field to get started.",

@@ -191,7 +191,7 @@
   "userCreate.field.phone.hint": "Gunakan format internasional, contoh +6281234567890",
   "userCreate.field.number.placeholder": "EMP-12345",
   "userCreate.field.number.hint": "ID karyawan, nomor mahasiswa, dll.",
-  "userCreate.customFields.toggle": "Tambah kolom kustom",
+  "userCreate.customFields.toggle": "Kolom Kustom",
   "common.optional": "(opsional)",
   "meta.label": "Meta (kolom kustom)",
   "meta.empty": "Belum ada kolom kustom. Klik Tambah kolom untuk mulai.",
