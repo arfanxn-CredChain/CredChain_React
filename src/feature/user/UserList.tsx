@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import {
@@ -54,8 +54,17 @@ import { truncateAddress, relativeTime } from "@shared/lib/format";
 export function UserList() {
   const { t, i18n } = useTranslation();
   const { params, setParam, setMany } = useUserListParams();
-  const debouncedSearch = useDebouncedValue(params.search, 300);
+  const [inputValue, setInputValue] = useState(params.search);
+  const searchTypedRef = useRef<string | null>(null);
+  const debouncedSearch = useDebouncedValue(inputValue, 300);
   const [editingUser, setEditingUser] = useState<UserDTO | null>(null);
+
+  useEffect(() => {
+    if (params.search !== searchTypedRef.current) {
+      searchTypedRef.current = null;
+      setInputValue(params.search);
+    }
+  }, [params.search]);
   const transfer = useTransferSuperAdmin();
   const deleteUsers = useDeleteUsers();
   const restoreUsers = useRestoreUsers();
@@ -102,8 +111,12 @@ export function UserList() {
                 enterKeyHint="search"
                 leadingIcon={Search}
                 placeholder={t("user.list.searchPlaceholder")}
-                value={params.search}
-                onChange={(e) => setParam("search", e.target.value)}
+                value={inputValue}
+                onChange={(e) => {
+                  setInputValue(e.target.value);
+                  searchTypedRef.current = e.target.value;
+                  setParam("search", e.target.value);
+                }}
                 aria-label={t("user.list.searchPlaceholder")}
               />
             </div>
