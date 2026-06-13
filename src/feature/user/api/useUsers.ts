@@ -21,5 +21,7 @@ export function useUsers(params?: UserListParams) {
       return response.data;
     },
     staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: "always",
   });
 }
