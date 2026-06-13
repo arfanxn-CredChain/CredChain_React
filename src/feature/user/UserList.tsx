@@ -7,6 +7,7 @@ import {
   Pencil,
   UserCircle,
   MoreVertical,
+  Eye,
   ArrowRightLeft,
   Trash2,
   RotateCcw,
@@ -107,13 +108,13 @@ export function UserList() {
               />
             </div>
             <div className="flex flex-wrap items-center gap-2 md:ml-auto md:shrink-0">
+              <RoleFilterMenu value={params.role} onChange={(r) => setParam("role", r)} />
+              <StatusFilterMenu value={params.deleted} onChange={(v) => setParam("deleted", v)} />
               <SortMenu
                 sort={params.sort}
                 order={params.order}
                 onChange={(s, o) => setMany({ sort: s, order: o })}
               />
-              <StatusFilterMenu value={params.deleted} onChange={(v) => setParam("deleted", v)} />
-              <RoleFilterMenu value={params.role} onChange={(r) => setParam("role", r)} />
               <PageSizeMenu value={params.limit} onChange={(v) => setParam("limit", v)} />
             </div>
           </div>
@@ -262,6 +263,11 @@ export function UserList() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
+                                {/* TODO: Navigate to user detail page */}
+                                <DropdownMenuItem onClick={() => {}}>
+                                  <Eye className="mr-2 h-4 w-4" />
+                                  {t("common.view")}
+                                </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onClick={() => {
                                     if (user.deleted_at) {

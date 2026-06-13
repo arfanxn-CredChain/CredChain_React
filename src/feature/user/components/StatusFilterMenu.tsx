@@ -1,4 +1,4 @@
-import { Filter, Check } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@ui/button";
 import {
@@ -24,12 +24,16 @@ export function StatusFilterMenu({ value, onChange }: StatusFilterMenuProps) {
     { key: "only", label: t("user.filter.trashed") },
   ];
 
+  const activeOption = options.find((opt) => opt.key === value);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm">
-          <Filter className="mr-2 h-4 w-4" />
-          {t("user.filter.status")}
+          {activeOption
+            ? `${t("user.filter.status")}: ${activeOption.label}`
+            : t("user.filter.status")}
+          <ChevronDown className="ml-1 h-3 w-3 text-gray-400" aria-hidden="true" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">

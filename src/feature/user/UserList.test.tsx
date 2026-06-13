@@ -251,7 +251,7 @@ describe("UserList", () => {
     renderUserList();
     await screen.findByText("User Directory");
 
-    await user.click(screen.getByRole("button", { name: /^role$/i }));
+    await user.click(screen.getByRole("button", { name: /^role:/i }));
     const adminItem = await screen.findByRole("menuitem", { name: /^admin$/i });
     await user.click(adminItem);
 

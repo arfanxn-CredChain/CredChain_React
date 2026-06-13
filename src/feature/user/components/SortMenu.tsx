@@ -1,4 +1,4 @@
-import { ArrowUpDown, Check } from "lucide-react";
+import { ChevronDown, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@ui/button";
 import {
@@ -25,12 +25,16 @@ export function SortMenu({ sort, order, onChange }: SortMenuProps) {
     { key: "role", sort: "role", order: "asc", label: t("user.sort.option.role") },
   ];
 
+  const activeOption = options.find((opt) => opt.sort === sort && opt.order === order);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm">
-          <ArrowUpDown className="mr-2 h-4 w-4" />
-          {t("user.sort.label")}
+          {activeOption
+            ? `${t("user.sort.label")}: ${activeOption.label}`
+            : t("user.sort.label")}
+          <ChevronDown className="ml-1 h-3 w-3 text-gray-400" aria-hidden="true" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
