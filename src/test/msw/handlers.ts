@@ -106,7 +106,11 @@ export const handlers = [
   ),
 
   http.delete("*/api/users/batch", () =>
-    envelope(300400, "User(s) deleted successfully.", { deleted_count: 1 }),
+    envelope(300700, "User(s) deleted successfully.", { deleted_count: 1 }),
+  ),
+
+  http.put("*/api/users/batch/restore", () =>
+    envelope(300900, "User(s) restored successfully.", { restored_count: 1 }),
   ),
 
   http.get("*/api/credentials", () =>
