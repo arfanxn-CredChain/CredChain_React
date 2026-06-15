@@ -34,3 +34,29 @@ export function canAccessAny(userRole: Role | undefined, allowed: Role[]): boole
 export function formatRole(role: Role): string {
   return role.replace("_", " ");
 }
+
+export function canEditUser(
+  currentUser: { id: string; role: Role } | null | undefined,
+  target: { id: string; role: Role },
+): boolean {
+  if (!currentUser) return false;
+  if (ROLE_LEVEL[currentUser.role] < ROLE_LEVEL[Role.ADMIN]) return false;
+  if (currentUser.id === target.id && currentUser.role !== Role.SUPER_ADMIN) return false;
+  if (target.role === Role.SUPER_ADMIN && currentUser.role !== Role.SUPER_ADMIN) return false;
+  if (currentUser.role === Role.ADMIN && ROLE_LEVEL[target.role] >= ROLE_LEVEL[Role.ADMIN])
+    return false;
+  return true;
+}
+
+export function canTransferTo(
+  currentUser: { id: string; role: Role } | null | undefined,
+  target: { id: string; role: Role; deleted_at: string | null },
+): boolean {
+  if (!currentUser) return false;
+  return (
+    currentUser.role === Role.SUPER_ADMIN &&
+    currentUser.id !== target.id &&
+    target.role !== Role.SUPER_ADMIN &&
+    target.deleted_at === null
+  );
+}
