@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canAccess, canAccessAny, formatRole, Role, ROLE_LEVEL } from "./role";
+import { canAccess, canAccessAny, canEditUser, canTransferTo, formatRole, Role, ROLE_LEVEL } from "./role";
 
 describe("ROLE_LEVEL", () => {
   it("assigns correct numeric levels", () => {
@@ -53,5 +53,159 @@ describe("formatRole", () => {
   it("replaces underscore with space", () => {
     expect(formatRole(Role.SUPER_ADMIN)).toBe("super admin");
     expect(formatRole(Role.HOLDER)).toBe("holder");
+  });
+});
+
+describe("canEditUser", () => {
+  it("returns true when Admin targets a Holder", () => {
+    expect(
+      canEditUser(
+        { id: "admin", role: Role.ADMIN },
+        { id: "h1", role: Role.HOLDER },
+      ),
+    ).toBe(true);
+  });
+
+  it("returns true when Admin targets an Issuer", () => {
+    expect(
+      canEditUser(
+        { id: "admin", role: Role.ADMIN },
+        { id: "i1", role: Role.ISSUER },
+      ),
+    ).toBe(true);
+  });
+
+  it("returns false when Admin targets a SuperAdmin", () => {
+    expect(
+      canEditUser(
+        { id: "admin", role: Role.ADMIN },
+        { id: "sa", role: Role.SUPER_ADMIN },
+      ),
+    ).toBe(false);
+  });
+
+  it("returns true when SuperAdmin targets a SuperAdmin", () => {
+    expect(
+      canEditUser(
+        { id: "sa", role: Role.SUPER_ADMIN },
+        { id: "sa2", role: Role.SUPER_ADMIN },
+      ),
+    ).toBe(true);
+  });
+
+  it("returns false when Issuer targets a Holder (below Admin+)", () => {
+    expect(
+      canEditUser(
+        { id: "issuer", role: Role.ISSUER },
+        { id: "h1", role: Role.HOLDER },
+      ),
+    ).toBe(false);
+  });
+
+  it("returns false when Holder targets a Holder (below Admin+)", () => {
+    expect(
+      canEditUser(
+        { id: "holder", role: Role.HOLDER },
+        { id: "h2", role: Role.HOLDER },
+      ),
+    ).toBe(false);
+  });
+
+  it("returns false when Admin targets self (no self-edit for non-SA)", () => {
+    expect(
+      canEditUser(
+        { id: "admin", role: Role.ADMIN },
+        { id: "admin", role: Role.ADMIN },
+      ),
+    ).toBe(false);
+  });
+
+  it("returns true when SuperAdmin targets self", () => {
+    expect(
+      canEditUser(
+        { id: "sa", role: Role.SUPER_ADMIN },
+        { id: "sa", role: Role.SUPER_ADMIN },
+      ),
+    ).toBe(true);
+  });
+
+  it("returns false when Admin targets another Admin (peer)", () => {
+    expect(
+      canEditUser(
+        { id: "admin1", role: Role.ADMIN },
+        { id: "admin2", role: Role.ADMIN },
+      ),
+    ).toBe(false);
+  });
+
+  it("returns false when currentUser is null", () => {
+    expect(
+      canEditUser(null, { id: "h1", role: Role.HOLDER }),
+    ).toBe(false);
+  });
+
+  it("returns false when currentUser is undefined", () => {
+    expect(
+      canEditUser(undefined, { id: "h1", role: Role.HOLDER }),
+    ).toBe(false);
+  });
+});
+
+describe("canTransferTo", () => {
+  it("returns true when SuperAdmin targets a non-SA live user", () => {
+    expect(
+      canTransferTo(
+        { id: "sa", role: Role.SUPER_ADMIN },
+        { id: "admin1", role: Role.ADMIN, deleted_at: null },
+      ),
+    ).toBe(true);
+  });
+
+  it("returns false when currentUser is not SuperAdmin", () => {
+    expect(
+      canTransferTo(
+        { id: "admin", role: Role.ADMIN },
+        { id: "issuer1", role: Role.ISSUER, deleted_at: null },
+      ),
+    ).toBe(false);
+  });
+
+  it("returns false for self-target", () => {
+    expect(
+      canTransferTo(
+        { id: "sa", role: Role.SUPER_ADMIN },
+        { id: "sa", role: Role.ISSUER, deleted_at: null },
+      ),
+    ).toBe(false);
+  });
+
+  it("returns false when target is SuperAdmin", () => {
+    expect(
+      canTransferTo(
+        { id: "sa", role: Role.SUPER_ADMIN },
+        { id: "sa2", role: Role.SUPER_ADMIN, deleted_at: null },
+      ),
+    ).toBe(false);
+  });
+
+  it("returns false when target is trashed", () => {
+    expect(
+      canTransferTo(
+        { id: "sa", role: Role.SUPER_ADMIN },
+        { id: "issuer1", role: Role.ISSUER, deleted_at: "2026-01-01T00:00:00Z" },
+      ),
+    ).toBe(false);
+  });
+
+  it("returns false when currentUser is null", () => {
+    expect(
+      canTransferTo(null, { id: "issuer1", role: Role.ISSUER, deleted_at: null }),
+    ).toBe(false);
+  });
+
+  it("returns false when currentUser is undefined", () => {
+    expect(
+      canTransferTo(undefined, { id: "issuer1", role: Role.ISSUER, deleted_at: null }),
+    ).toBe(false);
   });
 });
