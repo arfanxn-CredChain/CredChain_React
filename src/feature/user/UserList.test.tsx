@@ -11,7 +11,12 @@ import { UserList } from "./UserList";
 
 function LocationSentinel() {
   const location = useLocation();
-  return <div data-testid="location-search">{location.search}</div>;
+  return (
+    <>
+      <div data-testid="location-search">{location.search}</div>
+      <div data-testid="location-pathname">{location.pathname}</div>
+    </>
+  );
 }
 
 function renderUserList() {
@@ -291,5 +296,102 @@ describe("UserList", () => {
     await user.click(await screen.findByRole("menuitem", { name: /delete/i }));
 
     expect(await screen.findByRole("alertdialog")).toBeInTheDocument();
+  });
+
+  it("hides Edit menu item for super admin row when current user is admin", async () => {
+    const user = userEvent.setup();
+    renderUserList();
+
+    await waitFor(() => expect(screen.getByText("Super Admin")).toBeInTheDocument());
+
+    const menuButtons = screen.getAllByRole("button", { name: /actions/i });
+    await user.click(menuButtons[0]);
+
+    await screen.findByRole("menuitem", { name: /view/i });
+    expect(screen.queryByRole("menuitem", { name: /edit/i })).not.toBeInTheDocument();
+  });
+
+  it("shows Edit menu item for super admin row when current user is super admin", async () => {
+    useStore.setState({
+      user: { ...mockUsers[0] },
+      isAuthenticated: true,
+    });
+
+    const user = userEvent.setup();
+    renderUserList();
+
+    await waitFor(() => expect(screen.getByText("Super Admin")).toBeInTheDocument());
+
+    const menuButtons = screen.getAllByRole("button", { name: /actions/i });
+    await user.click(menuButtons[0]);
+
+    expect(await screen.findByRole("menuitem", { name: /edit/i })).toBeInTheDocument();
+  });
+
+  it("hides Edit and Delete options for issuer role on live users", async () => {
+    useStore.setState({
+      user: { ...mockUsers[2] },
+      isAuthenticated: true,
+    });
+
+    const ue = userEvent.setup();
+    renderUserList();
+
+    await waitFor(() => expect(screen.getByText("Jane Doe")).toBeInTheDocument());
+
+    const menuButtons = screen.getAllByRole("button", { name: /actions/i });
+    await ue.click(menuButtons[3]);
+
+    expect(await screen.findByRole("menuitem", { name: /view/i })).toBeInTheDocument();
+    expect(screen.queryByRole("menuitem", { name: /edit/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("menuitem", { name: /delete/i })).not.toBeInTheDocument();
+  });
+
+  it("hides Restore option for issuer role on trashed users", async () => {
+    useStore.setState({
+      user: { ...mockUsers[2] },
+      isAuthenticated: true,
+    });
+
+    const ue = userEvent.setup();
+    renderUserList();
+
+    await waitFor(() => expect(screen.getByText("Trashed User")).toBeInTheDocument());
+
+    const menuButtons = screen.getAllByRole("button", { name: /actions/i });
+    await ue.click(menuButtons[4]);
+
+    expect(screen.queryByRole("menuitem", { name: /restore/i })).not.toBeInTheDocument();
+  });
+
+  it("shows Edit, Delete, and Restore options for admin role", async () => {
+    const ue = userEvent.setup();
+    renderUserList();
+    await waitFor(() => expect(screen.getByText("Default Issuer")).toBeInTheDocument());
+
+    const menuButtons = screen.getAllByRole("button", { name: /actions/i });
+    await ue.click(menuButtons[2]);
+    expect(await screen.findByRole("menuitem", { name: /edit/i })).toBeInTheDocument();
+    expect(screen.getByRole("menuitem", { name: /delete/i })).toBeInTheDocument();
+
+    await ue.keyboard("{Escape}");
+    await waitFor(() => expect(screen.getByText("Trashed User")).toBeInTheDocument());
+
+    const menuButtons2 = screen.getAllByRole("button", { name: /actions/i });
+    await ue.click(menuButtons2[4]);
+    expect(await screen.findByRole("menuitem", { name: /restore/i })).toBeInTheDocument();
+  });
+
+  it("navigates to user detail on View click", async () => {
+    const ue = userEvent.setup();
+    renderUserList();
+
+    await waitFor(() => expect(screen.getByText("Jane Doe")).toBeInTheDocument());
+
+    const menuButtons = screen.getAllByRole("button", { name: /actions/i });
+    await ue.click(menuButtons[3]);
+    await ue.click(await screen.findByRole("menuitem", { name: /view/i }));
+
+    expect(screen.getByTestId("location-pathname").textContent).toBe("/users/usr_4");
   });
 });
