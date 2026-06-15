@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Plus,
   Search,
@@ -17,7 +17,7 @@ import { useTransferSuperAdmin } from "./api/useTransferSuperAdmin";
 import { useDeleteUsers } from "./api/useDeleteUsers";
 import { useRestoreUsers } from "./api/useRestoreUsers";
 import { useStore } from "@app/store";
-import { Role, canAccessAny } from "@shared/auth/role";
+import { Role, canAccessAny, canEditUser, canTransferTo } from "@shared/auth/role";
 import { useDebouncedValue } from "@shared/hooks/useDebouncedValue";
 import { useUserListParams } from "./hooks/useUserListParams";
 import { cn } from "@shared/lib/cn";
@@ -72,6 +72,7 @@ export function UserList() {
 
   const currentUser = useStore((s) => s.user);
   const canManageUsers = canAccessAny(currentUser?.role, [Role.ADMIN, Role.SUPER_ADMIN]);
+  const navigate = useNavigate();
 
   const sortArray = params.sort ? [params.sort] : ["-updated_at"];
   const filterArray: string[] = [];
@@ -286,13 +287,11 @@ export function UserList() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                {/* TODO: Navigate to user detail page */}
-                                <DropdownMenuItem onClick={() => {}}>
+                                <DropdownMenuItem onClick={() => navigate(`/users/${user.id}`)}>
                                   <Eye className="mr-2 h-4 w-4" />
                                   {t("common.view")}
                                 </DropdownMenuItem>
-                                {(user.role !== Role.SUPER_ADMIN ||
-                                  currentUser?.role === Role.SUPER_ADMIN) && (
+                                {currentUser && canEditUser(currentUser, user) && (
                                   <DropdownMenuItem
                                     onClick={() => {
                                       if (user.deleted_at) {
@@ -316,10 +315,7 @@ export function UserList() {
                                     {t("common.edit")}
                                   </DropdownMenuItem>
                                 )}
-                                {currentUser?.role === Role.SUPER_ADMIN &&
-                                  currentUser.id !== user.id &&
-                                  user.role !== Role.SUPER_ADMIN &&
-                                  !user.deleted_at && (
+                                {currentUser && canTransferTo(currentUser, user) && (
                                     <DropdownMenuItem
                                       onClick={() => {
                                         void (async () => {
@@ -342,7 +338,7 @@ export function UserList() {
                                       {t("user.transfer.menuLabel")}
                                     </DropdownMenuItem>
                                   )}
-                                {!user.deleted_at && currentUser?.id !== user.id && (
+                                {canManageUsers && !user.deleted_at && currentUser?.id !== user.id && (
                                   <DropdownMenuItem
                                     destructive
                                     onClick={() => {
@@ -364,7 +360,7 @@ export function UserList() {
                                     {t("user.actions.delete")}
                                   </DropdownMenuItem>
                                 )}
-                                {user.deleted_at && (
+                                {canManageUsers && user.deleted_at && (
                                   <DropdownMenuItem
                                     onClick={() => {
                                       void (async () => {
