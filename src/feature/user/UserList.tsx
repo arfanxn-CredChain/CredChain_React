@@ -208,7 +208,7 @@ export function UserList() {
                         >
                           <TableCell>
                             <div className="flex items-center">
-                               <UserAvatar user={user} size="md" className="shrink-0" />
+                              <UserAvatar user={user} size="md" className="shrink-0" />
                               <div className="ml-4 min-w-0">
                                 <div
                                   className={cn(
@@ -269,10 +269,16 @@ export function UserList() {
                             <UserStatusBadge deletedAt={user.deleted_at} />
                             <div className="mt-1 text-[10px] text-gray-400">
                               {user.deleted_at
-                                ? t("user.list.trashed", { time: relativeTime(user.deleted_at, i18n.language) })
+                                ? t("user.list.trashed", {
+                                    time: relativeTime(user.deleted_at, i18n.language),
+                                  })
                                 : user.updated_at !== user.created_at
-                                  ? t("user.list.updated", { time: relativeTime(user.updated_at, i18n.language) })
-                                  : t("user.list.created", { time: relativeTime(user.created_at, i18n.language) })}
+                                  ? t("user.list.updated", {
+                                      time: relativeTime(user.updated_at, i18n.language),
+                                    })
+                                  : t("user.list.created", {
+                                      time: relativeTime(user.created_at, i18n.language),
+                                    })}
                             </div>
                           </TableCell>
                           <TableCell className="text-right">
@@ -316,50 +322,52 @@ export function UserList() {
                                   </DropdownMenuItem>
                                 )}
                                 {currentUser && canTransferTo(currentUser, user) && (
-                                    <DropdownMenuItem
-                                      onClick={() => {
-                                        void (async () => {
-                                          const ok = await confirm({
-                                            title: t("user.transfer.confirm.title", {
-                                              name: user.name ?? user.email,
-                                            }),
-                                            description: t("user.transfer.confirm.body", {
-                                              name: user.name ?? user.email,
-                                            }),
-                                            confirmLabel: t("user.transfer.confirm.action"),
-                                            cancelLabel: t("common.cancel"),
-                                            tone: "destructive",
-                                          });
-                                          if (ok) transfer.mutate(user.id);
-                                        })();
-                                      }}
-                                    >
-                                      <ArrowRightLeft className="mr-2 h-4 w-4" />
-                                      {t("user.transfer.menuLabel")}
-                                    </DropdownMenuItem>
-                                  )}
-                                {canManageUsers && !user.deleted_at && currentUser?.id !== user.id && (
                                   <DropdownMenuItem
-                                    destructive
                                     onClick={() => {
                                       void (async () => {
                                         const ok = await confirm({
-                                          title: t("user.delete.confirm.title", {
+                                          title: t("user.transfer.confirm.title", {
                                             name: user.name ?? user.email,
                                           }),
-                                          description: t("user.delete.confirm.body"),
-                                          confirmLabel: t("user.delete.confirm.action"),
+                                          description: t("user.transfer.confirm.body", {
+                                            name: user.name ?? user.email,
+                                          }),
+                                          confirmLabel: t("user.transfer.confirm.action"),
                                           cancelLabel: t("common.cancel"),
                                           tone: "destructive",
                                         });
-                                        if (ok) deleteUsers.mutate([user.id]);
+                                        if (ok) transfer.mutate(user.id);
                                       })();
                                     }}
                                   >
-                                    <Trash2 className="mr-2 h-4 w-4" />
-                                    {t("user.actions.delete")}
+                                    <ArrowRightLeft className="mr-2 h-4 w-4" />
+                                    {t("user.transfer.menuLabel")}
                                   </DropdownMenuItem>
                                 )}
+                                {canManageUsers &&
+                                  !user.deleted_at &&
+                                  currentUser?.id !== user.id && (
+                                    <DropdownMenuItem
+                                      destructive
+                                      onClick={() => {
+                                        void (async () => {
+                                          const ok = await confirm({
+                                            title: t("user.delete.confirm.title", {
+                                              name: user.name ?? user.email,
+                                            }),
+                                            description: t("user.delete.confirm.body"),
+                                            confirmLabel: t("user.delete.confirm.action"),
+                                            cancelLabel: t("common.cancel"),
+                                            tone: "destructive",
+                                          });
+                                          if (ok) deleteUsers.mutate([user.id]);
+                                        })();
+                                      }}
+                                    >
+                                      <Trash2 className="mr-2 h-4 w-4" />
+                                      {t("user.actions.delete")}
+                                    </DropdownMenuItem>
+                                  )}
                                 {canManageUsers && user.deleted_at && (
                                   <DropdownMenuItem
                                     onClick={() => {
