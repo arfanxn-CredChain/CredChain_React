@@ -17,7 +17,7 @@ import { useTransferSuperAdmin } from "./api/useTransferSuperAdmin";
 import { useDeleteUsers } from "./api/useDeleteUsers";
 import { useRestoreUsers } from "./api/useRestoreUsers";
 import { useStore } from "@app/store";
-import { Role, canAccessAny, canEditUser, canTransferTo } from "@shared/auth/role";
+import { Role, canAccessAny, canDeleteUser, canEditUser, canTransferTo } from "@shared/auth/role";
 import { useDebouncedValue } from "@shared/hooks/useDebouncedValue";
 import { useUserListParams } from "./hooks/useUserListParams";
 import { cn } from "@shared/lib/cn";
@@ -344,9 +344,9 @@ export function UserList() {
                                     {t("user.transfer.menuLabel")}
                                   </DropdownMenuItem>
                                 )}
-                                {canManageUsers &&
-                                  !user.deleted_at &&
-                                  currentUser?.id !== user.id && (
+                                {currentUser &&
+                                  canDeleteUser(currentUser, user) &&
+                                  !user.deleted_at && (
                                     <DropdownMenuItem
                                       destructive
                                       onClick={() => {

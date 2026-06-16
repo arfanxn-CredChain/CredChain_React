@@ -7,7 +7,8 @@ import { Button } from "@ui/button";
 import { Input } from "@ui/input";
 import { FormField } from "@ui/form-field";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/select";
-import { Role } from "@shared/auth/role";
+import { Role, canAccess } from "@shared/auth/role";
+import { useStore } from "@app/store";
 import { cn } from "@shared/lib/cn";
 
 import type { UserBatchStoreFormInput } from "../schemas/user";
@@ -25,6 +26,8 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
   const role = form.watch(`users.${index}.role`);
   const gender = form.watch(`users.${index}.gender`);
   const [customFieldsOpen, setCustomFieldsOpen] = useState(false);
+  const currentUser = useStore((s) => s.user);
+  const canPromoteToAdmin = canAccess(currentUser?.role, Role.SUPER_ADMIN);
 
   const roleOptions = [
     { value: Role.HOLDER, label: t("user.edit.role.holder") },
@@ -150,12 +153,21 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
             </SelectTrigger>
             <SelectContent>
               {roleOptions.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
+                <SelectItem
+                  key={opt.value}
+                  value={opt.value}
+                  disabled={opt.value === Role.ADMIN && !canPromoteToAdmin}
+                >
                   {opt.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+          {!canPromoteToAdmin && (
+            <p className="mt-1 text-xs text-gray-400">
+              {t("user.edit.role.adminDisabled")}
+            </p>
+          )}
         </FormField>
       </div>
 

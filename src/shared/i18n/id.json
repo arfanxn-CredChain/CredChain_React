@@ -136,6 +136,7 @@
   "user.edit.role.holder": "Holder",
   "user.edit.role.issuer": "Issuer",
   "user.edit.role.admin": "Admin",
+  "user.edit.role.adminDisabled": "Hanya Super Admin yang dapat menetapkan peran Admin",
   "user.edit.superAdmin.emailLocked": "Email super admin tidak dapat diubah di sini. Gunakan Perbarui Email.",
   "user.edit.superAdmin.roleLocked": "Peran super admin terkunci. Gunakan Alihkan Super Admin. Anda menjadi Admin, target menjadi Super Admin.",
   "user.field.gender": "Jenis Kelamin",

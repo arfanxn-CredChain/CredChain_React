@@ -136,6 +136,7 @@
   "user.edit.role.holder": "Holder",
   "user.edit.role.issuer": "Issuer",
   "user.edit.role.admin": "Admin",
+  "user.edit.role.adminDisabled": "Only Super Admin can assign the Admin role",
   "user.edit.superAdmin.emailLocked": "Super admin email cannot be changed here. Use Update Email instead.",
   "user.edit.superAdmin.roleLocked": "Super admin role is locked. Use Transfer Super Admin. You become Admin, the target becomes Super Admin.",
   "user.field.gender": "Gender",

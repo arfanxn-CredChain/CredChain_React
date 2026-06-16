@@ -60,3 +60,23 @@ export function canTransferTo(
     target.deleted_at === null
   );
 }
+
+/**
+ * Can the current user delete this target user?
+ * Mirrors backend DeletePreFetch / DeletePostFetch rules:
+ *   - Below Admin -> blocked
+ *   - Self-delete -> blocked
+ *   - Admin deleting Admin+ target -> blocked
+ *   - SuperAdmin can delete anyone except self
+ */
+export function canDeleteUser(
+  currentUser: { id: string; role: Role } | null | undefined,
+  target: { id: string; role: Role },
+): boolean {
+  if (!currentUser) return false;
+  if (ROLE_LEVEL[currentUser.role] < ROLE_LEVEL[Role.ADMIN]) return false;
+  if (currentUser.id === target.id) return false;
+  if (currentUser.role === Role.ADMIN && ROLE_LEVEL[target.role] >= ROLE_LEVEL[Role.ADMIN])
+    return false;
+  return true;
+}

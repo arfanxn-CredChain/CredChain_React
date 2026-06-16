@@ -5,7 +5,8 @@ import { X, User, Hash, Phone, Calendar, Mail } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
-import { Role } from "@shared/auth/role";
+import { Role, canAccess } from "@shared/auth/role";
+import { useStore } from "@app/store";
 import { useConfirm } from "@ui/confirm-dialog";
 import { Button } from "@ui/button";
 import { Input } from "@ui/input";
@@ -35,6 +36,9 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
   const { t } = useTranslation();
   const { confirm, dialog } = useConfirm();
   const update = useUpdateUsers();
+  const isSuperAdmin = user?.role === Role.SUPER_ADMIN;
+  const currentUser = useStore((s) => s.user);
+  const canPromoteToAdmin = canAccess(currentUser?.role, Role.SUPER_ADMIN);
 
   const form = useForm<UserInlineEditFormInput>({
     resolver: zodResolver(userInlineEditFormSchema),
@@ -64,7 +68,7 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
         birth_date: user.birth_date ? user.birth_date.slice(0, 10) : undefined,
         gender: user.gender ?? undefined,
         email: user.email,
-        role: user.role as "admin" | "issuer" | "holder" | undefined,
+        role: user.role === Role.SUPER_ADMIN ? undefined : (user.role as "admin" | "issuer" | "holder" | undefined),
         meta_entries: entries,
       });
     }
@@ -134,8 +138,8 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
     if (dirty.phone_number) payload.phone_number = data.phone_number ?? null;
     if (dirty.birth_date) payload.birth_date = data.birth_date ?? null;
     if (dirty.gender) payload.gender = data.gender ?? null;
-    if (dirty.email) payload.email = data.email;
-    if (dirty.role) payload.role = data.role;
+    if (dirty.email && !isSuperAdmin) payload.email = data.email;
+    if (dirty.role && !isSuperAdmin) payload.role = data.role;
     if (dirty.meta_entries) {
       const merged = mergeMeta(data.meta_entries ?? [], original.preserved);
       if (!metaEqual(merged, user?.meta ?? null)) payload.meta = merged;
@@ -262,29 +266,64 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
                 </Select>
               </FormField>
               <FormField label={t("user.edit.email")} error={errors.email?.message}>
-                <Input type="email" leadingIcon={Mail} {...form.register("email")} />
-                {form.formState.dirtyFields.email && (
+                <Input
+                  type="email"
+                  leadingIcon={Mail}
+                  disabled={isSuperAdmin}
+                  {...form.register("email")}
+                />
+                {!isSuperAdmin && form.formState.dirtyFields.email && (
                   <p className="mt-1 text-xs text-warning" role="alert">
                     {t("user.email.update.warning")}
                   </p>
                 )}
+                {isSuperAdmin && (
+                  <p className="mt-1 text-xs text-gray-400">
+                    {t("user.edit.superAdmin.emailLocked")}
+                  </p>
+                )}
               </FormField>
               <FormField label={t("user.edit.role")} error={errors.role?.message}>
-                <Select
-                  value={form.watch("role")}
-                  onValueChange={(v) =>
-                    form.setValue("role", v as "admin" | "issuer" | "holder", { shouldDirty: true })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={t("user.edit.role.placeholder")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={Role.HOLDER}>{t("user.edit.role.holder")}</SelectItem>
-                    <SelectItem value={Role.ISSUER}>{t("user.edit.role.issuer")}</SelectItem>
-                    <SelectItem value={Role.ADMIN}>{t("user.edit.role.admin")}</SelectItem>
-                  </SelectContent>
-                </Select>
+                {isSuperAdmin ? (
+                  <>
+                    <Input
+                      disabled
+                      value={t("user.role.filter.superAdmin")}
+                      className="font-medium text-navy"
+                      aria-readonly
+                    />
+                    <p className="mt-1 text-xs text-gray-400">
+                      {t("user.edit.superAdmin.roleLocked")}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <Select
+                      value={form.watch("role")}
+                      onValueChange={(v) =>
+                        form.setValue("role", v as "admin" | "issuer" | "holder", {
+                          shouldDirty: true,
+                        })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={t("user.edit.role.placeholder")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={Role.HOLDER}>{t("user.edit.role.holder")}</SelectItem>
+                        <SelectItem value={Role.ISSUER}>{t("user.edit.role.issuer")}</SelectItem>
+                        <SelectItem value={Role.ADMIN} disabled={!canPromoteToAdmin}>
+                          {t("user.edit.role.admin")}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {!canPromoteToAdmin && (
+                      <p className="mt-1 text-xs text-gray-400">
+                        {t("user.edit.role.adminDisabled")}
+                      </p>
+                    )}
+                  </>
+                )}
               </FormField>
               <MetaEditor control={form.control} />
             </form>

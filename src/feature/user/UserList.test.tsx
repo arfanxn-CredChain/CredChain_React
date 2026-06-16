@@ -394,4 +394,29 @@ describe("UserList", () => {
 
     expect(screen.getByTestId("location-pathname").textContent).toBe("/users/usr_4");
   });
+
+  it("hides Delete option for admin on another admin row", async () => {
+    const ue = userEvent.setup();
+    renderUserList();
+    await waitFor(() => expect(screen.getByText("Platform Admin")).toBeInTheDocument());
+
+    const menuButtons = screen.getAllByRole("button", { name: /actions/i });
+    // Platform Admin is row index 1 (usr_2, ADMIN)
+    await ue.click(menuButtons[1]);
+
+    expect(await screen.findByRole("menuitem", { name: /view/i })).toBeInTheDocument();
+    expect(screen.queryByRole("menuitem", { name: /delete/i })).not.toBeInTheDocument();
+  });
+
+  it("shows Delete option for admin on a holder row", async () => {
+    const ue = userEvent.setup();
+    renderUserList();
+    await waitFor(() => expect(screen.getByText("Jane Doe")).toBeInTheDocument());
+
+    const menuButtons = screen.getAllByRole("button", { name: /actions/i });
+    // Jane Doe is row index 3 (usr_4, HOLDER)
+    await ue.click(menuButtons[3]);
+
+    expect(await screen.findByRole("menuitem", { name: /delete/i })).toBeInTheDocument();
+  });
 });

@@ -4,7 +4,10 @@ import userEvent from "@testing-library/user-event";
 import { TestProviders } from "@/test/TestProviders";
 import { UserEditDrawer } from "./UserEditDrawer";
 import { mockUserWithMeta } from "@/test/fixtures";
+import { makeUser } from "@/test/fixtures";
 import { i18n } from "@shared/i18n/config";
+import { Role } from "@shared/auth/role";
+import { useStore } from "@app/store";
 
 // Minimal vaul mock — jsdom doesn't fully support vaul's portal/animation
 vi.mock("vaul", () => ({
@@ -61,5 +64,124 @@ describe("UserEditDrawer", () => {
     await waitFor(() => expect(screen.getByDisplayValue("Test User")).toBeInTheDocument());
     await userEvent.click(screen.getByRole("button", { name: /close/i }));
     expect(onClose).toHaveBeenCalled();
+  });
+});
+
+describe("UserEditDrawer with SuperAdmin", () => {
+  beforeEach(() => {
+    mockMutate.mockClear();
+    void i18n.changeLanguage("en");
+    useStore.setState({
+      user: makeUser({ id: "usr_sa", role: Role.SUPER_ADMIN }),
+      isAuthenticated: true,
+    });
+  });
+
+  it("shows role as read-only text for super admin users", async () => {
+    const user = makeUser({
+      id: "usr_sa",
+      name: "Super Admin",
+      email: "sa@credchain.demo",
+      role: Role.SUPER_ADMIN,
+    });
+    render(<UserEditDrawer user={user} onClose={() => {}} />, { wrapper: TestProviders });
+
+    await waitFor(() => {
+      expect(screen.getAllByDisplayValue("Super Admin").length).toBeGreaterThanOrEqual(2);
+    });
+    expect(screen.queryByRole("combobox", { name: /role/i })).not.toBeInTheDocument();
+  });
+
+  it("disables email field for super admin users", async () => {
+    const user = makeUser({
+      id: "usr_sa",
+      name: "Super Admin",
+      email: "sa@credchain.demo",
+      role: Role.SUPER_ADMIN,
+    });
+    render(<UserEditDrawer user={user} onClose={() => {}} />, { wrapper: TestProviders });
+
+    await waitFor(() => {
+      const emailInput = screen.getByDisplayValue("sa@credchain.demo");
+      expect(emailInput).toBeDisabled();
+    });
+  });
+
+  it("shows email locked message for super admin users", async () => {
+    const user = makeUser({
+      id: "usr_sa",
+      name: "Super Admin",
+      email: "sa@credchain.demo",
+      role: Role.SUPER_ADMIN,
+    });
+    render(<UserEditDrawer user={user} onClose={() => {}} />, { wrapper: TestProviders });
+
+    await waitFor(() => {
+      expect(screen.getByText(/super admin email cannot be changed here/i)).toBeInTheDocument();
+      expect(screen.getByText(/update email instead/i)).toBeInTheDocument();
+    });
+  });
+
+  it("shows role locked message for super admin users", async () => {
+    const user = makeUser({
+      id: "usr_sa",
+      name: "Super Admin",
+      email: "sa@credchain.demo",
+      role: Role.SUPER_ADMIN,
+    });
+    render(<UserEditDrawer user={user} onClose={() => {}} />, { wrapper: TestProviders });
+
+    await waitFor(() => {
+      expect(screen.getByText(/super admin role is locked/i)).toBeInTheDocument();
+      expect(screen.getByText(/target becomes super admin/i)).toBeInTheDocument();
+    });
+  });
+
+  it("enables Admin option in role dropdown when auth is super admin", async () => {
+    const user = makeUser({ id: "usr_holder", role: Role.HOLDER });
+    render(<UserEditDrawer user={user} onClose={() => {}} />, { wrapper: TestProviders });
+
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument();
+    });
+
+    // Note should NOT be visible for SA auth
+    expect(
+      screen.queryByText(/only super admin can assign the admin role/i),
+    ).not.toBeInTheDocument();
+  });
+});
+
+describe("UserEditDrawer with Admin auth", () => {
+  beforeEach(() => {
+    mockMutate.mockClear();
+    void i18n.changeLanguage("en");
+    useStore.setState({
+      user: makeUser({ id: "usr_admin", role: Role.ADMIN }),
+      isAuthenticated: true,
+    });
+  });
+
+  it("disables Admin option in role dropdown when auth is admin", async () => {
+    const user = makeUser({ id: "usr_holder", role: Role.HOLDER });
+    render(<UserEditDrawer user={user} onClose={() => {}} />, { wrapper: TestProviders });
+
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument();
+    });
+
+    // Admin-disabled note should be visible for Admin auth
+    expect(
+      screen.getByText(/only super admin can assign the admin role/i),
+    ).toBeInTheDocument();
+  });
+
+  it("shows admin role disabled note when auth is admin", async () => {
+    const user = makeUser({ id: "usr_holder", role: Role.HOLDER });
+    render(<UserEditDrawer user={user} onClose={() => {}} />, { wrapper: TestProviders });
+
+    await waitFor(() => {
+      expect(screen.getByText(/only super admin can assign the admin role/i)).toBeInTheDocument();
+    });
   });
 });
