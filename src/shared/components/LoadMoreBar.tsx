@@ -11,7 +11,7 @@ interface LoadMoreBarProps {
 }
 
 export function LoadMoreBar({
-  total,
+  total: _total,
   hasMore,
   isLoading,
   onLoadMore,
