@@ -12,7 +12,8 @@ import {
   Trash2,
   RotateCcw,
 } from "lucide-react";
-import { useUsers } from "./api/useUsers";
+import { useLoadMore } from "@shared/hooks/useLoadMore";
+import { api } from "@shared/api/client";
 import { useTransferSuperAdmin } from "./api/useTransferSuperAdmin";
 import { useDeleteUsers } from "./api/useDeleteUsers";
 import { useRestoreUsers } from "./api/useRestoreUsers";
@@ -45,8 +46,7 @@ import { UserStatusBadge } from "./components/UserStatusBadge";
 import { SortMenu } from "./components/SortMenu";
 import { RoleFilterMenu } from "./components/RoleFilterMenu";
 import { StatusFilterMenu } from "./components/StatusFilterMenu";
-import { PageSizeMenu } from "./components/PageSizeMenu";
-import { PaginationBar } from "@shared/components/PaginationBar";
+import { LoadMoreBar } from "@shared/components/LoadMoreBar";
 import { CopyInlineButton } from "@shared/components/CopyInlineButton";
 import { UserEditDrawer } from "./components/UserEditDrawer";
 import { truncateAddress, relativeTime } from "@shared/lib/format";
@@ -80,17 +80,21 @@ export function UserList() {
   if (params.status === "deleted_at!_") filterArray.push("deleted_at!_");
   else if (params.status === "deleted_at_") filterArray.push("deleted_at_");
 
-  const { data, isLoading, isError } = useUsers({
-    page: params.page,
-    limit: params.limit,
-    search: debouncedSearch || undefined,
-    sorts: sortArray,
-    filters: filterArray.length > 0 ? filterArray : undefined,
-  });
+  const { items: users, total, isLoading, isError, isFetchingNextPage, hasMore, loadMore } =
+    useLoadMore<UserDTO>(
+      ["users", { search: debouncedSearch || undefined, sorts: sortArray, filters: filterArray }],
+      async (page, limit) => {
+        const q: Record<string, unknown> = {};
+        q.page = page;
+        q.limit = limit;
+        if (debouncedSearch) q.search = debouncedSearch;
+        q.sorts = sortArray;
+        if (filterArray.length > 0) q.filters = filterArray;
+        const response = await api.get("/users", { params: q });
+        return response.data;
+      },
+    );
 
-  const users = data?.items ?? [];
-  const total = data?.total ?? 0;
-  const totalPages = Math.max(1, Math.ceil(total / params.limit));
   const isEmpty = !isLoading && users.length === 0;
 
   return (
@@ -139,7 +143,6 @@ export function UserList() {
                 value={params.sort}
                 onChange={(sortString) => setParam("sort", sortString)}
               />
-              <PageSizeMenu value={params.limit} onChange={(v) => setParam("limit", v)} />
             </div>
           </div>
         </div>
@@ -397,21 +400,14 @@ export function UserList() {
               </Table>
             </div>
 
-            {total > 0 && !isLoading && (
-              <PaginationBar
-                page={params.page}
-                totalPages={totalPages}
-                onPageChange={(page) => setParam("page", page)}
-              >
-                <span className="text-xs text-gray-500 sm:text-sm">
-                  {t("user.pagination.showing", {
-                    from: Math.min((params.page - 1) * params.limit + 1, total),
-                    to: Math.min(params.page * params.limit, total),
-                    total,
-                    label: t("user.list.count", { count: total }).split(" ").slice(1).join(" "),
-                  })}
-                </span>
-              </PaginationBar>
+            {total > 0 && (
+              <LoadMoreBar
+                total={total}
+                hasMore={hasMore}
+                isLoading={isFetchingNextPage}
+                onLoadMore={loadMore}
+                countLabel={t("user.list.footerCount", { count: total })}
+              />
             )}
           </>
         )}
