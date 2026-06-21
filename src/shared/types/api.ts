@@ -36,20 +36,34 @@ export interface AuthResponseDTO extends UserDTO {
 /**
  * Mirrors backend response.Credential
  */
+export type ExtractStatus = "pending" | "succeeded" | "failed";
+
 export interface CredentialDTO {
   id: string;
-  holder_id: string;
-  issuer_id: string;
-  hash: string;
-  uri: string;
-  title: string;
-  description: string;
-  type: string;
+  holder_user_id: string;
+  issuer_user_id: string;
+  revoker_user_id: string | null;
+  name: string;
+  meta: Record<string, unknown> | null;
+  token_id: string | null;
+  file_hash: string;
+  file_uri: string | null;
+  extract_status: ExtractStatus;
+  extract_error: string | null;
+  extracted_at: string | null;
   issued_at: string;
-  valid_until: string | null;
-  revoked: boolean;
-  created_at: string;
-  updated_at: string;
+  revoked_at: string | null;
+  holder?: UserDTO;
+  issuer?: UserDTO;
+  revoker?: UserDTO;
+}
+
+export interface CredentialVerifyDTO {
+  verdict_code: number;
+  similarity_score: number | null;
+  similarity_percent: string | null;
+  description: string;
+  credential: CredentialDTO | null;
 }
 
 /**

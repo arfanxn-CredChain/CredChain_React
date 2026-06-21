@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
-import type { CredentialDTO, UserDTO } from "@shared/types/api";
-import { mockCredentials, mockUsers } from "../fixtures";
+import type { UserDTO } from "@shared/types/api";
+import { mockUsers } from "../fixtures";
 
 const envelope = <T>(code: number, message: string, data?: T) =>
   HttpResponse.json({ code, message, ...(data !== undefined ? { data } : {}) });
@@ -113,26 +113,306 @@ export const handlers = [
     envelope(300900, "User(s) restored successfully.", { restored_count: 1 }),
   ),
 
-  http.get("*/api/credentials", () =>
-    envelope(100300, "OK", {
-      items: mockCredentials,
-      total: mockCredentials.length,
-      page: 1,
-      limit: 10,
-      last_page: 1,
-      from: 1,
-      to: mockCredentials.length,
-      first_page_url: null,
-      last_page_url: null,
-      next_page_url: null,
-      prev_page_url: null,
-    }),
-  ),
+  http.get("*/api/credentials", () => {
+    return HttpResponse.json({
+      code: 400100,
+      message: "Credentials retrieved",
+      data: {
+        items: [
+          {
+            id: "cred_01HX",
+            holder_user_id: "usr_01",
+            issuer_user_id: "usr_02",
+            revoker_user_id: null,
+            name: "Bachelor's Degree",
+            meta: { institution: "University of Indonesia" },
+            token_id: "123456",
+            file_hash: "0xabcd1234",
+            file_uri: "local:///uploads/test.pdf",
+            extract_status: "succeeded",
+            extract_error: null,
+            extracted_at: "2024-01-15T10:00:00Z",
+            issued_at: "2024-01-15T10:00:00Z",
+            revoked_at: null,
+            holder: {
+              id: "usr_01",
+              name: "John Doe",
+              email: "john@example.com",
+              phone_number: "+6281234567890",
+              role: "holder",
+              wallet_address: "0x1234567890abcdef1234567890abcdef12345678",
+              created_at: "2024-01-01T00:00:00Z",
+              updated_at: "2024-01-01T00:00:00Z",
+              deleted_at: null,
+            },
+            issuer: {
+              id: "usr_02",
+              name: "University Admin",
+              email: "admin@university.edu",
+              phone_number: "+6281987654321",
+              role: "issuer",
+              wallet_address: "0xabcdef1234567890abcdef1234567890abcdef12",
+              created_at: "2024-01-01T00:00:00Z",
+              updated_at: "2024-01-01T00:00:00Z",
+              deleted_at: null,
+            },
+          },
+          {
+            id: "cred_02HY",
+            holder_user_id: "usr_03",
+            issuer_user_id: "usr_02",
+            revoker_user_id: "usr_02",
+            name: "Employment Certificate",
+            meta: null,
+            token_id: "123457",
+            file_hash: "0xefgh5678",
+            file_uri: null,
+            extract_status: "succeeded",
+            extract_error: null,
+            extracted_at: "2024-03-20T14:00:00Z",
+            issued_at: "2024-03-20T14:00:00Z",
+            revoked_at: "2024-06-01T08:00:00Z",
+            holder: {
+              id: "usr_03",
+              name: "Jane Smith",
+              email: "jane@company.com",
+              phone_number: "+6281111111111",
+              role: "holder",
+              wallet_address: "0x1111111111111111111111111111111111111111",
+              created_at: "2024-01-01T00:00:00Z",
+              updated_at: "2024-01-01T00:00:00Z",
+              deleted_at: null,
+            },
+            issuer: {
+              id: "usr_02",
+              name: "University Admin",
+              email: "admin@university.edu",
+              phone_number: "+6281987654321",
+              role: "issuer",
+              wallet_address: "0xabcdef1234567890abcdef1234567890abcdef12",
+              created_at: "2024-01-01T00:00:00Z",
+              updated_at: "2024-01-01T00:00:00Z",
+              deleted_at: null,
+            },
+            revoker: {
+              id: "usr_02",
+              name: "University Admin",
+              email: "admin@university.edu",
+              phone_number: "+6281987654321",
+              role: "issuer",
+              wallet_address: "0xabcdef1234567890abcdef1234567890abcdef12",
+              created_at: "2024-01-01T00:00:00Z",
+              updated_at: "2024-01-01T00:00:00Z",
+              deleted_at: null,
+            },
+          },
+          {
+            id: "cred_03HZ",
+            holder_user_id: "usr_04",
+            issuer_user_id: "usr_02",
+            revoker_user_id: null,
+            name: "Failed Extraction Credential",
+            meta: null,
+            token_id: "123458",
+            file_hash: "0xdeadbeef",
+            file_uri: null,
+            extract_status: "failed",
+            extract_error: "OCR failed",
+            extracted_at: null,
+            issued_at: "2024-04-01T10:00:00Z",
+            revoked_at: null,
+            holder: {
+              id: "usr_04",
+              name: "Bob Wilson",
+              email: "bob@example.com",
+              phone_number: "+6282222222222",
+              role: "holder",
+              wallet_address: "0x2222222222222222222222222222222222222222",
+              created_at: "2024-01-01T00:00:00Z",
+              updated_at: "2024-01-01T00:00:00Z",
+              deleted_at: null,
+            },
+            issuer: {
+              id: "usr_02",
+              name: "University Admin",
+              email: "admin@university.edu",
+              phone_number: "+6281987654321",
+              role: "issuer",
+              wallet_address: "0xabcdef1234567890abcdef1234567890abcdef12",
+              created_at: "2024-01-01T00:00:00Z",
+              updated_at: "2024-01-01T00:00:00Z",
+              deleted_at: null,
+            },
+          },
+        ],
+        total: 3,
+        page: 1,
+        limit: 30,
+        last_page: 1,
+        from: 1,
+        to: 3,
+        first_page_url: "/api/credentials?page=1",
+        last_page_url: "/api/credentials?page=1",
+        next_page_url: null,
+        prev_page_url: null,
+      },
+    });
+  }),
 
-  http.get("*/api/credentials/:id", ({ params }) => {
-    const cred = mockCredentials.find((c: CredentialDTO) => c.id === params.id);
-    return cred
-      ? envelope(100300, "OK", cred)
-      : HttpResponse.json({ code: 400300, message: "Not found" }, { status: 404 });
+  http.get("*/api/credentials/:id", () => {
+    return HttpResponse.json({
+      code: 400100,
+      message: "Credential retrieved",
+      data: {
+        id: "cred_01HX",
+        holder_user_id: "usr_01",
+        issuer_user_id: "usr_02",
+        revoker_user_id: null,
+        name: "Bachelor's Degree",
+        meta: { institution: "University of Indonesia" },
+        token_id: "123456",
+        file_hash: "0xabcd1234",
+        file_uri: "local:///uploads/test.pdf",
+        extract_status: "succeeded",
+        extract_error: null,
+        extracted_at: "2024-01-15T10:00:00Z",
+        issued_at: "2024-01-15T10:00:00Z",
+        revoked_at: null,
+        holder: {
+          id: "usr_01",
+          name: "John Doe",
+          email: "john@example.com",
+          role: "holder",
+          wallet_address: "0x1234",
+          created_at: "2024-01-01T00:00:00Z",
+          updated_at: "2024-01-01T00:00:00Z",
+          deleted_at: null,
+        },
+        issuer: {
+          id: "usr_02",
+          name: "University Admin",
+          email: "admin@university.edu",
+          role: "issuer",
+          wallet_address: "0x5678",
+          created_at: "2024-01-01T00:00:00Z",
+          updated_at: "2024-01-01T00:00:00Z",
+          deleted_at: null,
+        },
+      },
+    });
+  }),
+
+  http.get("*/api/users/self/credentials", () => {
+    return HttpResponse.json({
+      code: 400100,
+      message: "Credentials retrieved",
+      data: {
+        items: [
+          {
+            id: "cred_01HX",
+            holder_user_id: "usr_01",
+            issuer_user_id: "usr_02",
+            revoker_user_id: null,
+            name: "Bachelor's Degree",
+            meta: null,
+            token_id: "123456",
+            file_hash: "0xabcd1234",
+            file_uri: "local:///uploads/test.pdf",
+            extract_status: "succeeded",
+            extract_error: null,
+            extracted_at: "2024-01-15T10:00:00Z",
+            issued_at: "2024-01-15T10:00:00Z",
+            revoked_at: null,
+            holder: {
+              id: "usr_01",
+              name: "John Doe",
+              email: "john@example.com",
+              phone_number: "+6281234567890",
+              role: "holder",
+              wallet_address: "0x1234567890abcdef1234567890abcdef12345678",
+              created_at: "2024-01-01T00:00:00Z",
+              updated_at: "2024-01-01T00:00:00Z",
+              deleted_at: null,
+            },
+            issuer: {
+              id: "usr_02",
+              name: "University Admin",
+              email: "admin@university.edu",
+              phone_number: "+6281987654321",
+              role: "issuer",
+              wallet_address: "0xabcdef1234567890abcdef1234567890abcdef12",
+              created_at: "2024-01-01T00:00:00Z",
+              updated_at: "2024-01-01T00:00:00Z",
+              deleted_at: null,
+            },
+          },
+        ],
+        total: 1,
+        page: 1,
+        limit: 30,
+        last_page: 1,
+        from: 1,
+        to: 1,
+        first_page_url: "/api/users/self/credentials?page=1",
+        last_page_url: "/api/users/self/credentials?page=1",
+        next_page_url: null,
+        prev_page_url: null,
+      },
+    });
+  }),
+
+  http.post("*/api/credentials/batch/issue", () => {
+    return HttpResponse.json({
+      code: 400200,
+      message: "Credential(s) issued successfully",
+      data: [
+        {
+          id: "cred_NEW1",
+          holder_user_id: "usr_01",
+          issuer_user_id: "usr_02",
+          revoker_user_id: null,
+          name: "New Certificate",
+          meta: null,
+          token_id: "123458",
+          file_hash: "0xnewhash1",
+          file_uri: "local:///uploads/new.pdf",
+          extract_status: "pending",
+          extract_error: null,
+          extracted_at: null,
+          issued_at: new Date().toISOString(),
+          revoked_at: null,
+        },
+      ],
+    });
+  }),
+
+  http.post("*/api/credentials/batch/revoke", () => {
+    return HttpResponse.json({
+      code: 400300,
+      message: "Credential(s) revoked",
+      data: [],
+    });
+  }),
+
+  http.post("*/api/credentials/batch/reextract", () => {
+    return HttpResponse.json({
+      code: 400500,
+      message: "Re-extraction queued successfully",
+      data: [],
+    });
+  }),
+
+  http.post("*/api/credentials/verify", () => {
+    return HttpResponse.json({
+      code: 400407,
+      message: "No match",
+      data: {
+        verdict_code: 400407,
+        similarity_score: 0.23,
+        similarity_percent: "23.0%",
+        description: "No Match",
+        credential: null,
+      },
+    });
   }),
 ];

@@ -7,20 +7,24 @@
  */
 
 export const CODE_TO_MESSAGE_KEY: Record<number, string> = {
-  // System (10/40 + 00)
+  // System (10)
   100000: "system.success",
-  400000: "system.internal_error",
-  400001: "system.validation",
+  100050: "system.internal_error",
+  100040: "system.validation",
 
-  // Auth (10/40 + 01)
-  100100: "auth.login.success",
-  100101: "auth.refresh.success",
-  100102: "auth.logout.success",
+  // Auth (20)
+  200200: "auth.login.success",
+  200140: "auth.unauthorized",
+  200141: "auth.token.invalid",
   200142: "auth.forbidden",
-  400100: "auth.unauthorized",
-  400101: "auth.token.invalid",
-  400102: "auth.token.expired",
-  400103: "auth.login.failed",
+  200241: "auth.login.failed",
+  200300: "auth.refresh.success",
+  200340: "auth.refresh.invalid_token",
+  200341: "auth.token.expired",
+  200342: "auth.refresh.token_revoked",
+  200343: "auth.refresh.user_not_found",
+  200350: "auth.refresh.jwt_failed",
+  200400: "auth.logout.success",
 
   // User (30 + 00-09)
   300100: "user.fetch.success",
@@ -71,16 +75,45 @@ export const CODE_TO_MESSAGE_KEY: Record<number, string> = {
   300643: "user.transfer.target_trashed_forbidden",
   300645: "user.transfer.blockchain_sync_failed",
 
-  // Credential (10/30/40 + 03)
-  100300: "credential.fetch.success",
-  100301: "credential.issue.success",
-  100302: "credential.revoke.success",
-  100303: "credential.verify.success",
-  400240: "credential.issue.forbidden",
-  300301: "credential.revoke.forbidden",
-  400300: "credential.fetch.not_found",
-  400301: "credential.verify.hash_mismatch",
-  400302: "credential.verify.revoked",
+  // Credential (40)
+  400100: "credential.fetch.success",
+  400140: "credential.fetch.not_found",
+  400141: "credential.fetch.validation",
+  400200: "credential.issue.success",
+  400240: "credential.issue.failed",
+  400241: "credential.issue.validation",
+  400242: "credential.issue.duplicate_file_hash",
+  400243: "credential.issue.holder_not_found",
+  400244: "credential.issue.blockchain_sync_failed",
+  400245: "credential.issue.storage_failed",
+  400246: "credential.issue.hash_failed",
+  400300: "credential.revoke.success",
+  400340: "credential.revoke.failed",
+  400341: "credential.revoke.not_found",
+  400342: "credential.revoke.already_revoked",
+  400343: "credential.revoke.blockchain_sync_failed",
+  400400: "credential.verify.success",
+  400440: "credential.verify.failed",
+  400441: "credential.verify.validation",
+  400442: "credential.verify.extract_not_ready",
+  400443: "credential.verify.extract_failed",
+  400444: "credential.verify.ai_service_failed",
+  400445: "credential.verify.credential_not_found",
+  400401: "credential.verify.verdict.authentic",
+  400402: "credential.verify.verdict.revoked",
+  400403: "credential.verify.verdict.integrity_warning",
+  400404: "credential.verify.verdict.tampered",
+  400405: "credential.verify.verdict.suspicious",
+  400406: "credential.verify.verdict.low_similarity",
+  400407: "credential.verify.verdict.not_similar",
+  400408: "credential.verify.verdict.no_identifiers",
+  400409: "credential.verify.verdict.no_match",
+  400410: "credential.verify.verdict.holder_disabled",
+  400411: "credential.verify.verdict.issuer_disabled",
+  400412: "credential.verify.verdict.party_disabled",
+  400500: "credential.reextract.success",
+  400540: "credential.reextract.not_found",
+  400541: "credential.reextract.not_failed",
 };
 
 export function codeToMessageKey(code?: number): string {

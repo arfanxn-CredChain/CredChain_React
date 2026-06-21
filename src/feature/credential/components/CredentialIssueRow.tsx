@@ -1,12 +1,12 @@
 import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { Calendar, FileText, Hash, Link as LinkIcon, Trash2, Type } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import type { UserDTO } from "@shared/types/api";
 import { Button } from "@ui/button";
 import { Input } from "@ui/input";
 import { FormField } from "@ui/form-field";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/select";
-import { CREDENTIAL_TYPE_OPTIONS, type CredentialBatchIssueInput } from "../schemas/credential";
+import type { CredentialBatchIssueInput } from "../schemas/credential";
 
 interface CredentialIssueRowProps {
   index: number;
@@ -18,8 +18,7 @@ interface CredentialIssueRowProps {
 export function CredentialIssueRow({ index, form, holders, onRemove }: CredentialIssueRowProps) {
   const { t } = useTranslation();
   const errors = form.formState.errors.credentials?.[index];
-  const holderId = form.watch(`credentials.${index}.holder_id`);
-  const type = form.watch(`credentials.${index}.type`);
+  const holderId = form.watch(`credentials.${index}.holder_user_id`);
 
   return (
     <div className="relative flex flex-col gap-4 rounded-xl border border-gray-100 bg-gray-50/50 p-4 transition-all focus-within:border-gold/50 focus-within:bg-white sm:gap-6 sm:p-6">
@@ -37,17 +36,17 @@ export function CredentialIssueRow({ index, form, holders, onRemove }: Credentia
       )}
 
       <div className="grid w-full grid-cols-1 gap-4 pr-12 sm:gap-6 md:grid-cols-2">
-        <FormField label={t("cred.field.recipient")} error={errors?.holder_id?.message}>
+        <FormField label={t("cred.field.holder")} error={errors?.holder_user_id?.message}>
           <Select
             value={holderId}
             onValueChange={(value) =>
-              form.setValue(`credentials.${index}.holder_id`, value, {
+              form.setValue(`credentials.${index}.holder_user_id`, value, {
                 shouldValidate: true,
               })
             }
           >
             <SelectTrigger>
-              <SelectValue placeholder={t("cred.field.selectRecipient")} />
+              <SelectValue placeholder={t("cred.field.selectHolder")} />
             </SelectTrigger>
             <SelectContent>
               {holders.length === 0 ? (
@@ -63,74 +62,30 @@ export function CredentialIssueRow({ index, form, holders, onRemove }: Credentia
           </Select>
         </FormField>
 
-        <FormField label={t("cred.field.type")} error={errors?.type?.message}>
-          <Select
-            value={type}
-            onValueChange={(value) =>
-              form.setValue(`credentials.${index}.type`, value, {
-                shouldValidate: true,
-              })
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder={t("cred.field.selectType")} />
-            </SelectTrigger>
-            <SelectContent>
-              {CREDENTIAL_TYPE_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </FormField>
-
-        <FormField label={t("cred.field.title")} error={errors?.title?.message}>
+        <FormField label={t("cred.field.name")} error={errors?.name?.message}>
           <Input
-            leadingIcon={Type}
-            placeholder={t("cred.field.titlePlaceholder")}
-            {...form.register(`credentials.${index}.title`)}
+            placeholder={t("cred.field.namePlaceholder")}
+            {...form.register(`credentials.${index}.name`)}
           />
         </FormField>
 
-        <FormField
-          label={t("cred.field.description")}
-          error={errors?.description?.message}
-          optional
-        >
+        <FormField label={t("cred.field.file")} hint={t("cred.field.fileHint")} error={errors?.file?.message}>
           <Input
-            leadingIcon={FileText}
-            placeholder={t("cred.field.descriptionPlaceholder")}
-            {...form.register(`credentials.${index}.description`)}
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png,.webp,.tiff"
+            onChange={(e) => {
+              const file = e.target.files?.[0] ?? null;
+              form.setValue(`credentials.${index}.file`, file, { shouldValidate: true });
+            }}
           />
         </FormField>
 
-        <FormField
-          label={t("cred.field.uri")}
-          hint={t("cred.field.uriHint")}
-          error={errors?.uri?.message}
-        >
+        <FormField label={t("cred.field.meta")} optional error={errors?.meta?.message}>
           <Input
-            leadingIcon={LinkIcon}
-            placeholder={t("cred.field.uriPlaceholder")}
-            inputMode="url"
-            autoCapitalize="off"
-            {...form.register(`credentials.${index}.uri`)}
+            placeholder={t("cred.field.metaPlaceholder")}
+            {...form.register(`credentials.${index}.meta`)}
           />
         </FormField>
-
-        <FormField label={t("cred.field.validUntil")} error={errors?.valid_until?.message} optional>
-          <Input
-            type="date"
-            leadingIcon={Calendar}
-            {...form.register(`credentials.${index}.valid_until`)}
-          />
-        </FormField>
-      </div>
-
-      <div className="flex items-center font-mono text-xs text-gray-400">
-        <Hash className="mr-1 h-3 w-3" aria-hidden="true" />
-        {t("cred.field.hashNote")}
       </div>
     </div>
   );

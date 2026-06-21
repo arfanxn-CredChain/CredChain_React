@@ -52,7 +52,7 @@ export const router = createBrowserRouter([
     element: <PublicLayout />,
     children: [
       {
-        path: "/credentials/verify/:credentialId",
+        path: "/credentials/verify",
         ...lazyRoute(() => import("@feature/credential/VerifyCredential"), "VerifyCredential"),
       },
     ],

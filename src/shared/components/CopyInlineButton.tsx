@@ -19,7 +19,7 @@ export function CopyInlineButton({ value, ariaLabel, className }: CopyInlineButt
     try {
       await navigator.clipboard.writeText(value);
       setCopied(true);
-      notify.success("user.copy.copied");
+      notify.success("common.copied");
       setTimeout(() => setCopied(false), 1500);
     } catch {
       notify.error("system.internal_error");
@@ -31,7 +31,7 @@ export function CopyInlineButton({ value, ariaLabel, className }: CopyInlineButt
       type="button"
       variant="ghost"
       size="icon"
-      aria-label={copied ? t("user.copy.copied") : ariaLabel}
+      aria-label={copied ? t("common.copied") : ariaLabel}
       onClick={(e) => {
         e.stopPropagation();
         void handleCopy();

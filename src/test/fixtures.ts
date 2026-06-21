@@ -24,18 +24,21 @@ export function makeUser(overrides: Partial<UserDTO> = {}): UserDTO {
 export function makeCredential(overrides: Partial<CredentialDTO> = {}): CredentialDTO {
   return {
     id: "cred_test_1",
-    holder_id: "usr_test_1",
-    issuer_id: "usr_test_2",
-    hash: "0x" + "1".repeat(64),
-    uri: "ipfs://test",
-    title: "Test Credential",
-    description: "Test description",
-    type: "AcademicDegree",
+    holder_user_id: "usr_test_1",
+    issuer_user_id: "usr_test_2",
+    revoker_user_id: null,
+    name: "Test Credential",
+    meta: null,
+    token_id: "123456",
+    file_hash: "0x" + "1".repeat(64),
+    file_uri: "ipfs://test",
+    extract_status: "succeeded",
+    extract_error: null,
+    extracted_at: "2026-01-01T00:00:00Z",
     issued_at: "2026-01-01T00:00:00Z",
-    valid_until: null,
-    revoked: false,
-    created_at: "2026-01-01T00:00:00Z",
-    updated_at: "2026-01-01T00:00:00Z",
+    revoked_at: null,
+    holder: makeUser({ id: "usr_test_1", role: Role.HOLDER, name: "Test Holder" }),
+    issuer: makeUser({ id: "usr_test_2", role: Role.ISSUER, name: "Test Issuer" }),
     ...overrides,
   };
 }
@@ -70,9 +73,9 @@ export const mockUsers: UserDTO[] = [
 ];
 
 export const mockCredentials: CredentialDTO[] = [
-  makeCredential({ id: "cred_1", title: "Bachelor of Science" }),
-  makeCredential({ id: "cred_2", title: "Senior Software Engineer", revoked: false }),
-  makeCredential({ id: "cred_3", title: "Workshop Completion", revoked: true }),
+  makeCredential({ id: "cred_1", name: "Bachelor of Science" }),
+  makeCredential({ id: "cred_2", name: "Senior Software Engineer" }),
+  makeCredential({ id: "cred_3", name: "Workshop Completion", revoked_at: "2026-06-01T00:00:00Z" }),
 ];
 
 export function mockUserWithMeta(overrides: Partial<UserDTO> = {}): UserDTO {

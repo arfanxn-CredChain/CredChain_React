@@ -41,7 +41,7 @@ export function CredentialIssue() {
   });
 
   const onSubmit = form.handleSubmit((data) => {
-    issue.mutate(data, {
+    issue.mutate(data.credentials, {
       onSuccess: () => navigate("/credentials"),
     });
   });
@@ -69,7 +69,7 @@ export function CredentialIssue() {
               type="button"
               variant="dashed"
               onClick={() => append(defaultCredentialIssueRow())}
-              disabled={fields.length >= 50}
+              disabled={fields.length >= 100}
             >
               <Plus className="h-4 w-4" />
               {t("cred.issue.addAnother")}

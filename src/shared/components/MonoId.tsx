@@ -1,7 +1,7 @@
 import { cn } from "@shared/lib/cn";
-import { truncateAddress, truncateHash } from "@shared/lib/format";
+import { truncateAddress, truncateHash, truncateId } from "@shared/lib/format";
 
-type MonoIdMode = "truncate" | "address" | "full";
+type MonoIdMode = "truncate" | "address" | "id" | "full";
 
 interface MonoIdProps {
   value: string;
@@ -11,7 +11,13 @@ interface MonoIdProps {
 
 export function MonoId({ value, mode = "truncate", className }: MonoIdProps) {
   const display =
-    mode === "full" ? value : mode === "address" ? truncateAddress(value) : truncateHash(value);
+    mode === "full"
+      ? value
+      : mode === "address"
+        ? truncateAddress(value)
+        : mode === "id"
+          ? truncateId(value)
+          : truncateHash(value);
 
   return (
     <span className={cn("font-mono text-xs text-gray-500", className)} title={value}>

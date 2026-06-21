@@ -3,60 +3,86 @@ import {
   credentialBatchIssueSchema,
   credentialBatchRevokeSchema,
   credentialIssueRowSchema,
-  credentialVerifySchema,
+  defaultCredentialIssueRow,
 } from "./credential";
 
+function makeFile(size = 1024, type = "application/pdf", name = "test.pdf"): File {
+  return new File([new ArrayBuffer(size)], name, { type });
+}
+
 describe("credentialIssueRowSchema", () => {
-  const validRow = {
-    holder_id: "usr_1",
-    type: "AcademicDegree",
-    title: "BSc Computer Science",
-    description: "Awarded for completing requirements",
-    uri: "ipfs://QmYwAPJzv5CZsnA625s3Xf2bXawS5E2L1Gq5yMxb8y4LhK",
-  };
-
-  it("accepts a complete valid row", () => {
-    const result = credentialIssueRowSchema.safeParse(validRow);
-    expect(result.success).toBe(true);
-  });
-
-  it("requires holder_id", () => {
-    const result = credentialIssueRowSchema.safeParse({ ...validRow, holder_id: "" });
-    expect(result.success).toBe(false);
-  });
-
-  it("requires title", () => {
-    const result = credentialIssueRowSchema.safeParse({ ...validRow, title: "" });
-    expect(result.success).toBe(false);
-  });
-
-  it("rejects URI without ipfs:// or https:// prefix", () => {
+  it("accepts a valid row with file", () => {
     const result = credentialIssueRowSchema.safeParse({
-      ...validRow,
-      uri: "http://example.com/cred",
-    });
-    expect(result.success).toBe(false);
-  });
-
-  it("accepts https:// URI", () => {
-    const result = credentialIssueRowSchema.safeParse({
-      ...validRow,
-      uri: "https://example.com/credential.json",
+      holder_user_id: "usr_1",
+      name: "Bachelor's Degree",
+      file: makeFile(),
     });
     expect(result.success).toBe(true);
   });
 
-  it("accepts valid_until in YYYY-MM-DD format", () => {
-    const result = credentialIssueRowSchema.safeParse({ ...validRow, valid_until: "2030-12-31" });
+  it("requires holder_user_id", () => {
+    const result = credentialIssueRowSchema.safeParse({
+      holder_user_id: "",
+      name: "Test",
+      file: makeFile(),
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("requires name", () => {
+    const result = credentialIssueRowSchema.safeParse({
+      holder_user_id: "usr_1",
+      name: "",
+      file: makeFile(),
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects name over 256 chars", () => {
+    const result = credentialIssueRowSchema.safeParse({
+      holder_user_id: "usr_1",
+      name: "x".repeat(257),
+      file: makeFile(),
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects file over 10 MB", () => {
+    const result = credentialIssueRowSchema.safeParse({
+      holder_user_id: "usr_1",
+      name: "Test",
+      file: makeFile(11 * 1024 * 1024),
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("allows null file", () => {
+    const result = credentialIssueRowSchema.safeParse({
+      holder_user_id: "usr_1",
+      name: "Test",
+      file: null,
+    });
     expect(result.success).toBe(true);
   });
 
-  it("rejects valid_until in non-ISO format", () => {
+  it("accepts valid json meta string", () => {
     const result = credentialIssueRowSchema.safeParse({
-      ...validRow,
-      valid_until: "31/12/2030",
+      holder_user_id: "usr_1",
+      name: "Test",
+      meta: '{"key":"value"}',
+      file: makeFile(),
     });
-    expect(result.success).toBe(false);
+    expect(result.success).toBe(true);
+  });
+
+  it("allows empty meta string", () => {
+    const result = credentialIssueRowSchema.safeParse({
+      holder_user_id: "usr_1",
+      name: "Test",
+      meta: "",
+      file: makeFile(),
+    });
+    expect(result.success).toBe(true);
   });
 });
 
@@ -66,15 +92,24 @@ describe("credentialBatchIssueSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("rejects more than 50 credentials", () => {
-    const credentials = Array.from({ length: 51 }, (_, i) => ({
-      holder_id: `usr_${i}`,
-      type: "AcademicDegree",
-      title: `Title ${i}`,
-      uri: "ipfs://QmTest",
+  it("rejects more than 100 credentials", () => {
+    const credentials = Array.from({ length: 101 }, () => ({
+      holder_user_id: "usr_1",
+      name: "Test",
+      file: makeFile(),
     }));
     const result = credentialBatchIssueSchema.safeParse({ credentials });
     expect(result.success).toBe(false);
+  });
+
+  it("accepts 100 credentials", () => {
+    const credentials = Array.from({ length: 100 }, () => ({
+      holder_user_id: "usr_1",
+      name: "Test",
+      file: makeFile(),
+    }));
+    const result = credentialBatchIssueSchema.safeParse({ credentials });
+    expect(result.success).toBe(true);
   });
 });
 
@@ -84,8 +119,8 @@ describe("credentialBatchRevokeSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("rejects more than 50 ids", () => {
-    const ids = Array.from({ length: 51 }, (_, i) => `cred_${i}`);
+  it("rejects more than 100 ids", () => {
+    const ids = Array.from({ length: 101 }, (_, i) => `cred_${i}`);
     const result = credentialBatchRevokeSchema.safeParse({ ids });
     expect(result.success).toBe(false);
   });
@@ -94,95 +129,17 @@ describe("credentialBatchRevokeSchema", () => {
     const result = credentialBatchRevokeSchema.safeParse({ ids: ["cred_1", "cred_2"] });
     expect(result.success).toBe(true);
   });
-});
 
-describe("credentialVerifySchema", () => {
-  const validHash = "0x" + "a".repeat(64);
-
-  it("accepts valid 0x-prefixed SHA-256 hash", () => {
-    const result = credentialVerifySchema.safeParse({
-      credential_id: "cred_1",
-      hash: validHash,
-    });
-    expect(result.success).toBe(true);
-  });
-
-  it("rejects hash without 0x prefix", () => {
-    const result = credentialVerifySchema.safeParse({
-      credential_id: "cred_1",
-      hash: "a".repeat(64),
-    });
-    expect(result.success).toBe(false);
-  });
-
-  it("rejects hash with wrong length", () => {
-    const result = credentialVerifySchema.safeParse({
-      credential_id: "cred_1",
-      hash: "0x" + "a".repeat(63),
-    });
-    expect(result.success).toBe(false);
-  });
-
-  it("rejects hash with non-hex chars", () => {
-    const result = credentialVerifySchema.safeParse({
-      credential_id: "cred_1",
-      hash: "0x" + "z".repeat(64),
-    });
-    expect(result.success).toBe(false);
-  });
-});
-
-describe("credentialIssueRowSchema empty-string handling", () => {
-  const validRow = {
-    holder_id: "usr_1",
-    type: "AcademicDegree",
-    title: "BSc",
-    uri: "ipfs://QmTest",
-  };
-
-  describe("description", () => {
-    it("treats empty string as undefined", () => {
-      const result = credentialIssueRowSchema.safeParse({ ...validRow, description: "" });
-      expect(result.success).toBe(true);
-      if (result.success) expect(result.data.description).toBeUndefined();
-    });
-
-    it("preserves real value", () => {
-      const result = credentialIssueRowSchema.safeParse({
-        ...validRow,
-        description: "Awarded",
-      });
-      expect(result.success).toBe(true);
-      if (result.success) expect(result.data.description).toBe("Awarded");
-    });
-  });
-
-  describe("valid_until", () => {
-    it("treats empty string as null (no expiry)", () => {
-      const result = credentialIssueRowSchema.safeParse({ ...validRow, valid_until: "" });
-      expect(result.success).toBe(true);
-      if (result.success) expect(result.data.valid_until).toBeNull();
-    });
-
-    it("rejects malformed date (non-empty) with i18n key", () => {
-      const result = credentialIssueRowSchema.safeParse({
-        ...validRow,
-        valid_until: "31/12/2030",
-      });
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0].message).toBe("zod.user.dateFormat");
-      }
-    });
-  });
-});
-
-describe("credentialBatchRevokeSchema inner id validation", () => {
-  it("rejects empty inner id with i18n key", () => {
+  it("rejects empty inner id", () => {
     const result = credentialBatchRevokeSchema.safeParse({ ids: [""] });
     expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.issues[0].message).toBe("zod.credential.idRequired");
-    }
+  });
+});
+
+describe("defaultCredentialIssueRow", () => {
+  it("returns a valid default row", () => {
+    const row = defaultCredentialIssueRow();
+    const result = credentialIssueRowSchema.safeParse(row);
+    expect(result.success).toBe(true);
   });
 });

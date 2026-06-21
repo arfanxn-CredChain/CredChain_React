@@ -8,6 +8,10 @@ export function truncateAddress(address: string, lead = 10, tail = 4): string {
   return `${address.slice(0, lead)}...${address.slice(-tail)}`;
 }
 
+export function truncateId(id: string, lead = 10, tail = 4): string {
+  return truncateAddress(id, lead, tail);
+}
+
 export function truncateHash(hash: string, length = 16): string {
   if (!hash) return "";
   if (hash.length <= length) return hash;

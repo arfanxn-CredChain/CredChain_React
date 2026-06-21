@@ -3,19 +3,20 @@ import { api } from "@shared/api/client";
 import type { CredentialDTO, PaginatedResponse, PaginationParams } from "@shared/types/api";
 import { credentialKeys } from "./keys";
 
-export interface CredentialListParams extends PaginationParams {
-  holder_id?: string;
-  issuer_id?: string;
-  revoked?: boolean;
-  type?: string;
-}
-
-export function useCredentials(params?: CredentialListParams) {
+export function useCredentials(params?: PaginationParams & { includes?: string[] }) {
   return useQuery({
     queryKey: credentialKeys.list(params),
     queryFn: async () => {
+      const q: Record<string, unknown> = {};
+      if (params?.page) q.page = params.page;
+      if (params?.limit) q.limit = params.limit;
+      if (params?.search) q.search = params.search;
+      if (params?.sorts && params.sorts.length) q.sorts = params.sorts;
+      if (params?.filters && params.filters.length) q.filters = params.filters;
+      if (params?.includes && params.includes.length) q.includes = params.includes;
+
       const response = await api.get<PaginatedResponse<CredentialDTO>>("/credentials", {
-        params: params as Record<string, unknown>,
+        params: q,
       });
       return response.data;
     },
