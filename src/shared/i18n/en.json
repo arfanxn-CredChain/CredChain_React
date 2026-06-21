@@ -67,6 +67,7 @@
   "user.transfer.confirm.action": "Transfer Role",
   "user.list.count_one": "{{count}} user",
   "user.list.count_other": "{{count}} users",
+  "user.list.footerCount": "{{count}} Users",
   "user.list.limitLabel": "Per page",
   "user.list.updated": "Updated {{time}}",
   "user.list.created": "Created {{time}}",
@@ -117,7 +118,6 @@
   "user.sort.option.nameAZ": "Name A→Z",
   "user.sort.option.nameZA": "Name Z→A",
   "user.sort.option.role": "Role ↑",
-  "user.pagination.showing": "Showing {{from}}–{{to}} of {{total}} {{label}}",
   "user.list.title": "User Directory",
   "user.list.description": "Manage system users and their authorized roles.",
   "user.list.searchPlaceholder": "Search by name, email or role...",
@@ -157,13 +157,12 @@
   "user.edit.close": "Close",
   "common.edit": "Edit",
   "common.view": "View",
-  "common.previous": "Previous",
-  "common.next": "Next",
   "common.save": "Save changes",
   "common.saving": "Saving...",
   "common.dash": "—",
   "common.notSet": "Not set",
   "common.copied": "Copied",
+  "common.loadMore": "Load More",
   "dashboard.welcome": "Welcome, {{name}}",
   "dashboard.fallbackName": "there",
   "dashboard.overview": "Platform overview and recent activity.",
@@ -344,16 +343,16 @@
   "cred.field.fileHint": "PDF, JPEG, PNG, WebP, or TIFF (max 10 MB)",
   "cred.field.meta": "Metadata (JSON)",
   "cred.field.metaPlaceholder": "{\"institution\": \"University Name\"}",
-  "cred.list.searchPlaceholder": "Search credentials...",
+  "cred.list.searchPlaceholder": "Search by name, ID, token, hash, holder, issuer, and revoker",
   "cred.list.searchAriaLabel": "Search credentials",
   "cred.list.issueCta": "Issue",
   "cred.list.revokeSelectedCount": "Revoke ({{count}})",
-  "cred.list.count": "{{count}} credentials",
+  "cred.list.count_one": "{{count}} Credential",
+  "cred.list.count_other": "{{count}} Credentials",
   "cred.list.empty.search.title": "No credentials match your search",
   "cred.list.empty.search.body": "Try adjusting your search terms",
   "cred.list.empty.none.title": "No credentials yet",
   "cred.list.empty.none.body": "Issue the first credential to get started",
-  "cred.list.pagination.page": "Page {{page}} of {{total}}",
   "cred.list.error": "Failed to load credentials",
   "cred.mine.title": "My Credentials",
   "cred.mine.description": "Credentials issued to you",
@@ -614,10 +613,10 @@
     "list": {
       "title": "Credentials Ledger",
       "description": "Review all issued and revoked verifiable credentials across the network.",
-      "searchPlaceholder": "Search by ID, type, or title...",
+      "searchPlaceholder": "Search by name, ID, token, hash, holder, issuer, and revoker",
       "searchAriaLabel": "Search credentials",
-      "count_one": "{{count}} record",
-      "count_other": "{{count}} records",
+      "count_one": "{{count}} Credential",
+      "count_other": "{{count}} Credentials",
       "error": "Failed to load credentials. Please try again.",
       "empty": {
         "none": { "title": "No credentials yet", "body": "Issued credentials will appear here." },
@@ -626,14 +625,24 @@
           "body": "Try a different search term."
         }
       },
-      "pagination": {
-        "previous": "Previous",
-        "next": "Next",
-        "page": "Page {{page}} of {{total}}"
-      },
       "issueCta": "Issue New",
       "revokeSelected": "Revoke Selected",
       "revokeSelectedCount": "Revoke Selected ({{count}})"
+    },
+    "filter": {
+      "status": "Status",
+      "all": "All",
+      "active": "Active",
+      "revoked": "Revoked",
+      "pending": "Pending",
+      "failed": "Failed"
+    },
+    "sort": {
+      "label": "Sort",
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "nameAZ": "Name A→Z",
+      "nameZA": "Name Z→A"
     },
     "detail": {
       "title": "Credential Detail",
@@ -710,7 +719,8 @@
       "revokeSelectedCount": "Revoke ({{count}})",
       "reExtractSelectedCount": "Re-extract ({{count}})",
       "select": "Select credential",
-      "deselect": "Deselect credential"
+      "deselect": "Deselect credential",
+      "selectionCapReached": "Maximum of 100 credentials selected. Deselect some to add more."
     },
     "status": { "active": "Active", "revoked": "Revoked" },
     "field": {

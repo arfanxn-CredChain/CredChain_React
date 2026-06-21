@@ -67,6 +67,7 @@
   "user.transfer.confirm.action": "Alihkan Peran",
   "user.list.count_one": "{{count}} pengguna",
   "user.list.count_other": "{{count}} pengguna",
+  "user.list.footerCount": "{{count}} Pengguna",
   "user.list.limitLabel": "Per halaman",
   "user.list.updated": "Diperbarui {{time}}",
   "user.list.created": "Dibuat {{time}}",
@@ -117,7 +118,6 @@
   "user.sort.option.nameAZ": "Nama A→Z",
   "user.sort.option.nameZA": "Nama Z→A",
   "user.sort.option.role": "Peran ↑",
-  "user.pagination.showing": "Menampilkan {{from}}–{{to}} dari {{total}} {{label}}",
   "user.list.title": "Direktori Pengguna",
   "user.list.description": "Kelola pengguna sistem dan peran yang diizinkan.",
   "user.list.searchPlaceholder": "Cari berdasarkan nama, email, atau peran...",
@@ -157,13 +157,12 @@
   "user.edit.close": "Tutup",
   "common.edit": "Edit",
   "common.view": "Lihat",
-  "common.previous": "Sebelumnya",
-  "common.next": "Selanjutnya",
   "common.save": "Simpan perubahan",
   "common.saving": "Menyimpan...",
   "common.dash": "—",
   "common.notSet": "Belum diatur",
   "common.copied": "Tersalin",
+  "common.loadMore": "Muat Lebih Banyak",
   "dashboard.welcome": "Selamat datang, {{name}}",
   "dashboard.fallbackName": "di sana",
   "dashboard.overview": "Ikhtisar platform dan aktivitas terkini.",
@@ -344,16 +343,16 @@
   "cred.field.fileHint": "PDF, JPEG, PNG, WebP, atau TIFF (maks 10 MB)",
   "cred.field.meta": "Metadata (JSON)",
   "cred.field.metaPlaceholder": "{\"institusi\": \"Nama Universitas\"}",
-  "cred.list.searchPlaceholder": "Cari kredensial...",
+  "cred.list.searchPlaceholder": "Cari berdasarkan nama, ID, token, hash, pemegang, penerbit, dan pembatal",
   "cred.list.searchAriaLabel": "Cari kredensial",
   "cred.list.issueCta": "Terbitkan",
   "cred.list.revokeSelectedCount": "Cabut ({{count}})",
-  "cred.list.count": "{{count}} kredensial",
+  "cred.list.count_one": "{{count}} Kredensial",
+  "cred.list.count_other": "{{count}} Kredensial",
   "cred.list.empty.search.title": "Tidak ada kredensial yang cocok",
   "cred.list.empty.search.body": "Coba sesuaikan kata kunci pencarian",
   "cred.list.empty.none.title": "Belum ada kredensial",
   "cred.list.empty.none.body": "Terbitkan kredensial pertama untuk memulai",
-  "cred.list.pagination.page": "Halaman {{page}} dari {{total}}",
   "cred.list.error": "Gagal memuat kredensial",
   "cred.mine.title": "Kredensial Saya",
   "cred.mine.description": "Kredensial yang diterbitkan untuk Anda",
@@ -614,10 +613,10 @@
     "list": {
       "title": "Buku Besar Kredensial",
       "description": "Tinjau semua kredensial terverifikasi yang diterbitkan dan dicabut di seluruh jaringan.",
-      "searchPlaceholder": "Cari berdasarkan ID, tipe, atau judul...",
+      "searchPlaceholder": "Cari berdasarkan nama, ID, token, hash, pemegang, penerbit, dan pembatal",
       "searchAriaLabel": "Cari kredensial",
-      "count_one": "{{count}} data",
-      "count_other": "{{count}} data",
+      "count_one": "{{count}} Kredensial",
+      "count_other": "{{count}} Kredensial",
       "error": "Gagal memuat kredensial. Silakan coba lagi.",
       "empty": {
         "none": {
@@ -629,14 +628,24 @@
           "body": "Coba istilah pencarian yang berbeda."
         }
       },
-      "pagination": {
-        "previous": "Sebelumnya",
-        "next": "Berikutnya",
-        "page": "Halaman {{page}} dari {{total}}"
-      },
       "issueCta": "Terbitkan Baru",
       "revokeSelected": "Cabut Terpilih",
       "revokeSelectedCount": "Cabut Terpilih ({{count}})"
+    },
+    "filter": {
+      "status": "Status",
+      "all": "Semua",
+      "active": "Aktif",
+      "revoked": "Dicabut",
+      "pending": "Tertunda",
+      "failed": "Gagal"
+    },
+    "sort": {
+      "label": "Urutkan",
+      "newest": "Terbaru",
+      "oldest": "Terlama",
+      "nameAZ": "Nama A→Z",
+      "nameZA": "Nama Z→A"
     },
     "detail": {
       "title": "Detail Kredensial",
@@ -710,7 +719,8 @@
       "revokeSelectedCount": "Cabut ({{count}})",
       "reExtractSelectedCount": "Ekstrak Ulang ({{count}})",
       "select": "Pilih kredensial",
-      "deselect": "Batal pilih kredensial"
+      "deselect": "Batal pilih kredensial",
+      "selectionCapReached": "Maksimal 100 kredensial dipilih. Batalkan pilihan untuk menambah."
     },
     "status": { "active": "Aktif", "revoked": "Dicabut" },
     "field": {
