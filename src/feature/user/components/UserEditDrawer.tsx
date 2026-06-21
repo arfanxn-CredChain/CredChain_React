@@ -25,7 +25,7 @@ import {
   type UserUpdateInput,
 } from "../schemas/user";
 import { splitMeta, mergeMeta, metaEqual } from "../lib/meta";
-import { MetaEditor } from "./MetaEditor";
+import { MetaEditor } from "@shared/components/MetaEditor";
 
 interface UserEditDrawerProps {
   user: UserDTO | null;

@@ -12,7 +12,7 @@ import { useStore } from "@app/store";
 import { cn } from "@shared/lib/cn";
 
 import type { UserBatchStoreFormInput } from "../schemas/user";
-import { MetaEditor } from "./MetaEditor";
+import { MetaEditor } from "@shared/components/MetaEditor";
 
 interface UserCreateRowProps {
   index: number;

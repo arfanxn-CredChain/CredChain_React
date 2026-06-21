@@ -5,8 +5,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TestProviders } from "@/test/TestProviders";
 import { i18n } from "@shared/i18n/config";
-import { MetaEditor } from "./MetaEditor";
-import { metaEntriesSchema } from "../schemas/user";
+import { MetaEditor } from "@shared/components/MetaEditor";
+import { metaEntriesSchema } from "@feature/user/schemas/user";
 import { z } from "zod";
 
 function Harness({
