@@ -247,4 +247,39 @@ describe("CredentialCard", () => {
     await user.click(screen.getByText("Test Credential"));
     expect(navigateMock).not.toHaveBeenCalled();
   });
+
+  it("shows not-allowed cursor when selectDisabled is true", () => {
+    const credential = makeCredential();
+    render(
+      <CredentialCard credential={credential} selectionMode="revoke" selectDisabled />,
+      { wrapper: TestProviders },
+    );
+
+    const card = screen.getByRole("link", { name: /active/i });
+    expect(card.className).toContain("cursor-not-allowed");
+  });
+
+  it("disables checkbox when selectDisabled is true", () => {
+    const credential = makeCredential();
+    render(
+      <CredentialCard credential={credential} selectionMode="revoke" selectDisabled />,
+      { wrapper: TestProviders },
+    );
+
+    expect(screen.getByRole("button", { name: /select credential/i })).toBeDisabled();
+  });
+
+  it("does not call onSelect when selectDisabled is true and card is clicked", async () => {
+    const user = userEvent.setup();
+    const credential = makeCredential();
+    const onSelect = vi.fn();
+
+    render(
+      <CredentialCard credential={credential} selectionMode="revoke" onSelect={onSelect} selectDisabled />,
+      { wrapper: TestProviders },
+    );
+
+    await user.click(screen.getByText("Test Credential"));
+    expect(onSelect).not.toHaveBeenCalled();
+  });
 });

@@ -15,6 +15,7 @@ interface CredentialCardProps {
   isSelected?: boolean;
   selectionMode?: "revoke" | "reextract" | null;
   onSelect?: () => void;
+  selectDisabled?: boolean;
 }
 
 const INTERACTIVE_SELECTORS = "a,button,[role='button'],input,textarea,select";
@@ -24,6 +25,7 @@ export function CredentialCard({
   isSelected,
   selectionMode,
   onSelect,
+  selectDisabled,
 }: CredentialCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -40,7 +42,7 @@ export function CredentialCard({
   const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if ((e.target as HTMLElement).closest(INTERACTIVE_SELECTORS)) return;
     if (selectionMode) {
-      if (isSelectable) onSelect?.();
+      if (isSelectable && !selectDisabled) onSelect?.();
       return;
     }
     navigate(`/credentials/${credential.id}`);
@@ -50,7 +52,7 @@ export function CredentialCard({
     if (e.key !== "Enter") return;
     e.preventDefault();
     if (selectionMode) {
-      if (isSelectable) onSelect?.();
+      if (isSelectable && !selectDisabled) onSelect?.();
       return;
     }
     navigate(`/credentials/${credential.id}`);
@@ -64,6 +66,7 @@ export function CredentialCard({
       onKeyDown={handleCardKeyDown}
       className={cn(
         "relative cursor-pointer p-5 transition-all focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none",
+        selectDisabled && "cursor-not-allowed",
         revoked
           ? "border-error/20 bg-error/5"
           : "border-gray-100 hover:border-gold/50 hover:shadow-md",
@@ -76,13 +79,13 @@ export function CredentialCard({
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            if (isSelectable) onSelect?.();
+            if (isSelectable && !selectDisabled) onSelect?.();
           }}
-          disabled={!isSelectable}
+          disabled={!isSelectable || selectDisabled}
           className={cn(
             "absolute top-4 right-4 z-10 h-5 w-5 rounded border-2 transition-colors",
             "focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none",
-            !isSelectable && "cursor-not-allowed opacity-30",
+            (!isSelectable || selectDisabled) && "cursor-not-allowed opacity-30",
             isSelected ? "border-gold bg-gold" : "border-gray-300 hover:border-gold",
           )}
           aria-pressed={isSelected}
