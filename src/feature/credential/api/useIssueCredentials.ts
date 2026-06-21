@@ -57,6 +57,7 @@ export function useIssueCredentials<T extends FieldValues>(form?: UseFormReturn<
     onError: (error) => {
       if (isApiError(error) && error.fieldErrors && form) {
         setServerErrors(form, normalizeBatchErrorPaths(error.fieldErrors));
+        void queryClient.invalidateQueries({ queryKey: credentialKeys.all() });
       } else if (isApiError(error)) {
         notify.error(error.messageKey);
       } else {
