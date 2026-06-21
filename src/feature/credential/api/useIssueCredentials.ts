@@ -8,6 +8,24 @@ import type { UseFormReturn, FieldValues } from "react-hook-form";
 import type { CredentialIssueRowInput } from "../schemas/credential";
 import { credentialKeys } from "./keys";
 
+const BACKEND_TO_FRONTEND_PATH: Record<string, string> = {
+  Credentials: "credentials",
+  HolderUserID: "holder_user_id",
+  Name: "name",
+  File: "file",
+  Meta: "meta_entries",
+};
+
+function normalizeBatchErrorPaths(errors: Record<string, string[]>): Record<string, string[]> {
+  const out: Record<string, string[]> = {};
+  for (const [path, messages] of Object.entries(errors)) {
+    const parts = path.split(".");
+    const normalized = parts.map((p) => BACKEND_TO_FRONTEND_PATH[p] ?? p).join(".");
+    out[normalized] = messages;
+  }
+  return out;
+}
+
 export function useIssueCredentials<T extends FieldValues>(form?: UseFormReturn<T>) {
   const queryClient = useQueryClient();
 
@@ -38,7 +56,7 @@ export function useIssueCredentials<T extends FieldValues>(form?: UseFormReturn<
     },
     onError: (error) => {
       if (isApiError(error) && error.fieldErrors && form) {
-        setServerErrors(form, error.fieldErrors);
+        setServerErrors(form, normalizeBatchErrorPaths(error.fieldErrors));
       } else if (isApiError(error)) {
         notify.error(error.messageKey);
       } else {
