@@ -292,6 +292,7 @@
   "credential.issue.failed": "Penerbitan kredensial gagal",
   "credential.issue.validation": "Data penerbitan kredensial tidak valid",
   "credential.issue.duplicate_file_hash": "Kredensial dengan hash file ini sudah ada",
+  "credential.issue.encryption_failed": "Enkripsi file kredensial gagal",
   "credential.issue.holder_not_found": "Pengguna pemegang tidak ditemukan",
   "credential.issue.blockchain_sync_failed": "Sinkronisasi blockchain gagal",
   "credential.issue.storage_failed": "Penyimpanan file gagal",

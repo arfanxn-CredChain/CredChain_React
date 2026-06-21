@@ -292,6 +292,7 @@
   "credential.issue.failed": "Credential issuance failed",
   "credential.issue.validation": "Invalid credential issue data",
   "credential.issue.duplicate_file_hash": "A credential with this file hash already exists",
+  "credential.issue.encryption_failed": "Credential file encryption failed",
   "credential.issue.holder_not_found": "Holder user not found",
   "credential.issue.blockchain_sync_failed": "Blockchain synchronization failed",
   "credential.issue.storage_failed": "File storage failed",
