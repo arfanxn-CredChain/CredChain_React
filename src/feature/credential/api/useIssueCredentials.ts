@@ -3,6 +3,7 @@ import { api } from "@shared/api/client";
 import { notify } from "@shared/lib/notify";
 import { isApiError } from "@shared/api/envelope";
 import { setServerErrors } from "@shared/lib/forms";
+import { mergeMeta } from "@shared/lib/meta";
 import type { UseFormReturn, FieldValues } from "react-hook-form";
 import type { CredentialIssueRowInput } from "../schemas/credential";
 import { credentialKeys } from "./keys";
@@ -16,8 +17,11 @@ export function useIssueCredentials<T extends FieldValues>(form?: UseFormReturn<
       rows.forEach((row, i) => {
         formData.append(`items[${i}][holder_user_id]`, row.holder_user_id);
         formData.append(`items[${i}][name]`, row.name);
-        if (row.meta && row.meta !== "") {
-          formData.append(`items[${i}][meta]`, row.meta);
+        if (row.meta_entries && row.meta_entries.length > 0) {
+          const metaObj = mergeMeta(row.meta_entries, {});
+          if (metaObj) {
+            formData.append(`items[${i}][meta]`, JSON.stringify(metaObj));
+          }
         }
         if (row.file) {
           formData.append(`items[${i}][file]`, row.file);
@@ -37,6 +41,8 @@ export function useIssueCredentials<T extends FieldValues>(form?: UseFormReturn<
         setServerErrors(form, error.fieldErrors);
       } else if (isApiError(error)) {
         notify.error(error.messageKey);
+      } else {
+        notify.error("credential.issue.submitError");
       }
     },
   });
