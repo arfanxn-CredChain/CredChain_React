@@ -1,5 +1,47 @@
 import { describe, it, expect } from "vitest";
-import { splitMeta, mergeMeta, metaEqual } from "./meta";
+import { metaEntrySchema, metaEntriesSchema, splitMeta, mergeMeta, metaEqual } from "./meta";
+
+describe("metaEntrySchema", () => {
+  it("accepts valid entry", () => {
+    expect(metaEntrySchema.parse({ key: "dept", value: "Eng" })).toEqual({ key: "dept", value: "Eng" });
+  });
+
+  it("rejects empty key", () => {
+    expect(() => metaEntrySchema.parse({ key: "", value: "x" })).toThrow();
+  });
+
+  it("rejects key longer than 64", () => {
+    expect(() => metaEntrySchema.parse({ key: "x".repeat(65), value: "x" })).toThrow();
+  });
+
+  it("rejects value longer than 1024", () => {
+    expect(() => metaEntrySchema.parse({ key: "k", value: "x".repeat(1025) })).toThrow();
+  });
+});
+
+describe("metaEntriesSchema", () => {
+  it("rejects more than 32 entries", () => {
+    const entries = Array.from({ length: 33 }, (_, i) => ({ key: `k${i}`, value: "v" }));
+    expect(() => metaEntriesSchema.parse(entries)).toThrow();
+  });
+
+  it("rejects duplicate keys", () => {
+    const entries = [
+      { key: "dup", value: "first" },
+      { key: "dup", value: "second" },
+    ];
+    const result = metaEntriesSchema.safeParse(entries);
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts valid entries", () => {
+    const entries = [
+      { key: "a", value: "1" },
+      { key: "b", value: "2" },
+    ];
+    expect(metaEntriesSchema.parse(entries)).toEqual(entries);
+  });
+});
 
 describe("splitMeta", () => {
   it("returns empty entries and preserved for null", () => {

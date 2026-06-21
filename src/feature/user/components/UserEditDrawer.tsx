@@ -24,7 +24,7 @@ import {
   type UserInlineEditFormInput,
   type UserUpdateInput,
 } from "../schemas/user";
-import { splitMeta, mergeMeta, metaEqual } from "../lib/meta";
+import { splitMeta, mergeMeta, metaEqual } from "@shared/lib/meta";
 import { MetaEditor } from "@shared/components/MetaEditor";
 
 interface UserEditDrawerProps {

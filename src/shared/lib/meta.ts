@@ -1,4 +1,28 @@
-export type MetaEntry = { key: string; value: string };
+import { z } from "zod";
+
+export const metaEntrySchema = z.object({
+  key: z.string().min(1, "zod.meta.keyRequired").max(64, "zod.meta.keyTooLong"),
+  value: z.string().max(1024, "zod.meta.valueTooLong"),
+});
+
+export const metaEntriesSchema = z
+  .array(metaEntrySchema)
+  .max(32, "zod.meta.tooManyEntries")
+  .superRefine((entries, ctx) => {
+    const seen = new Set<string>();
+    entries.forEach((entry, idx) => {
+      if (entry.key && seen.has(entry.key)) {
+        ctx.addIssue({
+          code: "custom",
+          path: [idx, "key"],
+          message: "zod.meta.duplicateKey",
+        });
+      }
+      if (entry.key) seen.add(entry.key);
+    });
+  });
+
+export type MetaEntry = z.infer<typeof metaEntrySchema>;
 
 export function splitMeta(meta: Record<string, unknown> | null): {
   entries: MetaEntry[];

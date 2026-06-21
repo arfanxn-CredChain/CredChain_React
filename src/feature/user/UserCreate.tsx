@@ -15,7 +15,7 @@ import {
   defaultUserStoreFormRow,
   userBatchStoreFormSchema,
 } from "./schemas/user";
-import { mergeMeta } from "./lib/meta";
+import { mergeMeta } from "@shared/lib/meta";
 import { UserCreateRow } from "./components/UserCreateRow";
 
 export function UserCreate() {
