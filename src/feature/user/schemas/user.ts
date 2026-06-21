@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { Role } from "@shared/auth/role";
+import { metaEntrySchema, metaEntriesSchema } from "@shared/lib/meta";
+export { metaEntrySchema, metaEntriesSchema } from "@shared/lib/meta";
 
 const STRICT_E164 = /^\+[1-9]\d{6,14}$/;
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -30,30 +32,6 @@ export const phoneSchema = z
 export const birthDateSchema = z.string().regex(ISO_DATE, "zod.user.dateFormat");
 
 export const metaSchema = z.record(z.string(), z.unknown());
-
-export const metaEntrySchema = z.object({
-  key: z.string().min(1, "zod.meta.keyRequired").max(64, "zod.meta.keyTooLong"),
-  value: z.string().max(1024, "zod.meta.valueTooLong"),
-});
-
-export const metaEntriesSchema = z
-  .array(metaEntrySchema)
-  .max(32, "zod.meta.tooManyEntries")
-  .superRefine((entries, ctx) => {
-    const seen = new Set<string>();
-    entries.forEach((entry, idx) => {
-      if (entry.key && seen.has(entry.key)) {
-        ctx.addIssue({
-          code: "custom",
-          path: [idx, "key"],
-          message: "zod.meta.duplicateKey",
-        });
-      }
-      if (entry.key) seen.add(entry.key);
-    });
-  });
-
-export type MetaEntryInput = z.infer<typeof metaEntrySchema>;
 
 export const genderSchema = z.enum(["male", "female", "other"]);
 
