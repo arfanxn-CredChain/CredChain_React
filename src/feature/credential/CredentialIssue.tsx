@@ -4,13 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Plus, Save } from "lucide-react";
 
+import { BackLink } from "@shared/components/BackLink";
 import { PageHeader } from "@shared/components/PageHeader";
 import { Button } from "@ui/button";
 import { Card } from "@ui/card";
 
 import { useIssueCredentials } from "./api/useIssueCredentials";
-import { useUsers } from "@feature/user/api/useUsers";
-import { Role } from "@shared/auth/role";
 import {
   type CredentialBatchIssueInput,
   credentialBatchIssueSchema,
@@ -21,12 +20,6 @@ import { CredentialIssueRow } from "./components/CredentialIssueRow";
 export function CredentialIssue() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-
-  const { data: holdersData } = useUsers({
-    filters: [`role=${Role.HOLDER}`],
-    limit: 100,
-  });
-  const holders = holdersData?.items ?? [];
 
   const form = useForm<CredentialBatchIssueInput>({
     resolver: zodResolver(credentialBatchIssueSchema),
@@ -48,7 +41,9 @@ export function CredentialIssue() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
-      <PageHeader title={t("cred.issue.title")} description={t("cred.issue.description")} onBack />
+      <BackLink />
+
+      <PageHeader title={t("cred.issue.title")} description={t("cred.issue.description")} />
 
       <Card className="p-0">
         <form onSubmit={onSubmit} className="space-y-8 p-6 sm:p-8">
@@ -58,8 +53,22 @@ export function CredentialIssue() {
                 key={field.id}
                 index={index}
                 form={form}
-                holders={holders}
                 onRemove={fields.length > 1 ? () => remove(index) : undefined}
+                onDuplicate={
+                  fields.length < 100
+                    ? () => {
+                        const values = form.getValues(`credentials.${index}`);
+                        append({
+                          holder_user_id: values.holder_user_id,
+                          name: values.name,
+                          meta_entries: values.meta_entries
+                            ? values.meta_entries.map((e) => ({ ...e }))
+                            : [],
+                          file: null,
+                        });
+                      }
+                    : undefined
+                }
               />
             ))}
           </div>
