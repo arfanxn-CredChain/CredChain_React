@@ -29,6 +29,15 @@ describe("credentialIssueRowSchema", () => {
     expect(result.success).toBe(false);
   });
 
+  it("rejects the 'new_holder' sentinel value", () => {
+    const result = credentialIssueRowSchema.safeParse({
+      holder_user_id: "new_holder",
+      name: "Test",
+      file: makeFile(),
+    });
+    expect(result.success).toBe(false);
+  });
+
   it("requires name", () => {
     const result = credentialIssueRowSchema.safeParse({
       holder_user_id: "usr_1",
@@ -54,6 +63,52 @@ describe("credentialIssueRowSchema", () => {
       file: makeFile(11 * 1024 * 1024),
     });
     expect(result.success).toBe(false);
+  });
+
+  it("rejects file with invalid MIME type", () => {
+    const result = credentialIssueRowSchema.safeParse({
+      holder_user_id: "usr_1",
+      name: "Test",
+      file: makeFile(1024, "text/plain", "test.txt"),
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts file with valid MIME types", () => {
+    const pdf = credentialIssueRowSchema.safeParse({
+      holder_user_id: "usr_1",
+      name: "Test",
+      file: makeFile(1024, "application/pdf", "test.pdf"),
+    });
+    expect(pdf.success).toBe(true);
+
+    const jpeg = credentialIssueRowSchema.safeParse({
+      holder_user_id: "usr_1",
+      name: "Test",
+      file: makeFile(1024, "image/jpeg", "test.jpg"),
+    });
+    expect(jpeg.success).toBe(true);
+
+    const png = credentialIssueRowSchema.safeParse({
+      holder_user_id: "usr_1",
+      name: "Test",
+      file: makeFile(1024, "image/png", "test.png"),
+    });
+    expect(png.success).toBe(true);
+
+    const webp = credentialIssueRowSchema.safeParse({
+      holder_user_id: "usr_1",
+      name: "Test",
+      file: makeFile(1024, "image/webp", "test.webp"),
+    });
+    expect(webp.success).toBe(true);
+
+    const tiff = credentialIssueRowSchema.safeParse({
+      holder_user_id: "usr_1",
+      name: "Test",
+      file: makeFile(1024, "image/tiff", "test.tif"),
+    });
+    expect(tiff.success).toBe(true);
   });
 
   it("allows null file", () => {
@@ -150,9 +205,11 @@ describe("credentialBatchRevokeSchema", () => {
 });
 
 describe("defaultCredentialIssueRow", () => {
-  it("returns a valid default row", () => {
+  it("returns a row with empty name (filled by filename auto-detect) and empty holder", () => {
     const row = defaultCredentialIssueRow();
-    const result = credentialIssueRowSchema.safeParse(row);
-    expect(result.success).toBe(true);
+    expect(row.name).toBe("");
+    expect(row.holder_user_id).toBe("");
+    expect(row.meta_entries).toEqual([]);
+    expect(row.file).toBeNull();
   });
 });

@@ -3,13 +3,25 @@ import { metaEntriesSchema } from "@shared/lib/meta";
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
 
+const ALLOWED_MIME_TYPES = new Set([
+  "application/pdf",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/tiff",
+]);
+
 export const credentialIssueRowSchema = z.object({
-  holder_user_id: z.string().min(1, "zod.credential.holderRequired"),
+  holder_user_id: z
+    .string()
+    .min(1, "zod.credential.holderRequired")
+    .refine((v) => v !== "new_holder", { message: "zod.credential.holderRequired" }),
   name: z.string().min(1, "zod.credential.nameRequired").max(256, "zod.credential.nameTooLong"),
   meta_entries: metaEntriesSchema.optional(),
   file: z
     .instanceof(File)
     .refine((f) => f.size <= MAX_FILE_BYTES, { message: "zod.credential.fileTooLarge" })
+    .refine((f) => ALLOWED_MIME_TYPES.has(f.type), { message: "zod.credential.fileTypeInvalid" })
     .optional()
     .nullable(),
 });
@@ -36,8 +48,8 @@ export type CredentialBatchRevokeInput = z.infer<typeof credentialBatchRevokeSch
 
 export function defaultCredentialIssueRow(): CredentialIssueRowInput {
   return {
-    holder_user_id: "new_holder",
-    name: "New Credential",
+    holder_user_id: "",
+    name: "",
     meta_entries: [],
     file: null,
   };
