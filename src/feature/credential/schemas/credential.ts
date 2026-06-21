@@ -1,26 +1,12 @@
 import { z } from "zod";
+import { metaEntriesSchema } from "@shared/lib/meta";
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
 
 export const credentialIssueRowSchema = z.object({
   holder_user_id: z.string().min(1, "zod.credential.holderRequired"),
   name: z.string().min(1, "zod.credential.nameRequired").max(256, "zod.credential.nameTooLong"),
-  meta: z
-    .string()
-    .refine(
-      (v) => {
-        if (v === "") return true;
-        try {
-          JSON.parse(v);
-          return true;
-        } catch {
-          return false;
-        }
-      },
-      { message: "zod.credential.metaInvalid" },
-    )
-    .optional()
-    .or(z.literal("")),
+  meta_entries: metaEntriesSchema.optional(),
   file: z
     .instanceof(File)
     .refine((f) => f.size <= MAX_FILE_BYTES, { message: "zod.credential.fileTooLarge" })
@@ -52,7 +38,7 @@ export function defaultCredentialIssueRow(): CredentialIssueRowInput {
   return {
     holder_user_id: "new_holder",
     name: "New Credential",
-    meta: "",
+    meta_entries: [],
     file: null,
   };
 }

@@ -65,21 +65,34 @@ describe("credentialIssueRowSchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("accepts valid json meta string", () => {
+  it("accepts valid meta_entries array", () => {
     const result = credentialIssueRowSchema.safeParse({
       holder_user_id: "usr_1",
       name: "Test",
-      meta: '{"key":"value"}',
+      meta_entries: [{ key: "dept", value: "CS" }],
       file: makeFile(),
     });
     expect(result.success).toBe(true);
   });
 
-  it("allows empty meta string", () => {
+  it("rejects duplicate meta_entries keys", () => {
     const result = credentialIssueRowSchema.safeParse({
       holder_user_id: "usr_1",
       name: "Test",
-      meta: "",
+      meta_entries: [
+        { key: "dept", value: "CS" },
+        { key: "dept", value: "EE" },
+      ],
+      file: makeFile(),
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("allows empty meta_entries array", () => {
+    const result = credentialIssueRowSchema.safeParse({
+      holder_user_id: "usr_1",
+      name: "Test",
+      meta_entries: [],
       file: makeFile(),
     });
     expect(result.success).toBe(true);
