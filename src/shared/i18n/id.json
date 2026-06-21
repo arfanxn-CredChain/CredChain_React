@@ -704,6 +704,8 @@
     "mine": {
       "title": "Kredensial Saya",
       "description": "Kelola dan lihat catatan digital terverifikasi pribadi Anda.",
+      "count_one": "{{count}} Kredensial",
+      "count_other": "{{count}} Kredensial",
       "empty": {
         "title": "Belum ada kredensial",
         "body": "Kredensial yang ditautkan ke dompet Anda akan muncul di sini."

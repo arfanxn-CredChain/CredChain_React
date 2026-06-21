@@ -701,6 +701,8 @@
     "mine": {
       "title": "My Credentials",
       "description": "Manage and view your personal verifiable digital records.",
+      "count_one": "{{count}} Credential",
+      "count_other": "{{count}} Credentials",
       "empty": {
         "title": "No credentials yet",
         "body": "Issued credentials linked to your wallet will appear here."
