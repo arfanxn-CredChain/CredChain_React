@@ -114,6 +114,11 @@ export const CODE_TO_MESSAGE_KEY: Record<number, string> = {
   400500: "credential.reextract.success",
   400540: "credential.reextract.not_found",
   400541: "credential.reextract.not_failed",
+  400600: "credential.file_download.success",
+  400640: "credential.file_download.not_found",
+  400641: "credential.file_download.forbidden",
+  400642: "credential.file_download.decryption_failed",
+  400643: "credential.file_download.no_file",
 };
 
 export function codeToMessageKey(code?: number): string {

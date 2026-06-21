@@ -1,8 +1,33 @@
-import { useState, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useReducer } from "react";
 import { useQuery, type QueryKey } from "@tanstack/react-query";
 import type { PaginatedResponse } from "@shared/types/api";
 
 const BATCH_SIZE = 50;
+
+interface LoadMoreState {
+  page: number;
+  items: { id: string }[];
+}
+
+type LoadMoreAction =
+  | { type: "reset" }
+  | { type: "loaded"; page: number; items: { id: string }[] }
+  | { type: "nextPage" };
+
+function loadMoreReducer(state: LoadMoreState, action: LoadMoreAction): LoadMoreState {
+  switch (action.type) {
+    case "reset":
+      return { page: 1, items: [] };
+    case "loaded": {
+      if (action.page === 1) return { page: state.page, items: action.items };
+      const existingIds = new Set(state.items.map((i) => i.id));
+      const fresh = action.items.filter((i) => !existingIds.has(i.id));
+      return { page: state.page, items: [...state.items, ...fresh] };
+    }
+    case "nextPage":
+      return { page: state.page + 1, items: state.items };
+  }
+}
 
 export interface UseLoadMoreResult<T> {
   items: T[];
@@ -19,51 +44,40 @@ export function useLoadMore<T extends { id: string }>(
   queryKey: QueryKey,
   queryFn: (page: number, limit: number) => Promise<PaginatedResponse<T>>,
 ): UseLoadMoreResult<T> {
-  const [page, setPage] = useState(1);
-  const [allItems, setAllItems] = useState<T[]>([]);
+  const [state, dispatch] = useReducer(loadMoreReducer, { page: 1, items: [] });
 
   const query = useQuery({
-    queryKey: [...queryKey, page],
-    queryFn: () => queryFn(page, BATCH_SIZE),
+    queryKey: [...queryKey, state.page],
+    queryFn: () => queryFn(state.page, BATCH_SIZE),
   });
 
   const serializedKey = JSON.stringify(queryKey);
   useEffect(() => {
-    setPage(1);
-    setAllItems([]);
+    dispatch({ type: "reset" });
   }, [serializedKey]);
 
   useEffect(() => {
-    if (!query.data) return;
-    if (page === 1) {
-      setAllItems(query.data.items);
-    } else {
-      setAllItems((prev) => {
-        const existingIds = new Set(prev.map((i) => i.id));
-        const fresh = query.data.items.filter((i) => !existingIds.has(i.id));
-        return [...prev, ...fresh];
-      });
-    }
-  }, [query.data, page]);
+    if (!query.data || query.data.page !== state.page) return;
+    dispatch({ type: "loaded", page: query.data.page, items: query.data.items });
+  }, [query.data, state.page]);
 
   const loadMore = useCallback(() => {
-    if (query.data && page < query.data.last_page) {
-      setPage((p) => p + 1);
+    if (query.data && state.page < query.data.last_page) {
+      dispatch({ type: "nextPage" });
     }
-  }, [query.data, page]);
+  }, [query.data, state.page]);
 
   const reset = useCallback(() => {
-    setPage(1);
-    setAllItems([]);
+    dispatch({ type: "reset" });
   }, []);
 
   return {
-    items: allItems,
+    items: state.items as T[],
     total: query.data?.total ?? 0,
-    isLoading: query.isLoading && page === 1 && allItems.length === 0,
+    isLoading: query.isLoading && state.page === 1 && state.items.length === 0,
     isError: query.isError,
-    isFetchingNextPage: query.isFetching && page > 1,
-    hasMore: query.data ? page < query.data.last_page : false,
+    isFetchingNextPage: query.isFetching && state.page > 1,
+    hasMore: query.data ? state.page < query.data.last_page : false,
     loadMore,
     reset,
   };

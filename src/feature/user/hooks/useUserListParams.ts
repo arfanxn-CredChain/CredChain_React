@@ -17,13 +17,6 @@ const DEFAULTS: UserListParams = {
   role: "all",
 };
 
-const RESET_KEYS: (keyof UserListParams)[] = [
-  "search",
-  "sort",
-  "status",
-  "role",
-];
-
 function parseStatus(raw: string | null): "all" | "deleted_at_" | "deleted_at!_" {
   if (raw === "deleted_at_" || raw === "deleted_at!_") return raw;
   return "all";
