@@ -32,7 +32,7 @@ export function CredentialIssueRow({
   const file = form.watch(`credentials.${index}.file`);
   const [customFieldsOpen, setCustomFieldsOpen] = useState(false);
 
-  const isNameDirty = form.formState.dirtyFields.credentials?.[index]?.name;
+  const isNameTouched = form.formState.touchedFields.credentials?.[index]?.name;
 
   return (
     <div className="relative flex flex-col gap-4 rounded-xl border border-gray-100 bg-gray-50/50 p-4 transition-all focus-within:border-gold/50 focus-within:bg-white sm:gap-6 sm:p-6">
@@ -108,9 +108,9 @@ export function CredentialIssueRow({
             file={file ?? null}
             onChange={(f) => {
               form.setValue(`credentials.${index}.file`, f, { shouldValidate: true });
-              if (!f && !isNameDirty) {
+              if (!f && !isNameTouched) {
                 form.setValue(`credentials.${index}.name`, "", { shouldValidate: true });
-              } else if (f && !isNameDirty) {
+              } else if (f && !isNameTouched) {
                 const stem = f.name.replace(/\.[^.]+$/, "");
                 form.setValue(`credentials.${index}.name`, stem, { shouldValidate: true });
               }

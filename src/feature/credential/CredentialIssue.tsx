@@ -57,7 +57,6 @@ export function CredentialIssue() {
                 onDuplicate={
                   fields.length < 100
                     ? () => {
-                        const newIndex = fields.length;
                         const values = form.getValues(`credentials.${index}`);
                         append({
                           holder_user_id: values.holder_user_id,
@@ -67,7 +66,6 @@ export function CredentialIssue() {
                             : [],
                           file: null,
                         });
-                        form.setValue(`credentials.${newIndex}.name`, values.name, { shouldDirty: false });
                       }
                     : undefined
                 }
