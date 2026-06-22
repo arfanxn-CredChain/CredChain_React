@@ -5,7 +5,6 @@ import { Button } from "@ui/button";
 
 interface CredentialFilePreviewProps {
   file: File | null;
-  onFileSelect: (file: File) => void;
   onExpand: () => void;
   onRemove: () => void;
 }
@@ -20,7 +19,6 @@ function formatFileSize(bytes: number): string {
 
 export function CredentialFilePreview({
   file,
-  onFileSelect: _onFileSelect,
   onExpand,
   onRemove,
 }: CredentialFilePreviewProps) {

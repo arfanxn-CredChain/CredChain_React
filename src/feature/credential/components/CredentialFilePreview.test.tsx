@@ -20,7 +20,6 @@ describe("CredentialFilePreview", () => {
     render(
       <CredentialFilePreview
         file={null}
-        onFileSelect={() => {}}
         onExpand={onExpand}
         onRemove={onRemove}
       />,
@@ -34,7 +33,6 @@ describe("CredentialFilePreview", () => {
     render(
       <CredentialFilePreview
         file={file}
-        onFileSelect={() => {}}
         onExpand={() => {}}
         onRemove={() => {}}
       />,
@@ -49,7 +47,6 @@ describe("CredentialFilePreview", () => {
     render(
       <CredentialFilePreview
         file={file}
-        onFileSelect={() => {}}
         onExpand={() => {}}
         onRemove={onRemove}
       />,
@@ -66,7 +63,6 @@ describe("CredentialFilePreview", () => {
     render(
       <CredentialFilePreview
         file={file}
-        onFileSelect={() => {}}
         onExpand={onExpand}
         onRemove={() => {}}
       />,
@@ -83,7 +79,6 @@ describe("CredentialFilePreview", () => {
     render(
       <CredentialFilePreview
         file={file}
-        onFileSelect={() => {}}
         onExpand={() => {}}
         onRemove={() => {}}
       />,
