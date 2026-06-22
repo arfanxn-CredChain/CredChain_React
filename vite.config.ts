@@ -17,6 +17,9 @@ export default defineConfig({
       "@ui": path.resolve(__dirname, "./src/shared/components/ui"),
     },
   },
+  optimizeDeps: {
+    exclude: ["pdfjs-dist"],
+  },
   build: {
     target: "es2022",
     sourcemap: true,

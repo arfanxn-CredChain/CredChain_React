@@ -40,6 +40,7 @@
     "ethers": "^6.16.0",
     "i18next": "^23.16.0",
     "lucide-react": "^0.576.0",
+    "pdfjs-dist": "^5.6.205",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-error-boundary": "^4.1.2",
