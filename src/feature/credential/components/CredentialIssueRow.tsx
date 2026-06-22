@@ -120,9 +120,6 @@ export function CredentialIssueRow({
               }
             }}
             error={errors?.file?.message}
-            placeholder={t("cred.field.filePlaceholder")}
-            removeLabel={t("cred.field.fileRemoveAriaLabel")}
-            hint={t("cred.field.fileHint")}
           />
         </FormField>
         </div>
