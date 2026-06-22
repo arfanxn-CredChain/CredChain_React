@@ -237,7 +237,7 @@
   "zod.meta.keyTooLong": "Kunci terlalu panjang",
   "zod.meta.valueTooLong": "Nilai terlalu panjang",
   "zod.meta.tooManyEntries": "Terlalu banyak entri",
-  "zod.meta.duplicateKey": "Kunci duplikat",
+  "zod.meta.duplicateKey": "Kunci harus unik",
   "zod.batch.minOne": "Tambahkan minimal satu pengguna",
   "zod.batch.maxHundred": "Maksimal 100 pengguna per batch",
   "zod.batch.deleteMinOne": "Pilih minimal satu pengguna",

@@ -237,7 +237,7 @@
   "zod.meta.keyTooLong": "Key too long",
   "zod.meta.valueTooLong": "Value too long",
   "zod.meta.tooManyEntries": "Too many entries",
-  "zod.meta.duplicateKey": "Duplicate key",
+  "zod.meta.duplicateKey": "Key must be unique",
   "zod.batch.minOne": "Add at least one user",
   "zod.batch.maxHundred": "Maximum 100 users per batch",
   "zod.batch.deleteMinOne": "Select at least one user",
