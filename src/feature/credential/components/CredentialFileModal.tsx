@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect, useMemo } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ZoomOut, ZoomIn, ChevronLeft, ChevronRight } from "lucide-react";
 import {
@@ -62,11 +62,21 @@ export function CredentialFileModal({ file, open, onClose }: CredentialFileModal
 function ImageViewer({ file }: { file: File }) {
   const { t } = useTranslation();
   const [zoom, setZoom] = useState(1);
-  const objectUrl = useMemo(() => URL.createObjectURL(file), [file]);
+  const objectUrlRef = useRef<string | null>(null);
+  const [objectUrl, setObjectUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [objectUrl]);
+    const url = URL.createObjectURL(file);
+    objectUrlRef.current = url;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- object URL lifecycle requires ref for cleanup + state for render
+    setObjectUrl(url);
+    return () => {
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = null;
+      }
+    };
+  }, [file]);
 
   const handleWheel = useCallback(
     (e: React.WheelEvent) => {
@@ -153,6 +163,8 @@ function PdfViewer({ file }: { file: File }) {
     let cancelled = false;
 
     const loadPdf = async () => {
+      const objectUrl = URL.createObjectURL(file);
+      objectUrlRef.current = objectUrl;
       try {
         const pdfjsLib = await import("pdfjs-dist");
         pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
@@ -160,8 +172,7 @@ function PdfViewer({ file }: { file: File }) {
           import.meta.url,
         ).toString();
 
-        objectUrlRef.current = URL.createObjectURL(file);
-        const pdf = (await pdfjsLib.getDocument(objectUrlRef.current).promise) as unknown as PdfDocumentProxy;
+        const pdf = (await pdfjsLib.getDocument(objectUrl).promise) as unknown as PdfDocumentProxy;
         if (cancelled) {
           return;
         }
