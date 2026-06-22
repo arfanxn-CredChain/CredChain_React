@@ -93,27 +93,85 @@ export function CredentialFilePreview({
   );
 }
 
+function PdfThumbnail({ file }: { file: File }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const objectUrl = URL.createObjectURL(file);
+
+    const render = async () => {
+      try {
+        const pdfjsLib = await import("pdfjs-dist");
+        pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+          "pdfjs-dist/build/pdf.worker.min.mjs",
+          import.meta.url,
+        ).toString();
+
+        const pdf = await pdfjsLib.getDocument(objectUrl).promise;
+        if (cancelled) { pdf.destroy(); return; }
+
+        const page = await pdf.getPage(1);
+        const viewport = page.getViewport({ scale: 0.15 });
+        const canvas = canvasRef.current;
+        if (!canvas || cancelled) { pdf.destroy(); return; }
+
+        const ctx = canvas.getContext("2d")!;
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        await page.render({ canvasContext: ctx, viewport } as any).promise;
+        pdf.destroy();
+      } catch {
+        if (!cancelled) setError(true);
+      }
+    };
+
+    render();
+
+    return () => {
+      cancelled = true;
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [file]);
+
+  if (error) {
+    return (
+      <div className="flex h-14 w-12 shrink-0 items-center justify-center rounded-lg bg-gray-100">
+        <File className="h-5 w-5 text-gray-400" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-14 w-12 shrink-0 overflow-hidden rounded-lg border border-gray-100 bg-white">
+      <canvas ref={canvasRef} className="h-full w-full object-cover" />
+    </div>
+  );
+}
+
 function PreviewThumbnail({ file, isImage }: { file: File; isImage: boolean }) {
+  const isPdf = file.type === "application/pdf";
   const objectUrlRef = useRef<string | null>(null);
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    if (isImage) {
-      const url = URL.createObjectURL(file);
-      objectUrlRef.current = url;
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- object URL lifecycle requires ref for cleanup + state for render
-      setObjectUrl(url);
-      setError(false);
-      return () => {
-        if (objectUrlRef.current) {
-          URL.revokeObjectURL(objectUrlRef.current);
-          objectUrlRef.current = null;
-        }
-      };
-    }
-  }, [file, isImage]);
+    if (isPdf || !isImage) return;
+    const url = URL.createObjectURL(file);
+    objectUrlRef.current = url;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setObjectUrl(url);
+    setError(false);
+    return () => {
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = null;
+      }
+    };
+  }, [file, isImage, isPdf]);
 
+  if (isPdf) return <PdfThumbnail file={file} />;
   if (!isImage) {
     return (
       <div className="flex h-14 w-12 shrink-0 items-center justify-center rounded-lg bg-gray-100">
@@ -121,7 +179,6 @@ function PreviewThumbnail({ file, isImage }: { file: File; isImage: boolean }) {
       </div>
     );
   }
-
   if (error || !objectUrl) {
     return (
       <div className="flex h-14 w-12 shrink-0 items-center justify-center rounded-lg bg-gray-100">
@@ -129,7 +186,6 @@ function PreviewThumbnail({ file, isImage }: { file: File; isImage: boolean }) {
       </div>
     );
   }
-
   return (
     <div className="h-14 w-12 shrink-0 overflow-hidden rounded-lg border border-gray-100">
       <img

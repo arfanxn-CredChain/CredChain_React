@@ -108,6 +108,7 @@ export function CredentialIssueRow({
         <div className="md:col-span-2">
         <FormField
           label={t("cred.field.file")}
+          hint={t("cred.field.fileHint")}
           error={errors?.file?.message}
         >
           <CredentialFileInput
