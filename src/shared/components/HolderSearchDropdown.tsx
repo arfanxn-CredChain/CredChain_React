@@ -2,12 +2,12 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { Search } from "lucide-react";
 import type { UserDTO } from "@shared/types/api";
 import { UserAvatar } from "@shared/components/UserAvatar";
-import { truncateAddress } from "@shared/lib/format";
 import { cn } from "@shared/lib/cn";
 
 interface HolderSearchDropdownProps {
   value: string;
   onChange: (userId: string) => void;
+  onResolveUser?: (userId: string) => Promise<UserDTO | null>;
   error?: string;
   searchPlaceholder?: string;
   noResultsText?: string;
@@ -18,6 +18,7 @@ export function HolderSearchDropdown({
   value,
   onChange,
   error,
+  onResolveUser,
   searchPlaceholder = "Search...",
   noResultsText = "No results",
   onSearch,
@@ -27,7 +28,7 @@ export function HolderSearchDropdown({
   const [results, setResults] = useState<UserDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const selectedUser = results.find((u) => u.id === value) ?? null;
 
@@ -62,6 +63,16 @@ export function HolderSearchDropdown({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (onResolveUser && value && !selectedUser) {
+      onResolveUser(value).then((user) => {
+        if (user) {
+          setResults((prev) => (prev.find((u) => u.id === user.id) ? prev : [user, ...prev]));
+        }
+      });
+    }
+  }, [value, selectedUser, onResolveUser]);
+
   return (
     <div ref={containerRef} className="relative">
       <button
@@ -78,17 +89,11 @@ export function HolderSearchDropdown({
         )}
       >
         {selectedUser ? (
-          <div className="flex items-center gap-3 min-w-0 flex-1">
-            <UserAvatar user={selectedUser} size="md" className="shrink-0" />
-            <div className="min-w-0 text-left flex-1">
-              <div className="font-bold text-navy truncate">{selectedUser.name}</div>
-              <div className="text-xs text-gray-500 truncate">{selectedUser.number}</div>
-              <div className="text-xs text-gray-500 truncate">{selectedUser.email}</div>
-              <div className="text-xs text-gray-400 truncate">{selectedUser.phone_number}</div>
-              <div className="font-mono text-xs text-gray-400 truncate">
-                {selectedUser.wallet_address ? truncateAddress(selectedUser.wallet_address) : ""}
-              </div>
-            </div>
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <UserAvatar user={selectedUser} size="sm" className="shrink-0" />
+            <span className="truncate font-medium text-navy text-sm">
+              {selectedUser.name}{selectedUser.number ? ` · ${selectedUser.number}` : ""}
+            </span>
           </div>
         ) : (
           <span className="text-gray-400 flex-1">{searchPlaceholder}</span>
@@ -149,11 +154,6 @@ export function HolderSearchDropdown({
                       {user.name ?? user.email}
                     </div>
                     <div className="text-xs text-gray-500">{user.number}</div>
-                    <div className="text-xs text-gray-500 truncate">{user.email}</div>
-                    <div className="text-xs text-gray-400">{user.phone_number}</div>
-                    <div className="font-mono text-xs text-gray-400">
-                      {user.wallet_address ? truncateAddress(user.wallet_address) : ""}
-                    </div>
                   </div>
                 </button>
               ))}

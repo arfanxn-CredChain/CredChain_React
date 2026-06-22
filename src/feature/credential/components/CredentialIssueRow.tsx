@@ -32,9 +32,11 @@ export function CredentialIssueRow({
   const file = form.watch(`credentials.${index}.file`);
   const [customFieldsOpen, setCustomFieldsOpen] = useState(false);
 
+  const isNameDirty = form.formState.dirtyFields.credentials?.[index]?.name;
+
   return (
     <div className="relative flex flex-col gap-4 rounded-xl border border-gray-100 bg-gray-50/50 p-4 transition-all focus-within:border-gold/50 focus-within:bg-white sm:gap-6 sm:p-6">
-      <div className="absolute top-3 right-3 z-10 flex gap-1 sm:top-4 sm:right-4">
+      <div className="absolute top-3 right-3 z-10 flex flex-col gap-1 sm:top-4 sm:right-4">
         {onDuplicate && (
           <Button
             type="button"
@@ -61,7 +63,7 @@ export function CredentialIssueRow({
         )}
       </div>
 
-      <div className="grid w-full grid-cols-1 gap-4 pr-20 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid w-full grid-cols-1 gap-4 pr-12 sm:gap-6 md:grid-cols-2">
         <FormField label={t("cred.field.holder")} error={errors?.holder_user_id?.message}>
           <HolderSearchDropdown
             value={holderId}
@@ -70,6 +72,10 @@ export function CredentialIssueRow({
                 shouldValidate: true,
               })
             }
+            onResolveUser={async (userId) => {
+              const response = await api.get(`/users/${userId}`);
+              return (response.data as UserDTO) ?? null;
+            }}
             error={errors?.holder_user_id?.message}
             searchPlaceholder={t("cred.field.holderSearch")}
             noResultsText={t("cred.field.noSearchResults")}
@@ -93,23 +99,29 @@ export function CredentialIssueRow({
           />
         </FormField>
 
+        <div className="md:col-span-2">
         <FormField
           label={t("cred.field.file")}
-          hint={errors?.file?.message ? undefined : t("cred.field.fileHint")}
           error={errors?.file?.message}
-          className="md:col-span-2 lg:col-span-1"
         >
           <CredentialFileInput
             file={file ?? null}
-            onChange={(f) =>
-              form.setValue(`credentials.${index}.file`, f, { shouldValidate: true })
-            }
+            onChange={(f) => {
+              form.setValue(`credentials.${index}.file`, f, { shouldValidate: true });
+              if (!f && !isNameDirty) {
+                form.setValue(`credentials.${index}.name`, "", { shouldValidate: true });
+              } else if (f && !isNameDirty) {
+                const stem = f.name.replace(/\.[^.]+$/, "");
+                form.setValue(`credentials.${index}.name`, stem, { shouldValidate: true });
+              }
+            }}
             error={errors?.file?.message}
             placeholder={t("cred.field.filePlaceholder")}
             removeLabel={t("cred.field.fileRemoveAriaLabel")}
-            hint={errors?.file?.message ? undefined : t("cred.field.fileHint")}
+            hint={t("cred.field.fileHint")}
           />
         </FormField>
+        </div>
       </div>
 
       <div className="mt-2 sm:mt-4">
