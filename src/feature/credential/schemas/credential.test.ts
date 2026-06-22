@@ -111,13 +111,13 @@ describe("credentialIssueRowSchema", () => {
     expect(tiff.success).toBe(true);
   });
 
-  it("allows null file", () => {
+  it("rejects null file", () => {
     const result = credentialIssueRowSchema.safeParse({
       holder_user_id: "usr_1",
       name: "Test",
       file: null,
     });
-    expect(result.success).toBe(true);
+    expect(result.success).toBe(false);
   });
 
   it("accepts valid meta_entries array", () => {
