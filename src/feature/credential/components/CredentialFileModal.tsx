@@ -49,11 +49,10 @@ export function CredentialFileModal({ file, open, onClose }: CredentialFileModal
           )}
         </div>
 
-        <DialogFooter className="flex items-center justify-between">
+        <DialogFooter>
           <span className="text-xs text-gray-400">
             {formatFileSize(file.size)}{" · "}{file.type}
           </span>
-          {!isPdf && <ImageZoomControls />}
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -82,46 +81,43 @@ function ImageViewer({ file }: { file: File }) {
   );
 
   return (
-    <div
-      onWheel={handleWheel}
-      className="flex h-full w-full items-center justify-center overflow-hidden"
-    >
-      {objectUrl ? (
-        <img
-          src={objectUrl}
-          alt={file.name}
-          className="max-h-full max-w-full object-contain transition-transform duration-100"
-          style={{ transform: `scale(${zoom})` }}
-          draggable={false}
-        />
-      ) : (
-        <span className="text-sm text-gray-400">{t("credential.issue.preview.notAvailable")}</span>
-      )}
-    </div>
-  );
-}
-
-function ImageZoomControls() {
-  const { t } = useTranslation();
-
-  return (
-    <div className="flex items-center gap-1">
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        aria-label={t("credential.issue.preview.zoomOut")}
+    <div className="flex flex-col items-center gap-4">
+      <div
+        onWheel={handleWheel}
+        className="flex h-full w-full items-center justify-center overflow-hidden"
       >
-        <ZoomOut className="h-4 w-4" />
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        aria-label={t("credential.issue.preview.zoomIn")}
-      >
-        <ZoomIn className="h-4 w-4" />
-      </Button>
+        {objectUrl ? (
+          <img
+            src={objectUrl}
+            alt={file.name}
+            className="max-h-full max-w-full object-contain transition-transform duration-100"
+            style={{ transform: `scale(${zoom})` }}
+            draggable={false}
+          />
+        ) : (
+          <span className="text-sm text-gray-400">{t("credential.issue.preview.notAvailable")}</span>
+        )}
+      </div>
+      <div className="flex items-center gap-1">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          aria-label={t("credential.issue.preview.zoomOut")}
+          onClick={() => setZoom((z) => Math.max(MIN_ZOOM, z - ZOOM_STEP))}
+        >
+          <ZoomOut className="h-4 w-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          aria-label={t("credential.issue.preview.zoomIn")}
+          onClick={() => setZoom((z) => Math.min(MAX_ZOOM, z + ZOOM_STEP))}
+        >
+          <ZoomIn className="h-4 w-4" />
+        </Button>
+      </div>
     </div>
   );
 }
@@ -142,11 +138,16 @@ interface PdfDocumentProxy {
 
 function PdfViewer({ file }: { file: File }) {
   const { t } = useTranslation();
+  const tRef = useRef(t);
+  useEffect(() => {
+    tRef.current = t;
+  });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [pageNum, setPageNum] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const pdfDocRef = useRef<PdfDocumentProxy | null>(null);
+  const objectUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -159,10 +160,9 @@ function PdfViewer({ file }: { file: File }) {
           import.meta.url,
         ).toString();
 
-        const objectUrl = URL.createObjectURL(file);
-        const pdf = (await pdfjsLib.getDocument(objectUrl).promise) as unknown as PdfDocumentProxy;
+        objectUrlRef.current = URL.createObjectURL(file);
+        const pdf = (await pdfjsLib.getDocument(objectUrlRef.current).promise) as unknown as PdfDocumentProxy;
         if (cancelled) {
-          URL.revokeObjectURL(objectUrl);
           return;
         }
         pdfDocRef.current = pdf;
@@ -171,7 +171,7 @@ function PdfViewer({ file }: { file: File }) {
         setError(null);
       } catch {
         if (!cancelled) {
-          setError(t("credential.issue.preview.corrupt"));
+          setError(tRef.current("credential.issue.preview.corrupt"));
         }
       }
     };
@@ -184,8 +184,12 @@ function PdfViewer({ file }: { file: File }) {
         pdfDocRef.current.destroy();
         pdfDocRef.current = null;
       }
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = null;
+      }
     };
-  }, [file, t]);
+  }, [file]);
 
   useEffect(() => {
     const doc = pdfDocRef.current;
@@ -203,13 +207,13 @@ function PdfViewer({ file }: { file: File }) {
         canvas.width = viewport.width;
         await page.render({ canvasContext: ctx, viewport }).promise;
       } catch {
-        if (!cancelled) setError(t("credential.issue.preview.corrupt"));
+        if (!cancelled) setError(tRef.current("credential.issue.preview.corrupt"));
       }
     };
 
     renderPage();
     return () => { cancelled = true; };
-  }, [pageNum, t]);
+  }, [pageNum]);
 
   if (error) {
     return <span className="text-sm text-gray-400">{error}</span>;
