@@ -45,7 +45,7 @@ export function CredentialIssue() {
 
       <PageHeader title={t("cred.issue.title")} description={t("cred.issue.description")} />
 
-      <Card className="p-0">
+      <Card className="overflow-visible p-0">
         <form onSubmit={onSubmit} className="space-y-8 p-6 sm:p-8">
           <div className="space-y-6">
             {fields.map((field, index) => (
@@ -57,15 +57,17 @@ export function CredentialIssue() {
                 onDuplicate={
                   fields.length < 100
                     ? () => {
+                        const newIndex = fields.length;
                         const values = form.getValues(`credentials.${index}`);
                         append({
                           holder_user_id: values.holder_user_id,
-                          name: values.name,
+                          name: "",
                           meta_entries: values.meta_entries
                             ? values.meta_entries.map((e) => ({ ...e }))
                             : [],
                           file: null,
                         });
+                        form.setValue(`credentials.${newIndex}.name`, "", { shouldDirty: false });
                       }
                     : undefined
                 }
