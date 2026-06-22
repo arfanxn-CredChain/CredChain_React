@@ -61,13 +61,13 @@ export function CredentialIssue() {
                         const values = form.getValues(`credentials.${index}`);
                         append({
                           holder_user_id: values.holder_user_id,
-                          name: "",
+                          name: values.name,
                           meta_entries: values.meta_entries
                             ? values.meta_entries.map((e) => ({ ...e }))
                             : [],
                           file: null,
                         });
-                        form.setValue(`credentials.${newIndex}.name`, "", { shouldDirty: false });
+                        form.setValue(`credentials.${newIndex}.name`, values.name, { shouldDirty: false });
                       }
                     : undefined
                 }
