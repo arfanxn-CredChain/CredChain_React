@@ -2,11 +2,13 @@ import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { File, Upload, Eye, X } from "lucide-react";
 import { Button } from "@ui/button";
+import { cn } from "@shared/lib/cn";
 
 interface CredentialFilePreviewProps {
   file: File | null;
   onExpand: () => void;
   onRemove: () => void;
+  onFileDrop: (file: File) => void;
 }
 
 const ALLOWED_IMAGE_MIME_PREFIXES = ["image/jpeg", "image/png", "image/webp"];
@@ -21,12 +23,31 @@ export function CredentialFilePreview({
   file,
   onExpand,
   onRemove,
+  onFileDrop,
 }: CredentialFilePreviewProps) {
   const { t } = useTranslation();
+  const [isDragOver, setIsDragOver] = useState(false);
 
   if (!file) {
     return (
-      <div className="flex items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 px-4 py-6 text-sm text-gray-400 transition-colors hover:border-gray-300 hover:text-gray-500">
+      <div
+        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDragOver(true); }}
+        onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsDragOver(true); }}
+        onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDragOver(false); }}
+        onDrop={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsDragOver(false);
+          const f = e.dataTransfer.files?.[0];
+          if (f) onFileDrop(f);
+        }}
+        className={cn(
+          "flex items-center justify-center rounded-xl border-2 border-dashed px-4 py-6 text-sm transition-colors",
+          isDragOver
+            ? "border-gold bg-gold/5 text-gold"
+            : "border-gray-200 bg-gray-50 text-gray-400 hover:border-gray-300 hover:text-gray-500",
+        )}
+      >
         <Upload className="mr-2 h-4 w-4 shrink-0" />
         <span>{t("credential.issue.preview.dragDrop")}</span>
       </div>

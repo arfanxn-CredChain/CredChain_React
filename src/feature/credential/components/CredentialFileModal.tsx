@@ -1,11 +1,10 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ZoomOut, ZoomIn, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-
   DialogHeader,
   DialogTitle,
 } from "@ui/dialog";
@@ -43,9 +42,9 @@ export function CredentialFileModal({ file, open, onClose }: CredentialFileModal
 
         <div className="flex min-h-[40vh] items-center justify-center overflow-auto rounded-xl bg-gray-100">
           {isPdf ? (
-            <PdfViewer file={file} />
+            <PdfViewer file={file} key={file.name + file.size} />
           ) : (
-            <ImageViewer file={file} />
+            <ImageViewer file={file} key={file.name + file.size} />
           )}
         </div>
 
@@ -64,7 +63,7 @@ function ImageViewer({ file }: { file: File }) {
   useEffect(() => {
     const url = URL.createObjectURL(file);
     objectUrlRef.current = url;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- object URL lifecycle requires ref for cleanup + state for render
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setObjectUrl(url);
     return () => {
       if (objectUrlRef.current) {
@@ -74,29 +73,14 @@ function ImageViewer({ file }: { file: File }) {
     };
   }, [file]);
 
-  const handleWheel = useCallback(
-    (e: React.WheelEvent) => {
-      e.preventDefault();
-      setZoom((prev) => {
-        const delta = e.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP;
-        const next = prev + delta;
-        return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, Math.round(next * 100) / 100));
-      });
-    },
-    [],
-  );
-
   return (
     <div className="flex flex-col items-center gap-4">
-      <div
-        onWheel={handleWheel}
-        className="flex h-full w-full items-center justify-center overflow-hidden"
-      >
+      <div className="flex h-full w-full items-center justify-center overflow-hidden">
         {objectUrl ? (
           <img
             src={objectUrl}
             alt={file.name}
-            className="max-h-full max-w-full object-contain transition-transform duration-100"
+            className="max-h-full max-w-full object-contain transition-transform duration-200"
             style={{ transform: `scale(${zoom})` }}
             draggable={false}
           />
@@ -221,7 +205,7 @@ function PdfViewer({ file }: { file: File }) {
 
     renderPage();
     return () => { cancelled = true; };
-  }, [pageNum]);
+  }, [pageNum, totalPages]);
 
   if (error) {
     return <span className="text-sm text-gray-400">{error}</span>;

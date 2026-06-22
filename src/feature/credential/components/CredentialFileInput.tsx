@@ -23,6 +23,13 @@ export function CredentialFileInput({
     onChange(null);
   }, [onChange]);
 
+  const handleFileDrop = useCallback(
+    (f: File) => {
+      onChange(f);
+    },
+    [onChange],
+  );
+
   const handleFileChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const f = e.target.files?.[0] ?? null;
@@ -41,11 +48,12 @@ export function CredentialFileInput({
         onChange={handleFileChange}
         className="hidden"
       />
-      <div onClick={() => inputRef.current?.click()}>
+      <div onClick={!file ? () => inputRef.current?.click() : undefined}>
         <CredentialFilePreview
           file={file}
           onExpand={onExpand ?? noop}
           onRemove={handleRemove}
+          onFileDrop={handleFileDrop}
         />
       </div>
       {error && (
