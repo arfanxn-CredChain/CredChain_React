@@ -5,7 +5,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
+
   DialogHeader,
   DialogTitle,
 } from "@ui/dialog";
@@ -49,11 +49,7 @@ export function CredentialFileModal({ file, open, onClose }: CredentialFileModal
           )}
         </div>
 
-        <DialogFooter>
-          <span className="text-xs text-gray-400">
-            {formatFileSize(file.size)}{" · "}{file.type}
-          </span>
-        </DialogFooter>
+
       </DialogContent>
     </Dialog>
   );
@@ -174,6 +170,7 @@ function PdfViewer({ file }: { file: File }) {
 
         const pdf = (await pdfjsLib.getDocument(objectUrl).promise) as unknown as PdfDocumentProxy;
         if (cancelled) {
+          pdf.destroy();
           return;
         }
         pdfDocRef.current = pdf;
