@@ -11,6 +11,7 @@ import { MetaEditor } from "@shared/components/MetaEditor";
 import { api } from "@shared/api/client";
 import { cn } from "@shared/lib/cn";
 import { CredentialFileInput } from "./CredentialFileInput";
+import { CredentialFileModal } from "./CredentialFileModal";
 import type { CredentialBatchIssueInput } from "../schemas/credential";
 
 interface CredentialIssueRowProps {
@@ -31,6 +32,7 @@ export function CredentialIssueRow({
   const holderId = form.watch(`credentials.${index}.holder_user_id`);
   const file = form.watch(`credentials.${index}.file`);
   const [customFieldsOpen, setCustomFieldsOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const nameManuallyEdited = useRef(false);
   const { onChange: rhfNameOnChange, ...nameRest } = form.register(`credentials.${index}.name`);
 
@@ -119,6 +121,7 @@ export function CredentialIssueRow({
                 form.setValue(`credentials.${index}.name`, stem, { shouldValidate: true });
               }
             }}
+            onExpand={() => setPreviewOpen(true)}
           />
         </FormField>
         </div>
@@ -141,6 +144,13 @@ export function CredentialIssueRow({
           </div>
         )}
       </div>
+      {file && (
+        <CredentialFileModal
+          file={file}
+          open={previewOpen}
+          onClose={() => setPreviewOpen(false)}
+        />
+      )}
     </div>
   );
 }
