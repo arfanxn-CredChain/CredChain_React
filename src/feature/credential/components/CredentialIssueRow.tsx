@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Trash2, Copy, ChevronDown } from "lucide-react";
@@ -31,8 +31,8 @@ export function CredentialIssueRow({
   const holderId = form.watch(`credentials.${index}.holder_user_id`);
   const file = form.watch(`credentials.${index}.file`);
   const [customFieldsOpen, setCustomFieldsOpen] = useState(false);
-
-  const isNameTouched = form.formState.touchedFields.credentials?.[index]?.name;
+  const nameManuallyEdited = useRef(false);
+  const { onChange: rhfNameOnChange, ...nameRest } = form.register(`credentials.${index}.name`);
 
   return (
     <div className="relative flex flex-col gap-4 rounded-xl border border-gray-100 bg-gray-50/50 p-4 transition-all focus-within:border-gold/50 focus-within:bg-white sm:gap-6 sm:p-6">
@@ -95,7 +95,11 @@ export function CredentialIssueRow({
         <FormField label={t("cred.field.name")} error={errors?.name?.message}>
           <Input
             placeholder={t("cred.field.namePlaceholder")}
-            {...form.register(`credentials.${index}.name`)}
+            onChange={(e) => {
+              nameManuallyEdited.current = true;
+              rhfNameOnChange(e);
+            }}
+            {...nameRest}
           />
         </FormField>
 
@@ -108,9 +112,9 @@ export function CredentialIssueRow({
             file={file ?? null}
             onChange={(f) => {
               form.setValue(`credentials.${index}.file`, f, { shouldValidate: true });
-              if (!f && !isNameTouched) {
+              if (!f && !nameManuallyEdited.current) {
                 form.setValue(`credentials.${index}.name`, "", { shouldValidate: true });
-              } else if (f && !isNameTouched) {
+              } else if (f && !nameManuallyEdited.current) {
                 const stem = f.name.replace(/\.[^.]+$/, "");
                 form.setValue(`credentials.${index}.name`, stem, { shouldValidate: true });
               }
