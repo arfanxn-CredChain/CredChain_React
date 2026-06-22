@@ -1,0 +1,250 @@
+import { useState, useCallback, useRef, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { ZoomOut, ZoomIn, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@ui/dialog";
+import { Button } from "@ui/button";
+
+const MIN_ZOOM = 0.25;
+const MAX_ZOOM = 3;
+const ZOOM_STEP = 0.25;
+
+interface CredentialFileModalProps {
+  file: File;
+  open: boolean;
+  onClose: () => void;
+}
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+export function CredentialFileModal({ file, open, onClose }: CredentialFileModalProps) {
+  const { t } = useTranslation();
+  const isPdf = file.type === "application/pdf";
+
+  return (
+    <Dialog open={open} onOpenChange={(next) => { if (!next) onClose(); }}>
+      <DialogContent className="max-w-5xl">
+        <DialogHeader>
+          <DialogTitle>{file.name}</DialogTitle>
+          <DialogDescription>
+            {formatFileSize(file.size)}{" · "}{file.type || t("credential.issue.preview.notAvailable")}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="flex min-h-[40vh] items-center justify-center overflow-auto rounded-xl bg-gray-100">
+          {isPdf ? (
+            <PdfViewer file={file} />
+          ) : (
+            <ImageViewer file={file} />
+          )}
+        </div>
+
+        <DialogFooter className="flex items-center justify-between">
+          <span className="text-xs text-gray-400">
+            {formatFileSize(file.size)}{" · "}{file.type}
+          </span>
+          {!isPdf && <ImageZoomControls />}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ImageViewer({ file }: { file: File }) {
+  const { t } = useTranslation();
+  const [zoom, setZoom] = useState(1);
+  const objectUrl = useMemo(() => URL.createObjectURL(file), [file]);
+
+  useEffect(() => {
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [objectUrl]);
+
+  const handleWheel = useCallback(
+    (e: React.WheelEvent) => {
+      e.preventDefault();
+      setZoom((prev) => {
+        const delta = e.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP;
+        const next = prev + delta;
+        return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, Math.round(next * 100) / 100));
+      });
+    },
+    [],
+  );
+
+  return (
+    <div
+      onWheel={handleWheel}
+      className="flex h-full w-full items-center justify-center overflow-hidden"
+    >
+      {objectUrl ? (
+        <img
+          src={objectUrl}
+          alt={file.name}
+          className="max-h-full max-w-full object-contain transition-transform duration-100"
+          style={{ transform: `scale(${zoom})` }}
+          draggable={false}
+        />
+      ) : (
+        <span className="text-sm text-gray-400">{t("credential.issue.preview.notAvailable")}</span>
+      )}
+    </div>
+  );
+}
+
+function ImageZoomControls() {
+  const { t } = useTranslation();
+
+  return (
+    <div className="flex items-center gap-1">
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        aria-label={t("credential.issue.preview.zoomOut")}
+      >
+        <ZoomOut className="h-4 w-4" />
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        aria-label={t("credential.issue.preview.zoomIn")}
+      >
+        <ZoomIn className="h-4 w-4" />
+      </Button>
+    </div>
+  );
+}
+
+interface PdfPageProxy {
+  getViewport: (o: { scale: number }) => { height: number; width: number };
+  render: (o: {
+    canvasContext: CanvasRenderingContext2D;
+    viewport: { height: number; width: number };
+  }) => { promise: Promise<void> };
+}
+
+interface PdfDocumentProxy {
+  numPages: number;
+  getPage: (n: number) => Promise<PdfPageProxy>;
+  destroy: () => void;
+}
+
+function PdfViewer({ file }: { file: File }) {
+  const { t } = useTranslation();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [pageNum, setPageNum] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const pdfDocRef = useRef<PdfDocumentProxy | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadPdf = async () => {
+      try {
+        const pdfjsLib = await import("pdfjs-dist");
+        pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+          "pdfjs-dist/build/pdf.worker.min.mjs",
+          import.meta.url,
+        ).toString();
+
+        const objectUrl = URL.createObjectURL(file);
+        const pdf = (await pdfjsLib.getDocument(objectUrl).promise) as unknown as PdfDocumentProxy;
+        if (cancelled) {
+          URL.revokeObjectURL(objectUrl);
+          return;
+        }
+        pdfDocRef.current = pdf;
+        setTotalPages(pdf.numPages);
+        setPageNum(1);
+        setError(null);
+      } catch {
+        if (!cancelled) {
+          setError(t("credential.issue.preview.corrupt"));
+        }
+      }
+    };
+
+    loadPdf();
+
+    return () => {
+      cancelled = true;
+      if (pdfDocRef.current) {
+        pdfDocRef.current.destroy();
+        pdfDocRef.current = null;
+      }
+    };
+  }, [file, t]);
+
+  useEffect(() => {
+    const doc = pdfDocRef.current;
+    if (!doc || !canvasRef.current) return;
+    let cancelled = false;
+
+    const renderPage = async () => {
+      try {
+        const page = await doc.getPage(pageNum);
+        if (cancelled) return;
+        const viewport = page.getViewport({ scale: 1.5 });
+        const canvas = canvasRef.current!;
+        const ctx = canvas.getContext("2d")!;
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        await page.render({ canvasContext: ctx, viewport }).promise;
+      } catch {
+        if (!cancelled) setError(t("credential.issue.preview.corrupt"));
+      }
+    };
+
+    renderPage();
+    return () => { cancelled = true; };
+  }, [pageNum, t]);
+
+  if (error) {
+    return <span className="text-sm text-gray-400">{error}</span>;
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <canvas ref={canvasRef} className="max-h-[60vh] max-w-full rounded-lg shadow-lg" />
+      {totalPages > 1 && (
+        <div className="flex items-center gap-4">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            disabled={pageNum <= 1}
+            aria-label={t("credential.issue.preview.previousPage")}
+            onClick={() => setPageNum((p) => Math.max(1, p - 1))}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="text-sm text-gray-500">
+            {t("credential.issue.preview.pageCount", { current: pageNum, total: totalPages })}
+          </span>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            disabled={pageNum >= totalPages}
+            aria-label={t("credential.issue.preview.nextPage")}
+            onClick={() => setPageNum((p) => Math.min(totalPages, p + 1))}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
