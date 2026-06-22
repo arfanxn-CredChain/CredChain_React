@@ -1,12 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Calendar, Mail, Phone, Wallet } from "lucide-react";
+import { Calendar, Hash, Mail, Phone, Wallet } from "lucide-react";
 import { cn } from "@shared/lib/cn";
 import { MonoId } from "@shared/components/MonoId";
 import { formatDate, truncateAddress } from "@shared/lib/format";
 import { Card } from "@ui/card";
 import { CopyInlineButton } from "@shared/components/CopyInlineButton";
 import { UserAvatar } from "@shared/components/UserAvatar";
+import { notify } from "@shared/lib/notify";
 import type { CredentialDTO, UserDTO } from "@shared/types/api";
 import { CredentialStatusBadge } from "./CredentialStatusBadge";
 
@@ -42,7 +43,12 @@ export function CredentialCard({
   const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if ((e.target as HTMLElement).closest(INTERACTIVE_SELECTORS)) return;
     if (selectionMode) {
-      if (isSelectable && !selectDisabled) onSelect?.();
+      if (isSelectable && !selectDisabled) {
+        onSelect?.();
+      } else if (!isSelectable) {
+        const toastKey = selectionMode === "revoke" ? "cred.card.alreadyRevoked" : "cred.card.alreadySucceeded";
+        notify.info(toastKey);
+      }
       return;
     }
     navigate(`/credentials/${credential.id}`);
@@ -123,6 +129,7 @@ export function CredentialCard({
             user={credential.holder}
             fallbackId={credential.holder_user_id}
             copyPrefix="holder"
+            blockLinks={!!selectionMode}
           />
 
           <UserContactBlock
@@ -130,6 +137,7 @@ export function CredentialCard({
             user={credential.issuer}
             fallbackId={credential.issuer_user_id}
             copyPrefix="issuer"
+            blockLinks={!!selectionMode}
           />
 
           {revoked && credential.revoker && (
@@ -139,6 +147,7 @@ export function CredentialCard({
               fallbackId={credential.revoker_user_id ?? ""}
               copyPrefix="revoker"
               tone="error"
+              blockLinks={!!selectionMode}
             />
           )}
         </div>
@@ -170,6 +179,7 @@ interface UserContactBlockProps {
   copyPrefix: "holder" | "issuer" | "revoker";
   labelType: "full" | "compact";
   tone?: "default" | "error";
+  blockLinks?: boolean;
 }
 
 function UserContactBlock({
@@ -178,6 +188,7 @@ function UserContactBlock({
   copyPrefix,
   labelType,
   tone = "default",
+  blockLinks,
 }: UserContactBlockProps) {
   const { t } = useTranslation();
 
@@ -194,17 +205,29 @@ function UserContactBlock({
       <UserAvatar user={user ?? null} size="sm" className="mt-0.5 shrink-0" />
       <div className="flex min-w-0 flex-col space-y-0.5">
         <div className="flex flex-wrap items-center gap-2">
-          <Link
-            to={`/users/${userId}`}
-            onClick={(e) => e.stopPropagation()}
-            className={cn(
-              "truncate text-left text-sm hover:underline focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none",
-              nameWeight,
-              textColor,
-            )}
-          >
-            {name}
-          </Link>
+          {blockLinks ? (
+            <span
+              className={cn(
+                "truncate text-left text-sm",
+                nameWeight,
+                textColor,
+              )}
+            >
+              {name}
+            </span>
+          ) : (
+            <Link
+              to={`/users/${userId}`}
+              onClick={(e) => e.stopPropagation()}
+              className={cn(
+                "truncate text-left text-sm hover:underline focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none",
+                nameWeight,
+                textColor,
+              )}
+            >
+              {name}
+            </Link>
+          )}
           {isDeleted && (
             <span className="rounded-md bg-gray-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gray-600">
               {t("user.status.trashed")}
@@ -216,6 +239,18 @@ function UserContactBlock({
 
         {labelType === "full" && (
           <>
+            {user?.number && (
+              <div className="flex items-center gap-1 text-xs text-gray-500">
+                <Hash className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
+                <span className="truncate">{user.number}</span>
+                <CopyInlineButton
+                  value={user.number}
+                  ariaLabel={t(`cred.copy.${copyPrefix}Number`)}
+                  className="shrink-0"
+                />
+              </div>
+            )}
+
             {user?.email && (
               <div className="flex items-center gap-1 text-xs text-gray-500">
                 <Mail className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />

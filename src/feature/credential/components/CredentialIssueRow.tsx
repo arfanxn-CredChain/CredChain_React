@@ -119,7 +119,6 @@ export function CredentialIssueRow({
                 form.setValue(`credentials.${index}.name`, stem, { shouldValidate: true });
               }
             }}
-            error={errors?.file?.message}
           />
         </FormField>
         </div>

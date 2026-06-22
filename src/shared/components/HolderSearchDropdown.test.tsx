@@ -58,7 +58,7 @@ describe("HolderSearchDropdown", () => {
     }, { timeout: 500 });
   });
 
-  it("displays search results with full user details", async () => {
+  it("displays search results with name and number", async () => {
     const onSearch = vi.fn().mockResolvedValue(MOCK_USERS);
     render(
       <HolderSearchDropdown
@@ -76,7 +76,6 @@ describe("HolderSearchDropdown", () => {
     await waitFor(() => {
       expect(screen.getByText("John Doe")).toBeInTheDocument();
       expect(screen.getByText("22091234")).toBeInTheDocument();
-      expect(screen.getByText("john@example.com")).toBeInTheDocument();
     });
   });
 

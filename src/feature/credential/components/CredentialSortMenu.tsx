@@ -7,25 +7,47 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@ui/dropdown-menu";
-
-export type CredentialSort = "newest" | "oldest" | "nameAZ" | "nameZA";
+import type { CredentialStatusFilter } from "./CredentialStatusFilterMenu";
 
 interface CredentialSortMenuProps {
-  value: CredentialSort;
-  onChange: (sortString: CredentialSort) => void;
+  value: string;
+  onChange: (sortString: string) => void;
+  statusFilter: CredentialStatusFilter;
 }
 
-const OPTIONS: { key: CredentialSort; labelKey: string }[] = [
-  { key: "newest", labelKey: "cred.sort.newest" },
-  { key: "oldest", labelKey: "cred.sort.oldest" },
-  { key: "nameAZ", labelKey: "cred.sort.nameAZ" },
-  { key: "nameZA", labelKey: "cred.sort.nameZA" },
+interface SortOption {
+  key: string;
+  labelKey: string;
+  getSortString: (status: CredentialStatusFilter) => string;
+}
+
+const OPTIONS: SortOption[] = [
+  {
+    key: "newest",
+    labelKey: "cred.sort.newest",
+    getSortString: (s) => (s === "revoked" ? "-revoked_at" : "-issued_at"),
+  },
+  {
+    key: "oldest",
+    labelKey: "cred.sort.oldest",
+    getSortString: (s) => (s === "revoked" ? "revoked_at" : "issued_at"),
+  },
+  {
+    key: "nameAZ",
+    labelKey: "cred.sort.nameAZ",
+    getSortString: () => "name",
+  },
+  {
+    key: "nameZA",
+    labelKey: "cred.sort.nameZA",
+    getSortString: () => "-name",
+  },
 ];
 
-export function CredentialSortMenu({ value, onChange }: CredentialSortMenuProps) {
+export function CredentialSortMenu({ value, onChange, statusFilter }: CredentialSortMenuProps) {
   const { t } = useTranslation();
 
-  const activeOption = OPTIONS.find((opt) => opt.key === value);
+  const activeOption = OPTIONS.find((opt) => opt.getSortString(statusFilter) === value);
 
   return (
     <DropdownMenu>
@@ -39,11 +61,12 @@ export function CredentialSortMenu({ value, onChange }: CredentialSortMenuProps)
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
         {OPTIONS.map((opt) => {
-          const active = opt.key === value;
+          const sortString = opt.getSortString(statusFilter);
+          const active = sortString === value;
           return (
             <DropdownMenuItem
               key={opt.key}
-              onClick={() => onChange(opt.key)}
+              onClick={() => onChange(sortString)}
               className="flex cursor-pointer items-center justify-between"
             >
               <span className={active ? "font-bold" : ""}>{t(opt.labelKey)}</span>

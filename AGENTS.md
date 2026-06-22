@@ -92,8 +92,9 @@ CredChain_React/
                                # + api/ (11 hooks: useCreateUsers, useDeleteUsers, useRestoreUsers,
                                #         useTransferSuperAdmin, useUpdateSelfEmail, useUpdateSelfProfile,
                                #         useUpdateUserRoles, useUpdateUsers, useUser, useUsers, useUserSelf)
-                                # + components/ (MetaEditor, RoleFilterMenu, SortMenu, StatusFilterMenu,
-                                #                PageSizeMenu, UserCreateRow, UserEditDrawer, UserStatusBadge)
+                                # + components/ (CredentialSortMenu, CredentialStatusFilterMenu, MetaEditor,
+                                #                RoleFilterMenu, SortMenu, StatusFilterMenu, UserCreateRow,
+                                #                UserEditDrawer, UserStatusBadge)
                                # + hooks/ (useUserListParams) + lib/ (meta) + schemas/ (user)
       credential/              # CredentialDetail, CredentialIssue, CredentialList, MyCredentials,
                                # VerifyCredential + api/ (6 hooks + keys.ts) + components/ + schemas/
@@ -108,7 +109,7 @@ CredChain_React/
         ui/                    # 12 shadcn-style primitives (sole Radix import location)
         layout/                # AdaptiveLayout, DashboardLayout, PublicLayout, SplitLayout,
                                # DashboardSidebar, NavbarDashboard, nav-items.ts
-      hooks/                   # useDebouncedValue, useNavSearch, useOnline, useT
+      hooks/                   # useDebouncedValue, useLoadMore, useNavSearch, useOnline, useSmartBack, useT
       i18n/                    # config.ts + en.json + id.json
       lib/                     # cn, env, format, forms, hash, jwt, notify
       types/api.ts             # DTO mirrors (UserDTO, AuthResponseDTO, CredentialDTO, PaginatedResponse)
@@ -335,13 +336,15 @@ className={`base classes ${isActive ? "active" : ""} ${className}`}
 
 **Custom shared components** (`@shared/components/*` — 20):
 
-`BackLink`, `CopyInlineButton`, `CopyrightFooter`, `DecorBlob`, `DetailRow`, `EmptyState`, `ErrorBoundary` (`AppErrorBoundary`), `EyebrowLabel`, `FormField` (in `@ui/form-field`), `LanguageSwitcher`, `LoadingSpinner` / `FullPageSpinner`, `MonoId`, `NotFound`, `OfflineBanner`, `PaginationBar`, `PageHeader`, `RouteErrorBoundary`, `StatusPill`, `UserAvatar`, `UserRoleBadge`.
+`BackLink`, `CopyInlineButton`, `CopyrightFooter`, `DecorBlob`, `DetailRow`, `EmptyState`, `ErrorBoundary` (`AppErrorBoundary`), `EyebrowLabel`, `FormField` (in `@ui/form-field`), `LanguageSwitcher`, `LoadMoreBar`, `LoadingSpinner` / `FullPageSpinner`, `MonoId`, `NotFound`, `OfflineBanner`, `PageHeader`, `RouteErrorBoundary`, `StatusPill`, `UserAvatar`, `UserRoleBadge`.
 
 `DetailRow` renders a dt/dd pair (`label` + `value`) with optional icon and error/default tone. Extracted from the repeated pattern in UserDetail, UserSelfProfile, Settings, and CredentialDetail.
 
 `FormField` wraps a `<Label>` + children + optional error/hint/optional tag. Used by `UserCreateRow`, `CredentialIssueRow`, and `UserEditDrawer` (extracted from 3 duplicated inline implementations).
 
 `CopyrightFooter` is the shared copyright strip rendered by `PublicLayout` at the bottom of public pages (and `AdaptiveLayout` when unauthenticated). It uses `font-sans` (DM Sans) for the copyright text — not `font-display` (reserved for headings) or `font-mono` (reserved for identifiers) — and renders the current year dynamically via `new Date().getFullYear()`. The footer background is `bg-transparent` (not `bg-surface`) so the page's `bg-base` shows through, eliminating the "white void" gap between short content and the footer when `bg-base` (#F8FAFC) and `bg-surface` (#FFFFFF) are nearly indistinguishable. Includes `safe-area-bottom` and `no-print` classes. The container that hosts it uses `min-h-dvh` (not `min-h-screen`) so the footer stays anchored to the bottom of the _visible_ viewport on mobile, where `100vh` over-counts due to browser chrome.
+
+`LoadMoreBar` replaces `PaginationBar` for list pagination. Used in `CredentialList`, `UserList`, and `MyCredentials` with `useLoadMore` hook (cumulative offset-based pagination with count label + Load More button).
 
 ### Error Handling Layers
 
@@ -474,7 +477,7 @@ All env vars must be prefixed with `VITE_` to be exposed to the browser. Reading
 | Integration | Vitest + MSW | Feature flows with mocked `/api`                            |
 | E2E         | Playwright   | Auth flow, public routes, a11y smoke                        |
 
-**Current count:** **343 unit/component tests across 40 spec files** under `src/`, plus **20 Playwright tests across 3 e2e specs** (`auth.spec.ts`, `public.spec.ts`, `a11y.spec.ts`).
+**Current count:** **426 unit/component tests across 47 spec files** under `src/`, plus **20 Playwright tests across 3 e2e specs** (`auth.spec.ts`, `public.spec.ts`, `a11y.spec.ts`).
 
 **Coverage** (in `vitest.config.ts`): the `coverage` config uses a **selective `include` allowlist** (NOT global). Per-file thresholds of 90% lines / 85% branches / 90% functions / 90% statements apply only to the curated paths:
 
@@ -556,6 +559,8 @@ Before pushing, run the repo's canonical verification command and confirm it pas
 - `CredChain_React`: `npm run lint && npm run build && npm run test && npm run check-locales`
 
 ## Change Log
+
+- **2026-06-21 — PaginationBar → LoadMoreBar migration + Credential filter/sort menus.** Deleted `PaginationBar` and `PageSizeMenu`. New shared `LoadMoreBar` component (count label + Load More button). New `useLoadMore` hook (cumulative offset-based pagination). `CredentialList` uses `useLoadMore` + `LoadMoreBar` + new `CredentialStatusFilterMenu` + `CredentialSortMenu`. `UserList` uses `useLoadMore` + `LoadMoreBar`. `MyCredentials` uses `useLoadMore` + `LoadMoreBar`. `useUserListParams` simplified: removed `page`, `limit`, `ALLOWED_LIMITS`, `parsePage`, `parseLimit`. Updated AGENTS.md: test count 343→426 (40→47 spec files), hooks list, shared component list, architecture diagram. All 426 tests pass. Modified: `LoadMoreBar.tsx`, `useLoadMore.ts`, `CredentialStatusFilterMenu.tsx`, `CredentialSortMenu.tsx`, `CredentialList.tsx`, `UserList.tsx`, `MyCredentials.tsx`, `useUserListParams.ts`, `AGENTS.md`.
 
 - **2026-06-13 — UserCreate page polish: header, birth date width, custom fields toggle.** Matched Add User page header to About page pattern (`<BackLink />` + `<PageHeader>` without circular icon `onBack`). Fixed Birth Date input taking full width on mobile by constraining to `max-w-[13rem]`. Replaced native `<details>/<summary>` custom fields toggle with controlled `useState` button + `ChevronDown` icon that rotates 180° on open. Changed i18n label from `+ Add custom fields` → `Custom Fields` (en) / `Kolom Kustom` (id). All 343 tests pass. Modified: `UserCreate.tsx`, `UserCreateRow.tsx`, `en.json`, `id.json`.
 

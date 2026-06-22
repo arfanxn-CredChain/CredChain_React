@@ -1,6 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Ban, FileBadge, RefreshCw, Search } from "lucide-react";
 import { useRevokeCredentials } from "./api/useRevokeCredentials";
 import { useReExtractCredentials } from "./api/useReExtractCredentials";
@@ -26,68 +26,70 @@ import { CredentialCard } from "./components/CredentialCard";
 import { CredentialStatusFilterMenu } from "./components/CredentialStatusFilterMenu";
 import type { CredentialStatusFilter } from "./components/CredentialStatusFilterMenu";
 import { CredentialSortMenu } from "./components/CredentialSortMenu";
-import type { CredentialSort } from "./components/CredentialSortMenu";
 
 const MAX_SELECTION = 100;
 
+const SORT_OPTIONS = [
+  { key: "newest", getSort: (s: CredentialStatusFilter) => (s === "revoked" ? "-revoked_at" : "-issued_at") },
+  { key: "oldest", getSort: (s: CredentialStatusFilter) => (s === "revoked" ? "revoked_at" : "issued_at") },
+  { key: "nameAZ", getSort: () => "name" },
+  { key: "nameZA", getSort: () => "-name" },
+];
+
 type BulkMode = "revoke" | "reextract" | null;
+
+function adjustSortForStatus(sortString: string, oldStatus: CredentialStatusFilter, newStatus: CredentialStatusFilter): string {
+  for (const opt of SORT_OPTIONS) {
+    if (opt.getSort(oldStatus) === sortString) {
+      return opt.getSort(newStatus);
+    }
+  }
+  return sortString;
+}
 
 export function CredentialList() {
   const { t } = useTranslation();
-  const [search, setSearch] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkMode, setBulkMode] = useState<BulkMode>(null);
-  const [credStatus, setCredStatus] = useState<CredentialStatusFilter>("active");
-  const [credSort, setCredSort] = useState<CredentialSort>("newest");
+
+  const credStatus: CredentialStatusFilter = (searchParams.get("status") as CredentialStatusFilter) ?? "active";
+  const credSort = searchParams.get("sort") ?? SORT_OPTIONS[0].getSort(credStatus);
+
+  const searchParam = searchParams.get("search") ?? "";
+  const [search, setSearch] = useState(searchParam);
+  const searchTypedRef = useRef<string | null>(null);
   const debouncedSearch = useDebouncedValue(search, 300);
+
+  useEffect(() => {
+    if (searchParam !== searchTypedRef.current) {
+      searchTypedRef.current = null;
+      setSearch(searchParam);
+    }
+  }, [searchParam]);
 
   const currentUser = useStore((s) => s.user);
   const canManage = canAccessAny(currentUser?.role, [Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]);
 
-  const buildSortString = useCallback(
-    (sort: CredentialSort, status: CredentialStatusFilter): string => {
-      const isRevoked = status === "revoked";
-      switch (sort) {
-        case "newest":
-          return isRevoked ? "-revoked_at" : "-issued_at";
-        case "oldest":
-          return isRevoked ? "revoked_at" : "issued_at";
-        case "nameAZ":
-          return "name";
-        case "nameZA":
-          return "-name";
-      }
-    },
-    [],
-  );
-
-  const buildFilterArray = useCallback((status: CredentialStatusFilter): string[] => {
-    switch (status) {
-      case "all":
-        return [];
-      case "active":
-        return ["revoked_at_", "extract_status!=failed"];
-      case "revoked":
-        return ["revoked_at!_", "extract_status!=failed"];
-      case "pending":
-        return ["extract_status=pending"];
-      case "failed":
-        return ["extract_status=failed"];
+  const filterArray: string[] = (() => {
+    switch (credStatus) {
+      case "all": return [];
+      case "active": return ["revoked_at_", "extract_status!=failed"];
+      case "revoked": return ["revoked_at!_", "extract_status!=failed"];
+      case "pending": return ["extract_status=pending"];
+      case "failed": return ["extract_status=failed"];
     }
-  }, []);
-
-  const sortString = buildSortString(credSort, credStatus);
-  const filterArray = buildFilterArray(credStatus);
+  })();
 
   const { items: credentials, total, isLoading, isError, isFetchingNextPage, hasMore, loadMore, reset } =
     useLoadMore<CredentialDTO>(
-      ["credentials", { search: debouncedSearch || undefined, sort: sortString, filters: filterArray }],
+      ["credentials", { search: debouncedSearch || undefined, sort: credSort, filters: filterArray }],
       async (page, limit) => {
         const q: Record<string, unknown> = {};
         q.page = page;
         q.limit = limit;
         if (debouncedSearch) q.search = debouncedSearch;
-        q.sorts = [sortString];
+        q.sorts = [credSort];
         if (filterArray.length > 0) q.filters = filterArray;
         q.includes = ["holder", "issuer", "revoker"];
         const response = await api.get("/credentials", { params: q });
@@ -228,17 +230,40 @@ export function CredentialList() {
   };
 
   const handleStatusChange = (status: CredentialStatusFilter) => {
-    setCredStatus(status);
+    if (status === credStatus) return;
+    const newSort = adjustSortForStatus(credSort, credStatus, status);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (status === "active") next.delete("status");
+      else next.set("status", status);
+      if (newSort === SORT_OPTIONS[0].getSort(status)) next.delete("sort");
+      else next.set("sort", newSort);
+      return next;
+    });
     reset();
   };
 
-  const handleSortChange = (sort: CredentialSort) => {
-    setCredSort(sort);
+  const handleSortChange = (sortString: string) => {
+    if (sortString === credSort) return;
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      const defaultSort = SORT_OPTIONS[0].getSort(credStatus);
+      if (sortString === defaultSort) next.delete("sort");
+      else next.set("sort", sortString);
+      return next;
+    });
     reset();
   };
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
+    searchTypedRef.current = value;
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (!value) next.delete("search");
+      else next.set("search", value);
+      return next;
+    });
     reset();
   };
 
@@ -267,7 +292,7 @@ export function CredentialList() {
             </div>
             <div className="flex flex-wrap items-center gap-2 md:ml-auto md:shrink-0">
               <CredentialStatusFilterMenu value={credStatus} onChange={handleStatusChange} />
-              <CredentialSortMenu value={credSort} onChange={handleSortChange} />
+              <CredentialSortMenu value={credSort} onChange={handleSortChange} statusFilter={credStatus} />
             </div>
           </div>
         </div>
@@ -312,7 +337,7 @@ export function CredentialList() {
                     selectionMode={bulkMode}
                     isSelected={selectedIds.has(cred.id)}
                     onSelect={() => toggleSelection(cred.id)}
-                    selectDisabled={!isSelectable || (selectionFull && !selectedIds.has(cred.id))}
+                    selectDisabled={bulkMode ? (!isSelectable || (selectionFull && !selectedIds.has(cred.id))) : undefined}
                   />
                 );
               })}

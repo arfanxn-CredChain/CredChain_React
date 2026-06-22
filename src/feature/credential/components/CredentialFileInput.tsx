@@ -17,10 +17,20 @@ export function CredentialFileInput({
 }: CredentialFileInputProps) {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
+  const noop = useCallback(() => {}, []);
 
   const handleRemove = useCallback(() => {
     onChange(null);
   }, [onChange]);
+
+  const handleFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const f = e.target.files?.[0] ?? null;
+      if (f) onChange(f);
+      if (inputRef.current) inputRef.current.value = "";
+    },
+    [onChange],
+  );
 
   return (
     <div>
@@ -28,17 +38,13 @@ export function CredentialFileInput({
         ref={inputRef}
         type="file"
         accept=".pdf,.jpg,.jpeg,.png,.webp,.tiff"
-        onChange={(e) => {
-          const f = e.target.files?.[0] ?? null;
-          if (f) onChange(f);
-          if (inputRef.current) inputRef.current.value = "";
-        }}
+        onChange={handleFileChange}
         className="hidden"
       />
       <div onClick={() => inputRef.current?.click()}>
         <CredentialFilePreview
           file={file}
-          onExpand={onExpand ?? (() => {})}
+          onExpand={onExpand ?? noop}
           onRemove={handleRemove}
         />
       </div>

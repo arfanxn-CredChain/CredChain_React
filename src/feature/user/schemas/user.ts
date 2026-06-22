@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { Role } from "@shared/auth/role";
-import { metaEntrySchema, metaEntriesSchema } from "@shared/lib/meta";
+
+import { metaEntriesSchema } from "@shared/lib/meta";
 export { metaEntrySchema, metaEntriesSchema } from "@shared/lib/meta";
 
 const STRICT_E164 = /^\+[1-9]\d{6,14}$/;
