@@ -46,8 +46,15 @@ export function CredentialCard({
       if (isSelectable && !selectDisabled) {
         onSelect?.();
       } else if (!isSelectable) {
-        const toastKey = selectionMode === "revoke" ? "cred.card.alreadyRevoked" : "cred.card.alreadySucceeded";
-        notify.info(toastKey);
+        if (selectionMode === "revoke") {
+          notify.info("cred.card.alreadyRevoked");
+        } else {
+          notify.info(
+            credential.extract_status === "succeeded"
+              ? "cred.card.alreadySucceeded"
+              : "credential.reextract.not_eligible",
+          );
+        }
       }
       return;
     }
