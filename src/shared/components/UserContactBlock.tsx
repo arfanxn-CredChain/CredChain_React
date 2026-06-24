@@ -77,10 +77,10 @@ export function UserContactBlock({
         {labelType === "full" && (
           <div
             className={cn(
-              "gap-x-4 gap-y-0.5",
+              "gap-y-0.5",
               layout === "grid"
-                ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-                : "flex flex-wrap",
+                ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4"
+                : "flex flex-col",
             )}
           >
             {user?.number && (
