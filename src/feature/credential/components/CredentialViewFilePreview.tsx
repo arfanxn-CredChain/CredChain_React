@@ -157,7 +157,7 @@ function PdfBlobThumbnail({ blob }: { blob: Blob }) {
         const ctx = canvas.getContext("2d")!;
         canvas.height = viewport.height;
         canvas.width = viewport.width;
-        await page.render({ canvasContext: ctx, viewport } as any).promise;
+        await (page.render({ canvasContext: ctx, viewport }) as { promise: Promise<void> }).promise;
         pdf.destroy();
       } catch {
         if (!cancelled) setError(true);
@@ -202,6 +202,7 @@ function BlobThumbnail({
     if (isPdf || !isImage) return;
     const url = URL.createObjectURL(blob);
     objectUrlRef.current = url;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setObjectUrl(url);
     setError(false);
     return () => {
