@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TestProviders } from "@/test/TestProviders";
-import { NavbarDashboard } from "./NavbarDashboard";
+import { NavbarOverview } from "./NavbarOverview";
 import { useStore } from "@app/store";
 import { Role } from "@shared/auth/role";
 import { mockUserWithMeta } from "@/test/fixtures";
@@ -14,10 +14,10 @@ vi.mock("@feature/auth/api/useLogout", () => ({
 }));
 
 function renderNavbar() {
-  return render(<NavbarDashboard onMenuClick={() => {}} />, { wrapper: TestProviders });
+  return render(<NavbarOverview onMenuClick={() => {}} />, { wrapper: TestProviders });
 }
 
-describe("NavbarDashboard logout confirmation", () => {
+describe("NavbarOverview logout confirmation", () => {
   beforeEach(() => {
     void i18n.changeLanguage("en");
     mockMutate.mockClear();
@@ -36,7 +36,7 @@ describe("NavbarDashboard logout confirmation", () => {
   });
 });
 
-describe("NavbarDashboard search", () => {
+describe("NavbarOverview search", () => {
   beforeEach(() => {
     void i18n.changeLanguage("en");
     useStore.setState({

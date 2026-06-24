@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TestProviders } from "@/test/TestProviders";
-import { DashboardSidebar } from "./DashboardSidebar";
+import { OverviewSidebar } from "./OverviewSidebar";
 import { useStore } from "@app/store";
 import { Role } from "@shared/auth/role";
 import { mockUserWithMeta } from "@/test/fixtures";
@@ -13,11 +13,11 @@ vi.mock("@feature/auth/api/useLogout", () => ({
   useLogout: () => ({ mutate: mockMutate, isPending: false }),
 }));
 
-function renderDashboardSidebar() {
-  return render(<DashboardSidebar />, { wrapper: TestProviders });
+function renderOverviewSidebar() {
+  return render(<OverviewSidebar />, { wrapper: TestProviders });
 }
 
-describe("DashboardSidebar logout confirmation", () => {
+describe("OverviewSidebar logout confirmation", () => {
   beforeEach(() => {
     void i18n.changeLanguage("en");
     mockMutate.mockClear();
@@ -28,14 +28,14 @@ describe("DashboardSidebar logout confirmation", () => {
   });
 
   it("shows confirm dialog on logout click", async () => {
-    renderDashboardSidebar();
+    renderOverviewSidebar();
     await userEvent.click(screen.getByRole("button", { name: /log out/i }));
     expect(await screen.findByRole("alertdialog")).toBeInTheDocument();
     expect(mockMutate).not.toHaveBeenCalled();
   });
 
   it("calls logout mutate when confirmed", async () => {
-    renderDashboardSidebar();
+    renderOverviewSidebar();
     await userEvent.click(screen.getByRole("button", { name: /log out/i }));
     const dialog = await screen.findByRole("alertdialog");
     const confirm = dialog.querySelectorAll("button")[1] as HTMLElement;
@@ -44,7 +44,7 @@ describe("DashboardSidebar logout confirmation", () => {
   });
 
   it("does not call logout when cancelled", async () => {
-    renderDashboardSidebar();
+    renderOverviewSidebar();
     await userEvent.click(screen.getByRole("button", { name: /log out/i }));
     await screen.findByRole("alertdialog");
     await userEvent.keyboard("{Escape}");

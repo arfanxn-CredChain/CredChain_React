@@ -8,11 +8,11 @@ import { useLogout } from "@feature/auth/api/useLogout";
 import { useConfirm } from "@ui/confirm-dialog";
 import { NAV_ITEMS } from "@shared/components/layout/nav-items";
 
-interface DashboardSidebarProps {
+interface OverviewSidebarProps {
   onClose?: () => void;
 }
 
-export function DashboardSidebar({ onClose }: DashboardSidebarProps) {
+export function OverviewSidebar({ onClose }: OverviewSidebarProps) {
   const user = useStore((s) => s.user);
   const logout = useLogout();
   const { t } = useTranslation();
@@ -62,7 +62,7 @@ export function DashboardSidebar({ onClose }: DashboardSidebarProps) {
             <NavLink
               key={item.href}
               to={item.href}
-              end={item.href === "/dashboard"}
+              end={item.href === "/overview"}
               onClick={onClose}
               className={({ isActive }) =>
                 cn(

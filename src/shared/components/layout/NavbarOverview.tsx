@@ -19,11 +19,11 @@ import {
   DropdownMenuTrigger,
 } from "@ui/dropdown-menu";
 
-interface NavbarDashboardProps {
+interface NavbarOverviewProps {
   onMenuClick: () => void;
 }
 
-export function NavbarDashboard({ onMenuClick }: NavbarDashboardProps) {
+export function NavbarOverview({ onMenuClick }: NavbarOverviewProps) {
   const user = useStore((s) => s.user);
   const setLocale = useStore((s) => s.setLocale);
   const currentLocale = useStore((s) => s.locale);

@@ -2,10 +2,10 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { cn } from "@shared/lib/cn";
 import { useScrollToTop } from "@shared/hooks/useScrollToTop";
-import { DashboardSidebar } from "./DashboardSidebar";
-import { NavbarDashboard } from "./NavbarDashboard";
+import { OverviewSidebar } from "./OverviewSidebar";
+import { NavbarOverview } from "./NavbarOverview";
 
-export function DashboardLayout() {
+export function OverviewLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   useScrollToTop();
 
@@ -29,12 +29,12 @@ export function DashboardLayout() {
         )}
         aria-label="Sidebar"
       >
-        <DashboardSidebar onClose={() => setSidebarOpen(false)} />
+        <OverviewSidebar onClose={() => setSidebarOpen(false)} />
       </aside>
 
       {/* Main */}
       <div className="flex min-w-0 flex-1 flex-col bg-base">
-        <NavbarDashboard onMenuClick={() => setSidebarOpen(true)} />
+        <NavbarOverview onMenuClick={() => setSidebarOpen(true)} />
 
         <main
           id="main"
