@@ -12,6 +12,10 @@ export const CODE_TO_MESSAGE_KEY: Record<number, string> = {
   100050: "system.internal_error",
   100040: "system.validation",
 
+  // Overview (10 + 01)
+  100100: "overview.success",
+  100150: "overview.internal_error",
+
   // Auth (20)
   200200: "auth.login.success",
   200140: "auth.unauthorized",
