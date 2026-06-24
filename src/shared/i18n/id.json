@@ -170,11 +170,6 @@
   "common.notSet": "Belum diatur",
   "common.copied": "Tersalin",
   "common.loadMore": "Muat Lebih Banyak",
-  "dashboard.welcome": "Selamat datang, {{name}}",
-  "dashboard.fallbackName": "di sana",
-  "dashboard.overview": "Ikhtisar platform dan aktivitas terkini.",
-  "dashboard.comingSoon.title": "Dasbor akan segera hadir",
-  "dashboard.comingSoon.body": "Kartu statistik, tren penerbitan, dan aktivitas akan tampil di sini.",
   "settings.title": "Pengaturan",
   "settings.account.heading": "Akun Anda",
   "settings.account.name": "Nama",
@@ -187,7 +182,7 @@
   "settings.account.copyWallet": "Salin alamat wallet",
   "settings.account.walletCopied": "Alamat wallet tersalin",
   "settings.language.heading": "Bahasa",
-  "settings.language.body": "Pilih bahasa yang Anda sukai untuk dasbor dan notifikasi.",
+  "settings.language.body": "Pilih bahasa yang Anda sukai untuk ringkasan dan notifikasi.",
   "settings.security.heading": "Keamanan",
   "settings.security.body": "Autentikasi dikelola oleh Google. Sesi menggunakan cookie httpOnly dan token akses dirotasi otomatis. Untuk keluar, gunakan menu pengguna di kanan atas.",
   "help.faq.title": "Pertanyaan yang sering diajukan",
@@ -200,7 +195,7 @@
   "landing.title": "Kredensial, terjangkar on-chain.",
   "landing.subtitle": "CredChain menerbitkan, mencabut, dan memverifikasi kredensial profesional sebagai NFT soulbound. Anti-pemalsuan. Portabel. Milik Anda.",
   "landing.cta.signIn": "Masuk",
-  "landing.cta.dashboard": "Ke Dasbor",
+  "landing.cta.overview": "Ke Ringkasan",
   "landing.cta.help": "Bantuan",
   "landing.cta.about": "Tentang",
   "userCreate.title": "Daftarkan Pengguna Baru",
@@ -622,7 +617,7 @@
     "code": "404",
     "title": "Halaman tidak ditemukan",
     "description": "Halaman yang Anda cari tidak ada atau telah dipindahkan.",
-    "goDashboard": "Kembali ke Dasbor",
+    "goOverview": "Kembali ke Ringkasan",
     "signIn": "Masuk"
   },
   "offline": {
@@ -634,7 +629,7 @@
     "notFoundTitle": "Halaman tidak ditemukan",
     "notFoundDescription": "Halaman yang Anda cari tidak ada.",
     "reload": "Muat ulang",
-    "goDashboard": "Dasbor"
+    "goOverview": "Ringkasan"
   },
   "user.detail": {
     "title": "Profil Pengguna",

@@ -26,9 +26,9 @@ describe("NotFound", () => {
     expect(root?.className).not.toContain("min-h-screen");
   });
 
-  it("renders Dashboard CTA button", () => {
+  it("renders Overview CTA button", () => {
     render(<NotFound />, { wrapper: TestProviders });
-    expect(screen.getByRole("link", { name: /Back to Dashboard/ })).toBeDefined();
+    expect(screen.getByRole("link", { name: /Back to Overview/ })).toBeDefined();
   });
 
   it("renders Sign in CTA button", () => {

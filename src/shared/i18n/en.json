@@ -170,11 +170,6 @@
   "common.notSet": "Not set",
   "common.copied": "Copied",
   "common.loadMore": "Load More",
-  "dashboard.welcome": "Welcome, {{name}}",
-  "dashboard.fallbackName": "there",
-  "dashboard.overview": "Platform overview and recent activity.",
-  "dashboard.comingSoon.title": "Dashboard coming soon",
-  "dashboard.comingSoon.body": "Stat cards, issuance trends, and activity feed will live here.",
   "settings.title": "Settings",
   "settings.account.heading": "Your Account",
   "settings.account.name": "Name",
@@ -187,7 +182,7 @@
   "settings.account.copyWallet": "Copy wallet address",
   "settings.account.walletCopied": "Wallet address copied",
   "settings.language.heading": "Language",
-  "settings.language.body": "Choose your preferred language for the dashboard and notifications.",
+  "settings.language.body": "Choose your preferred language for the overview and notifications.",
   "settings.security.heading": "Security",
   "settings.security.body": "Authentication is managed by Google. Sessions use httpOnly cookies and rotate access tokens automatically. To sign out, use the user menu in the top right.",
   "help.faq.title": "Frequently asked questions",
@@ -200,7 +195,7 @@
   "landing.title": "Credentials, anchored on-chain.",
   "landing.subtitle": "CredChain issues, revokes, and verifies professional credentials as soulbound NFTs. Tamper-proof. Portable. Yours.",
   "landing.cta.signIn": "Sign In",
-  "landing.cta.dashboard": "Go to Dashboard",
+  "landing.cta.overview": "Go to Overview",
   "landing.cta.help": "Help",
   "landing.cta.about": "About",
   "userCreate.title": "Register New Users",
@@ -287,7 +282,7 @@
   "auth.welcome.mobileTagline": "Decentralized credential platform",
   "auth.welcome.securedBy": "Secured by Google Sign-In",
   "auth.signin.title": "Sign in",
-  "auth.signin.subtitle": "Access the platform dashboard with your Google account.",
+  "auth.signin.subtitle": "Access the platform overview with your Google account.",
   "auth.signin.terms": "By signing in you agree to CredChain's terms of service. Authentication is handled by Google. Sessions use httpOnly cookies.",
   "credential.fetch.success": "Credential retrieved successfully",
   "credential.fetch.not_found": "Credential not found",
@@ -622,7 +617,7 @@
     "code": "404",
     "title": "Page not found",
     "description": "The page you are looking for does not exist or has been moved.",
-    "goDashboard": "Back to Dashboard",
+    "goOverview": "Back to Overview",
     "signIn": "Sign in"
   },
   "offline": {
@@ -634,7 +629,7 @@
     "notFoundTitle": "Page not found",
     "notFoundDescription": "The page you are looking for does not exist.",
     "reload": "Reload",
-    "goDashboard": "Dashboard"
+    "goOverview": "Overview"
   },
   "user.detail": {
     "title": "User Profile",

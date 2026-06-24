@@ -68,9 +68,9 @@ describe("RouteErrorBoundary", () => {
     expect(await screen.findByRole("button", { name: "Reload" })).toBeDefined();
   });
 
-  it("renders Dashboard link", async () => {
+  it("renders Overview link", async () => {
     void i18n.changeLanguage("en");
     renderWithErrorRoute(<div>Page</div>, new Error("Boom"));
-    expect(await screen.findByRole("link", { name: "Dashboard" })).toBeDefined();
+    expect(await screen.findByRole("link", { name: "Overview" })).toBeDefined();
   });
 });
