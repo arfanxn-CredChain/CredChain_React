@@ -16,7 +16,7 @@ export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
   }
 
   if (allowedRoles && allowedRoles.length > 0 && !canAccessAny(user.role, allowedRoles)) {
-    const fallback = user.role === Role.HOLDER ? "/credentials/self" : "/dashboard";
+    const fallback = user.role === Role.HOLDER ? "/credentials/self" : "/overview";
     return <Navigate to={fallback} replace />;
   }
 
@@ -29,7 +29,7 @@ export function PublicRoute() {
   const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname;
 
   if (isAuthenticated) {
-    return <Navigate to={from ?? "/dashboard"} replace />;
+    return <Navigate to={from ?? "/overview"} replace />;
   }
   return <Outlet />;
 }

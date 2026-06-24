@@ -8,7 +8,7 @@ interface PageHeaderProps {
   action?: React.ReactNode;
   /**
    * When true, render the back icon button using `useSmartBack()` (browser
-   * history if available, otherwise `/dashboard` for authed users or `/`
+   * history if available, otherwise `/overview` for authed users or `/`
    * for unauthed users). Pass a function to override with custom behavior.
    * Omit (or pass `false`) to hide the back button entirely.
    */

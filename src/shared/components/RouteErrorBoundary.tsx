@@ -23,9 +23,9 @@ export function RouteErrorBoundary() {
         <p className="mb-6 text-sm text-gray-500">{description}</p>
         <div className="flex flex-col justify-center gap-3 sm:flex-row">
           <Button asChild variant="primary">
-            <Link to="/dashboard">
+            <Link to="/overview">
               <ArrowLeft className="h-4 w-4" />
-              {t("error_boundary.goDashboard")}
+              {t("error_boundary.goOverview")}
             </Link>
           </Button>
           <Button variant="outline" onClick={() => window.location.reload()}>

@@ -153,8 +153,8 @@ export function Landing() {
   const { t } = useTranslation();
   const isAuthenticated = useStore((s) => s.isAuthenticated);
 
-  const primaryHref = isAuthenticated ? "/dashboard" : "/login";
-  const primaryLabel = isAuthenticated ? t("landing.cta.dashboard") : t("landing.cta.signIn");
+  const primaryHref = isAuthenticated ? "/overview" : "/login";
+  const primaryLabel = isAuthenticated ? t("landing.cta.overview") : t("landing.cta.signIn");
 
   const desktopBrand = (
     <div className="flex flex-col items-center gap-8 text-center">

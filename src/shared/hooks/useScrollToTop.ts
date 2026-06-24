@@ -6,7 +6,7 @@ import { useLocation } from "react-router-dom";
  *
  * Handles both scroll containers used across the app:
  * - the document/window scroller (PublicLayout, Landing, Login)
- * - the `#main` overflow container (DashboardLayout uses
+ * - the `#main` overflow container (OverviewLayout uses
  *   `overflow-y-scroll` so the window itself never scrolls)
  *
  * React Router's built-in `ScrollRestoration` only manages the document

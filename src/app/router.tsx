@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import { PublicLayout } from "@shared/components/layout/PublicLayout";
-import { DashboardLayout } from "@shared/components/layout/DashboardLayout";
+import { OverviewLayout } from "@shared/components/layout/OverviewLayout";
 import { AdaptiveLayout } from "@shared/components/layout/AdaptiveLayout";
 import { ProtectedRoute, PublicRoute } from "@shared/auth/guards";
 import { Role } from "@shared/auth/role";
@@ -78,12 +78,12 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute />,
     children: [
       {
-        element: <DashboardLayout />,
+        element: <OverviewLayout />,
         children: [
           // Any authenticated user
           {
-            path: "/dashboard",
-            ...lazyRoute(() => import("@feature/dashboard/Dashboard"), "Dashboard"),
+            path: "/overview",
+            ...lazyRoute(() => import("@feature/overview/Overview"), "Overview"),
           },
           {
             path: "/credentials/self",
@@ -138,7 +138,7 @@ export const router = createBrowserRouter([
               },
               {
                 path: "/settings",
-                ...lazyRoute(() => import("@feature/dashboard/Settings"), "Settings"),
+                ...lazyRoute(() => import("@feature/overview/Settings"), "Settings"),
               },
             ],
           },

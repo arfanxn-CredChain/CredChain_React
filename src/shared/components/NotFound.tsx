@@ -27,9 +27,9 @@ export function NotFound() {
 
         <div className="flex flex-col justify-center gap-3 sm:flex-row">
           <Button asChild variant="primary" size="lg">
-            <Link to="/dashboard">
+            <Link to="/overview">
               <ArrowLeft className="h-4 w-4" />
-              {t("not_found.goDashboard")}
+              {t("not_found.goOverview")}
             </Link>
           </Button>
           <Button asChild variant="outline" size="lg">

@@ -13,10 +13,10 @@ export interface NavSearchItem {
 
 export const NAV_ITEMS: NavSearchItem[] = [
   {
-    href: "/dashboard",
+    href: "/overview",
     i18nKey: "nav.overview",
     icon: LayoutDashboard,
-    minRole: Role.ISSUER,
+    minRole: Role.HOLDER,
     inSidebar: true,
   },
   { href: "/users", i18nKey: "nav.users", icon: Users, minRole: Role.ISSUER, inSidebar: true },

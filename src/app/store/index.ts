@@ -10,10 +10,10 @@ interface AuthSlice {
 }
 
 interface UiSlice {
-  dashboardSidebarOpen: boolean;
+  overviewSidebarOpen: boolean;
   locale: "en" | "id";
-  setDashboardSidebarOpen: (open: boolean) => void;
-  toggleDashboardSidebar: () => void;
+  setOverviewSidebarOpen: (open: boolean) => void;
+  toggleOverviewSidebar: () => void;
   setLocale: (locale: "en" | "id") => void;
 }
 
@@ -29,10 +29,10 @@ export const useStore = create<StoreState>()(
       clearUser: () => set({ user: null, isAuthenticated: false }),
 
       // UI slice
-      dashboardSidebarOpen: false,
+      overviewSidebarOpen: false,
       locale: "id",
-      setDashboardSidebarOpen: (open) => set({ dashboardSidebarOpen: open }),
-      toggleDashboardSidebar: () => set((s) => ({ dashboardSidebarOpen: !s.dashboardSidebarOpen })),
+      setOverviewSidebarOpen: (open) => set({ overviewSidebarOpen: open }),
+      toggleOverviewSidebar: () => set((s) => ({ overviewSidebarOpen: !s.overviewSidebarOpen })),
       setLocale: (locale) => set({ locale }),
     }),
     {

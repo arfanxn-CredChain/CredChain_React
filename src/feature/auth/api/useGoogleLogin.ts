@@ -24,7 +24,7 @@ export function useGoogleLogin() {
       void _r;
       setUser(user);
       notify.success("auth.login.success");
-      navigate("/dashboard");
+      navigate("/overview");
     },
     onError: () => {
       notify.error("auth.login.failed");
