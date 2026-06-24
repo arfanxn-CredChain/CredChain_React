@@ -67,16 +67,52 @@ src/feature/overview/
   api/useOverview.test.ts — hook tests
 ```
 
+### Date Range Filter
+
+The overview endpoint supports an optional date range via the standard `filters` query param:
+
+```
+GET /api/overview?filters=date..2026-01-01,2026-06-30
+```
+
+The date range filter UI is placed in the `PageHeader` action area, matching the filter placement pattern from `CredentialList.tsx` and `UserList.tsx`:
+
+```
+<PageHeader
+  title={t("overview.welcome")}
+  description={t("overview.description")}
+  action={
+    <DateRangeFilter value={dateRange} onChange={setDateRange} />
+  }
+/>
+```
+
+The `DateRangeFilter` is a paired `from`/`to` date input (native `<input type="date">`) with:
+- "From" and "To" labels
+- Clear button to reset to all-time
+- State managed via `useState` + `useSearchParams` for URL persistence
+- Debounced 300ms before updating the query filter array
+- Filter string format: `date..2026-01-01,2026-06-30`
+- Empty/cleared = all-time (no filter param sent)
+
+Filter state flows: `DateRangeFilter` → `useSearchParams` → parsed into `filters` array → `useOverview(filters)` → `api.get("/overview", { params: { filters } })`.
+
 ### Overview.tsx Component Tree
 
 ```
 Overview()
 ├── useStore() → user (name, role)
 ├── useTranslation()
-├── useOverview() → { data, isLoading, isError, refetch }
+├── useSearchParams() → dateFrom, dateTo
+├── useState() → local date state (debounced)
+├── useOverview({ filters }) → { data, isLoading, isError, refetch }
 ├── canAccessAny(user.role, [ISSUER, ADMIN, SUPER_ADMIN])
 │
-├── <PageHeader title={t("overview.welcome")} description={t("overview.description")} />
+├── <PageHeader
+│     title={t("overview.welcome")}
+│     description={t("overview.description")}
+│     action={<DateRangeFilter value={dateRange} onChange={setDateRange} />}
+│   />
 │
 ├── [Loading] → 3 Skeleton cards (counts grid + recents card + chain card)
 ├── [Error]   → <EmptyState icon={AlertTriangle} title/description/action={Retry btn} />
@@ -232,7 +268,7 @@ Added to `src/shared/api/codes.ts` under System (10) block:
 ```ts
 // feature/overview/api/keys.ts
 export const overviewKeys = {
-  all: () => ["overview"] as const,
+  all: (filters?: string[]) => ["overview", { filters }] as const,
 };
 
 // feature/overview/api/useOverview.ts
@@ -241,18 +277,26 @@ import { api } from "@shared/api/client";
 import type { OverviewDTO } from "@shared/types/api";
 import { overviewKeys } from "./keys";
 
-export function useOverview() {
+export interface UseOverviewParams {
+  filters?: string[];
+}
+
+export function useOverview(params?: UseOverviewParams) {
   return useQuery({
-    queryKey: overviewKeys.all(),
+    queryKey: overviewKeys.all(params?.filters),
     queryFn: async () => {
-      const response = await api.get<OverviewDTO>("/overview");
+      const q: Record<string, unknown> = {};
+      if (params?.filters && params.filters.length > 0) {
+        q.filters = params.filters;
+      }
+      const response = await api.get<OverviewDTO>("/overview", { params: q });
       return response.data;
     },
   });
 }
 ```
 
-Uses default staleTime (5 min) from queryClient — dashboard data doesn't need real-time refresh. No pagination, no load-more.
+Uses default staleTime (5 min) from queryClient — overview data doesn't need real-time refresh. No pagination, no load-more. Filter changes invalidate the cache via distinct query keys.
 
 ## i18n Keys
 
@@ -312,6 +356,9 @@ Uses default staleTime (5 min) from queryClient — dashboard data doesn't need 
 | `overview.error.body` | "Could not load the overview." | "Tidak dapat memuat ringkasan." |
 | `overview.error.retry` | "Retry" | "Coba lagi" |
 | `overview.loading` | "Loading overview..." | "Memuat ringkasan..." |
+| `overview.dateFilter.from` | "From" | "Dari" |
+| `overview.dateFilter.to` | "To" | "Sampai" |
+| `overview.dateFilter.clear` | "Clear" | "Hapus" |
 | `nav.overview` | *(unchanged)* | "Ringkasan" |
 | `landing.cta.overview` | "Go to Overview" | "Ke Ringkasan" |
 
@@ -418,6 +465,8 @@ http.get("*/api/overview", () => {
   });
 }),
 ```
+
+The handler ignores the `filters` query param and returns the full mock data — tests for filter behavior would be mocked separately.
 
 ## Verification
 
