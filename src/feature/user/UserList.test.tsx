@@ -233,21 +233,21 @@ describe("UserList", () => {
   it("renders copy buttons for email in each row", async () => {
     renderUserList();
     await waitFor(() => expect(screen.getByText("Jane Doe")).toBeInTheDocument());
-    expect(screen.getAllByRole("button", { name: /copy email/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("button", { name: /copy user email/i }).length).toBeGreaterThan(0);
   });
 
   it("renders copy button for phone when phone exists", async () => {
     renderUserList();
     await waitFor(() => expect(screen.getByText("Jane Doe")).toBeInTheDocument());
-    expect(screen.getAllByRole("button", { name: /copy phone/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("button", { name: /copy user phone/i }).length).toBeGreaterThan(0);
   });
 
   it("renders copy buttons for wallet address in each row", async () => {
     renderUserList();
     await waitFor(() => expect(screen.getByText("Jane Doe")).toBeInTheDocument());
-    expect(screen.getAllByRole("button", { name: /copy wallet address/i }).length).toBeGreaterThan(
-      0,
-    );
+    expect(screen.getAllByRole("button", { name: /copy user wallet/i }).length).toBeGreaterThan(
+       0,
+     );
   });
 
   it("selecting a role filter updates the URL with role param", async () => {
