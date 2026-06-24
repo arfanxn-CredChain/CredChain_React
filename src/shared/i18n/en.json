@@ -848,5 +848,12 @@
   "overview.loading": "Loading overview...",
   "overview.dateFilter.from": "From",
   "overview.dateFilter.to": "To",
-  "overview.dateFilter.clear": "Clear"
+  "overview.dateFilter.clear": "Clear",
+  "overview.dateFilter.label": "Date range",
+  "overview.dateFilter.all": "All time",
+  "overview.dateFilter.last7Days": "Last 7 days",
+  "overview.dateFilter.last30Days": "Last 30 days",
+  "overview.dateFilter.thisMonth": "This month",
+  "overview.dateFilter.custom": "Custom range",
+  "overview.dateFilter.apply": "Apply"
 }

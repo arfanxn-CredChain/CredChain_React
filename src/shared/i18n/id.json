@@ -848,5 +848,12 @@
   "overview.loading": "Memuat ringkasan...",
   "overview.dateFilter.from": "Dari",
   "overview.dateFilter.to": "Sampai",
-  "overview.dateFilter.clear": "Hapus"
+  "overview.dateFilter.clear": "Hapus",
+  "overview.dateFilter.label": "Rentang tanggal",
+  "overview.dateFilter.all": "Semua waktu",
+  "overview.dateFilter.last7Days": "7 hari terakhir",
+  "overview.dateFilter.last30Days": "30 hari terakhir",
+  "overview.dateFilter.thisMonth": "Bulan ini",
+  "overview.dateFilter.custom": "Rentang kustom",
+  "overview.dateFilter.apply": "Terapkan"
 }

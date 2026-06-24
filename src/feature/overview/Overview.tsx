@@ -1,7 +1,14 @@
 import { useState } from "react";
+import type { LucideIcon } from "lucide-react";
+import {
+  User,
+  AlertTriangle,
+  FileBadge,
+  Ban,
+  Layers,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
-import { User, AlertTriangle, FileBadge, Ban } from "lucide-react";
 import { useStore } from "@app/store";
 import { Role } from "@shared/auth/role";
 import { RoleGate } from "@shared/auth/guards";
@@ -15,8 +22,9 @@ import { MonoId } from "@shared/components/MonoId";
 import { Card } from "@ui/card";
 import { Skeleton } from "@ui/skeleton";
 import { Button } from "@ui/button";
-import { Input } from "@ui/input";
 import { cn } from "@shared/lib/cn";
+import { DateFilterMenu } from "./components/DateFilterMenu";
+import type { OverviewRecentCredential, OverviewRecentUser } from "@shared/types/api";
 
 /* ── helpers ── */
 
@@ -38,6 +46,14 @@ function relativeTime(
   return t("overview.relativeTime.weeks", { n: weeks });
 }
 
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 /* ── stat item ── */
 
 interface StatItemProps {
@@ -52,7 +68,7 @@ function StatItem({ value, label, accent, note }: StatItemProps) {
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center rounded-2xl border p-6 h-40",
+        "flex h-40 flex-col items-center justify-center rounded-2xl border p-6",
         isAccent
           ? "border-gold/20 bg-gold/10 shadow-sm shadow-gold/10"
           : "border-gray-100 bg-surface shadow-sm",
@@ -61,9 +77,13 @@ function StatItem({ value, label, accent, note }: StatItemProps) {
       <span className="font-display text-4xl font-extrabold tracking-tight text-navy">
         {value.toLocaleString()}
       </span>
-      <span className="mt-2 text-xs font-bold tracking-wider text-gray-400 uppercase">
+      <span className="mt-2 text-center text-xs font-bold tracking-wider text-gray-400 uppercase">
         {label}
-        {note && <span className="ml-1 normal-case text-gray-400/70 font-normal">{note}</span>}
+        {note && (
+          <span className="ml-1 block font-normal normal-case text-gray-400/70">
+            {note}
+          </span>
+        )}
       </span>
     </div>
   );
@@ -72,7 +92,116 @@ function StatItem({ value, label, accent, note }: StatItemProps) {
 /* ── skeleton stat ── */
 
 function StatSkeleton() {
-  return <Skeleton className="h-40 rounded-2xl" />;
+  return (
+    <div className="flex h-40 flex-col items-center justify-center gap-3 rounded-2xl border border-gray-100 bg-surface p-6 shadow-sm">
+      <Skeleton className="h-10 w-20 rounded-lg" />
+      <Skeleton className="h-4 w-24 rounded-md" />
+    </div>
+  );
+}
+
+/* ── recent section ── */
+
+interface RecentSectionProps {
+  title: string;
+  icon: LucideIcon;
+  tone?: "gold" | "error" | "navy";
+  count: number;
+  children: React.ReactNode;
+}
+
+const toneBlock = {
+  gold: "bg-gold/10 text-gold",
+  error: "bg-error/10 text-error",
+  navy: "bg-navy/10 text-navy",
+};
+
+function RecentSection({ title, icon: Icon, tone = "gold", count, children }: RecentSectionProps) {
+  return (
+    <div>
+      <div className="mb-4 flex items-center gap-3">
+        <div className={cn("rounded-lg p-1.5", toneBlock[tone])}>
+          <Icon className="h-4 w-4" aria-hidden="true" />
+        </div>
+        <h4 className="flex-1 text-xs font-bold tracking-wider text-gray-400 uppercase">
+          {title}
+        </h4>
+        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-bold text-gray-500">
+          {count}
+        </span>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+/* ── recent rows ── */
+
+function CredentialRow({
+  cred,
+  variant,
+  t,
+}: {
+  cred: OverviewRecentCredential;
+  variant: "active" | "revoked";
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  const isRevoked = variant === "revoked";
+  const Icon = isRevoked ? Ban : FileBadge;
+  const tone = isRevoked ? ("error" as const) : ("gold" as const);
+  const actor = isRevoked ? cred.revoker : cred.issuer;
+  const key = isRevoked ? "overview.recents.revokedBy" : "overview.recents.issuedBy";
+  const time = isRevoked && cred.revoked_at ? relativeTime(cred.revoked_at, t) : relativeTime(cred.issued_at, t);
+
+  return (
+    <div className="group -mx-2 flex items-start gap-4 rounded-lg border-t border-gray-100 px-2 py-3 transition-colors first:border-t-0 hover:bg-gray-50/70">
+      <div className={cn("mt-0.5 shrink-0 rounded-lg p-1.5", toneBlock[tone])}>
+        <Icon className="h-4 w-4" aria-hidden="true" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold text-navy">
+          {cred.name || t("overview.recents.noName")}
+        </p>
+        <p className="mt-0.5 text-xs text-gray-500">
+          {cred.holder ? `${cred.holder.name} · ` : ""}
+          {t(key, { [isRevoked ? "revoker" : "issuer"]: actor?.name ?? t("overview.recents.noName") })}
+        </p>
+      </div>
+      <time
+        dateTime={isRevoked && cred.revoked_at ? cred.revoked_at : cred.issued_at}
+        className="mt-0.5 shrink-0 text-xs text-gray-400"
+      >
+        {time}
+      </time>
+    </div>
+  );
+}
+
+function UserRow({
+  user,
+  t,
+}: {
+  user: OverviewRecentUser;
+  t: ReturnType<typeof useTranslation>["t"];
+}) {
+  return (
+    <div className="group -mx-2 flex items-start gap-4 rounded-lg border-t border-gray-100 px-2 py-3 transition-colors first:border-t-0 hover:bg-gray-50/70">
+      <div className="mt-0.5 shrink-0 rounded-lg bg-navy/10 p-1.5">
+        <User className="h-4 w-4 text-navy" aria-hidden="true" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold text-navy">
+          {user.name || t("overview.recents.noName")}
+        </p>
+        <p className="mt-0.5 text-xs text-gray-500">
+          {t("overview.recents.joined", { date: formatDate(user.created_at) })}
+        </p>
+      </div>
+      <time dateTime={user.created_at} className="mt-0.5 shrink-0 text-xs text-gray-400">
+        {relativeTime(user.created_at, t)}
+      </time>
+    </div>
+  );
 }
 
 /* ── main page ── */
@@ -82,9 +211,7 @@ export function Overview() {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [dateFrom, setDateFrom] = useState(
-    searchParams.get("dateFrom") ?? "",
-  );
+  const [dateFrom, setDateFrom] = useState(searchParams.get("dateFrom") ?? "");
   const [dateTo, setDateTo] = useState(searchParams.get("dateTo") ?? "");
   const debouncedFrom = useDebouncedValue(dateFrom, 300);
   const debouncedTo = useDebouncedValue(dateTo, 300);
@@ -115,17 +242,6 @@ export function Overview() {
     });
   };
 
-  const handleClearDates = () => {
-    setDateFrom("");
-    setDateTo("");
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      next.delete("dateFrom");
-      next.delete("dateTo");
-      return next;
-    });
-  };
-
   return (
     <div className="mx-auto max-w-7xl space-y-6">
       <PageHeader
@@ -134,40 +250,11 @@ export function Overview() {
         })}
         description={t("overview.description")}
         action={
-          <div className="flex flex-wrap items-end gap-2">
-            <div className="flex flex-col gap-1">
-              <label className="text-xs text-gray-500">
-                {t("overview.dateFilter.from")}
-              </label>
-              <Input
-                type="date"
-                value={dateFrom}
-                onChange={(e) => handleDateChange(e.target.value, dateTo)}
-                className="w-36"
-              />
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs text-gray-500">
-                {t("overview.dateFilter.to")}
-              </label>
-              <Input
-                type="date"
-                value={dateTo}
-                onChange={(e) => handleDateChange(dateFrom, e.target.value)}
-                className="w-36"
-              />
-            </div>
-            {(dateFrom || dateTo) && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleClearDates}
-                className="mb-0.5"
-              >
-                {t("overview.dateFilter.clear")}
-              </Button>
-            )}
-          </div>
+          <DateFilterMenu
+            dateFrom={dateFrom}
+            dateTo={dateTo}
+            onChange={handleDateChange}
+          />
         }
       />
 
@@ -184,13 +271,14 @@ export function Overview() {
         />
       ) : isLoading ? (
         <>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-5">
+            <StatSkeleton />
             <StatSkeleton />
             <StatSkeleton />
             <StatSkeleton />
             <StatSkeleton />
           </div>
-          <Skeleton className="h-60 rounded-2xl" />
+          <Skeleton className="h-72 rounded-2xl" />
           <Skeleton className="h-64 rounded-2xl" />
         </>
       ) : data ? (
@@ -199,8 +287,10 @@ export function Overview() {
           <Card className="relative overflow-hidden p-6 shadow-lg ring-1 shadow-gold/20 ring-gold/10 sm:p-8">
             <DecorBlob tone="gold" position="top-right" size="lg" />
             <div className="relative z-10">
-              <EyebrowLabel className="mb-6">{t("overview.credentialCounts")}</EyebrowLabel>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+              <EyebrowLabel className="mb-6">
+                {t("overview.credentialCounts")}
+              </EyebrowLabel>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-5">
                 <StatItem
                   value={data.credential_counts.active}
                   label={t("overview.counts.active")}
@@ -229,38 +319,44 @@ export function Overview() {
           {/* ── user counts ── */}
           <RoleGate allowed={[Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]}>
             {data.user_counts && (
-              <Card className="p-6 sm:p-8">
-                <EyebrowLabel className="mb-6">{t("overview.userCounts")}</EyebrowLabel>
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-                  <StatItem
-                    value={data.user_counts.total}
-                    label={t("overview.counts.total")}
-                  />
-                  <StatItem
-                    value={data.user_counts.holder}
-                    label={t("overview.counts.holder")}
-                  />
-                  <StatItem
-                    value={data.user_counts.issuer}
-                    label={t("overview.counts.issuer")}
-                  />
-                  <StatItem
-                    value={data.user_counts.admin}
-                    label={t("overview.counts.admin")}
-                  />
-                  <StatItem
-                    value={data.user_counts.super_admin}
-                    label={t("overview.counts.superAdmin")}
-                    note={t("overview.superAdminAlwaysOne")}
-                  />
-                  <StatItem
-                    value={data.user_counts.active}
-                    label={t("overview.counts.activeUsers")}
-                  />
-                  <StatItem
-                    value={data.user_counts.trashed}
-                    label={t("overview.counts.trashed")}
-                  />
+              <Card className="relative overflow-hidden p-6 shadow-lg ring-1 shadow-gold/20 ring-gold/10 sm:p-8">
+                <DecorBlob tone="gold" position="top-right" size="lg" />
+                <div className="relative z-10">
+                  <EyebrowLabel className="mb-6">
+                    {t("overview.userCounts")}
+                  </EyebrowLabel>
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                    <StatItem
+                      value={data.user_counts.total}
+                      label={t("overview.counts.total")}
+                    />
+                    <StatItem
+                      value={data.user_counts.holder}
+                      label={t("overview.counts.holder")}
+                    />
+                    <StatItem
+                      value={data.user_counts.issuer}
+                      label={t("overview.counts.issuer")}
+                    />
+                    <StatItem
+                      value={data.user_counts.admin}
+                      label={t("overview.counts.admin")}
+                    />
+                    <StatItem
+                      value={data.user_counts.super_admin}
+                      label={t("overview.counts.superAdmin")}
+                      note={t("overview.superAdminAlwaysOne")}
+                    />
+                    <StatItem
+                      value={data.user_counts.active}
+                      label={t("overview.counts.activeUsers")}
+                      accent="gold"
+                    />
+                    <StatItem
+                      value={data.user_counts.trashed}
+                      label={t("overview.counts.trashed")}
+                    />
+                  </div>
                 </div>
               </Card>
             )}
@@ -268,110 +364,65 @@ export function Overview() {
 
           {/* ── recent activity ── */}
           <Card className="p-6 sm:p-8">
-            <EyebrowLabel className="mb-6">{t("overview.recents")}</EyebrowLabel>
+            <EyebrowLabel className="mb-6">
+              {t("overview.recents")}
+            </EyebrowLabel>
             <div className="space-y-8">
-              {/* active creds */}
-              <div>
-                <h4 className="mb-4 text-xs font-bold tracking-wider text-gray-400 uppercase">
-                  {t("overview.recents.activeCredentials")}
-                </h4>
+              <RecentSection
+                title={t("overview.recents.activeCredentials")}
+                icon={FileBadge}
+                tone="gold"
+                count={data.recents.active_credentials.length}
+              >
                 {data.recents.active_credentials.length === 0 ? (
                   <p className="py-6 text-center text-sm text-gray-400 italic">
                     {t("overview.recents.empty")}
                   </p>
                 ) : (
                   data.recents.active_credentials.map((cred) => (
-                    <div
+                    <CredentialRow
                       key={cred.id}
-                      className="flex items-start gap-4 border-t border-gray-50 py-3 first:border-t-0"
-                    >
-                      <div className="mt-0.5 shrink-0 rounded-lg bg-gold/10 p-1.5">
-                        <FileBadge className="h-4 w-4 text-gold" aria-hidden="true" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-navy">
-                          {cred.name || t("overview.recents.noName")}
-                        </p>
-                        <p className="mt-0.5 text-xs text-gray-500">
-                          {cred.holder ? `${cred.holder.name} · ` : ""}
-                          {t("overview.recents.issuedBy", {
-                            issuer: cred.issuer?.name ?? t("overview.recents.noName"),
-                          })}
-                        </p>
-                      </div>
-                      <time className="mt-0.5 shrink-0 text-xs text-gray-400">
-                        {relativeTime(cred.issued_at, t)}
-                      </time>
-                    </div>
+                      cred={cred}
+                      variant="active"
+                      t={t}
+                    />
                   ))
                 )}
-              </div>
+              </RecentSection>
 
-              {/* revoked creds */}
-              <div>
-                <h4 className="mb-4 text-xs font-bold tracking-wider text-gray-400 uppercase">
-                  {t("overview.recents.revokedCredentials")}
-                </h4>
+              <RecentSection
+                title={t("overview.recents.revokedCredentials")}
+                icon={Ban}
+                tone="error"
+                count={data.recents.revoked_credentials.length}
+              >
                 {data.recents.revoked_credentials.length === 0 ? (
                   <p className="py-6 text-center text-sm text-gray-400 italic">
                     {t("overview.recents.empty")}
                   </p>
                 ) : (
                   data.recents.revoked_credentials.map((cred) => (
-                    <div
+                    <CredentialRow
                       key={cred.id}
-                      className="flex items-start gap-4 border-t border-gray-50 py-3 first:border-t-0"
-                    >
-                      <div className="mt-0.5 shrink-0 rounded-lg bg-error/10 p-1.5">
-                        <Ban className="h-4 w-4 text-error" aria-hidden="true" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-navy">
-                          {cred.name || t("overview.recents.noName")}
-                        </p>
-                        <p className="mt-0.5 text-xs text-gray-500">
-                          {cred.holder ? `${cred.holder.name} · ` : ""}
-                          {t("overview.recents.revokedBy", {
-                            revoker: cred.revoker?.name ?? t("overview.recents.noName"),
-                          })}
-                        </p>
-                      </div>
-                      <time className="mt-0.5 shrink-0 text-xs text-gray-400">
-                        {cred.revoked_at ? relativeTime(cred.revoked_at, t) : ""}
-                      </time>
-                    </div>
+                      cred={cred}
+                      variant="revoked"
+                      t={t}
+                    />
                   ))
                 )}
-              </div>
+              </RecentSection>
 
-              {/* stored users */}
               {data.recents.stored_users && data.recents.stored_users.length > 0 && (
-                <div>
-                  <h4 className="mb-4 text-xs font-bold tracking-wider text-gray-400 uppercase">
-                    {t("overview.recents.storedUsers")}
-                  </h4>
+                <RecentSection
+                  title={t("overview.recents.storedUsers")}
+                  icon={User}
+                  tone="navy"
+                  count={data.recents.stored_users.length}
+                >
                   {data.recents.stored_users.map((u) => (
-                    <div
-                      key={u.id}
-                      className="flex items-start gap-4 border-t border-gray-50 py-3 first:border-t-0"
-                    >
-                      <div className="mt-0.5 shrink-0 rounded-lg bg-navy/10 p-1.5">
-                        <User className="h-4 w-4 text-navy" aria-hidden="true" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-navy">
-                          {u.name || t("overview.recents.noName")}
-                        </p>
-                        <p className="mt-0.5 text-xs text-gray-500">
-                          {u.role} · {new Date(u.created_at).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
-                        </p>
-                      </div>
-                      <time className="mt-0.5 shrink-0 text-xs text-gray-400">
-                        {relativeTime(u.created_at, t)}
-                      </time>
-                    </div>
+                    <UserRow key={u.id} user={u} t={t} />
                   ))}
-                </div>
+                </RecentSection>
               )}
             </div>
           </Card>
@@ -379,44 +430,61 @@ export function Overview() {
           {/* ── chain details ── */}
           <RoleGate allowed={[Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]}>
             {data.chain_details && (
-              <Card className="p-6 sm:p-8">
-                <EyebrowLabel className="mb-6">{t("overview.chainDetails")}</EyebrowLabel>
-                <dl className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-                  <div>
-                    <dt className="mb-1 text-xs font-bold tracking-wider text-gray-400 uppercase">
-                      {t("overview.chainDetails.authorityContract")}
-                    </dt>
-                    <dd>
-                      <MonoId
-                        value={data.chain_details.authority_contract}
-                        mode="address"
-                        className="text-sm text-navy"
-                      />
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="mb-1 text-xs font-bold tracking-wider text-gray-400 uppercase">
-                      {t("overview.chainDetails.registryContract")}
-                    </dt>
-                    <dd>
-                      <MonoId
-                        value={data.chain_details.registry_contract}
-                        mode="address"
-                        className="text-sm text-navy"
-                      />
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="mb-1 text-xs font-bold tracking-wider text-gray-400 uppercase">
-                      {t("overview.chainDetails.lastBlock")}
-                    </dt>
-                    <dd className="font-display text-2xl font-bold tracking-tight text-navy">
-                      {data.chain_details.last_block === 0
-                        ? t("overview.chainDetails.unavailable")
-                        : data.chain_details.last_block.toLocaleString()}
-                    </dd>
-                  </div>
-                </dl>
+              <Card className="relative overflow-hidden p-6 shadow-lg ring-1 shadow-gold/20 ring-gold/10 sm:p-8">
+                <DecorBlob tone="gold" position="top-right" size="lg" />
+                <div className="relative z-10">
+                  <EyebrowLabel className="mb-6">
+                    {t("overview.chainDetails")}
+                  </EyebrowLabel>
+                  <dl className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+                    <div>
+                      <EyebrowLabel
+                        as="dt"
+                        className="flex items-center gap-1.5"
+                      >
+                        <Layers className="h-3.5 w-3.5" aria-hidden="true" />
+                        {t("overview.chainDetails.authorityContract")}
+                      </EyebrowLabel>
+                      <dd>
+                        <MonoId
+                          value={data.chain_details.authority_contract}
+                          mode="address"
+                          className="text-sm text-navy"
+                        />
+                      </dd>
+                    </div>
+                    <div>
+                      <EyebrowLabel
+                        as="dt"
+                        className="flex items-center gap-1.5"
+                      >
+                        <Layers className="h-3.5 w-3.5" aria-hidden="true" />
+                        {t("overview.chainDetails.registryContract")}
+                      </EyebrowLabel>
+                      <dd>
+                        <MonoId
+                          value={data.chain_details.registry_contract}
+                          mode="address"
+                          className="text-sm text-navy"
+                        />
+                      </dd>
+                    </div>
+                    <div>
+                      <EyebrowLabel
+                        as="dt"
+                        className="flex items-center gap-1.5"
+                      >
+                        <Layers className="h-3.5 w-3.5" aria-hidden="true" />
+                        {t("overview.chainDetails.lastBlock")}
+                      </EyebrowLabel>
+                      <dd className="font-display text-2xl font-bold tracking-tight text-navy">
+                        {data.chain_details.last_block === 0
+                          ? t("overview.chainDetails.unavailable")
+                          : data.chain_details.last_block.toLocaleString()}
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
               </Card>
             )}
           </RoleGate>
