@@ -10,7 +10,7 @@ import { Card } from "@ui/card";
 import { Skeleton } from "@ui/skeleton";
 import { UserAvatar } from "@shared/components/UserAvatar";
 import { UserRoleBadge } from "@shared/components/UserRoleBadge";
-import { UserStatusBadge } from "./components/UserStatusBadge";
+import { UserStatusBadge } from "@shared/components/UserStatusBadge";
 import { formatDate, formatDateTime } from "@shared/lib/format";
 
 export function UserDetail() {

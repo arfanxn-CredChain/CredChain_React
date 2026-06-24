@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Activity, XOctagon } from "lucide-react";
+import { XOctagon } from "lucide-react";
 import { StatusPill } from "@shared/components/StatusPill";
 
 interface UserStatusBadgeProps {
@@ -9,16 +9,11 @@ interface UserStatusBadgeProps {
 export function UserStatusBadge({ deletedAt }: UserStatusBadgeProps) {
   const { t } = useTranslation();
 
-  if (deletedAt) {
-    return (
-      <StatusPill tone="error" icon={XOctagon}>
-        {t("user.status.trashed")}
-      </StatusPill>
-    );
-  }
+  if (!deletedAt) return null;
+
   return (
-    <StatusPill tone="green" icon={Activity}>
-      {t("user.status.active")}
+    <StatusPill tone="error" icon={XOctagon}>
+      {t("user.status.trashed")}
     </StatusPill>
   );
 }

@@ -42,7 +42,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@ui/table";
 
 import { UserRoleBadge } from "@shared/components/UserRoleBadge";
-import { UserStatusBadge } from "./components/UserStatusBadge";
+import { UserStatusBadge } from "@shared/components/UserStatusBadge";
 import { SortMenu } from "./components/SortMenu";
 import { RoleFilterMenu } from "./components/RoleFilterMenu";
 import { StatusFilterMenu } from "./components/StatusFilterMenu";
