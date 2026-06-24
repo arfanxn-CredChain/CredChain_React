@@ -1,12 +1,16 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { TestProviders } from "@/test/TestProviders";
+import { i18n } from "@shared/i18n/config";
 import { CredentialDetail } from "./CredentialDetail";
 
 describe("CredentialDetail", () => {
+  beforeAll(() => i18n.changeLanguage("en"));
+  afterAll(() => i18n.changeLanguage("id"));
+
   const renderPage = () =>
     render(
-      <TestProviders initialEntries={["/credentials/cred_01HX"]}>
+      <TestProviders initialEntries={["/credentials/cred_01HX"]} routePath="/credentials/:id">
         <CredentialDetail />
       </TestProviders>,
     );
@@ -18,17 +22,17 @@ describe("CredentialDetail", () => {
 
   it("renders the credential name as page title", async () => {
     renderPage();
-    expect(await screen.findByText("Bachelor's Degree")).toBeDefined();
+    expect(await screen.findByRole("heading", { level: 2, name: "Bachelor's Degree" })).toBeDefined();
   });
 
   it("renders the credential ID", async () => {
     renderPage();
-    expect(await screen.findByText(/cred_01HX/)).toBeDefined();
+    expect((await screen.findAllByText(/cred_01HX/)).length).toBeGreaterThan(0);
   });
 
   it("renders the active status badge", async () => {
     renderPage();
-    expect(await screen.findByText("Active")).toBeDefined();
+    expect((await screen.findAllByText("Active")).length).toBeGreaterThan(0);
   });
 
   it("renders the file hash", async () => {

@@ -7,9 +7,10 @@ import { i18n } from "@shared/i18n/config";
 interface TestProvidersProps {
   children: ReactNode;
   initialEntries?: string[];
+  routePath?: string;
 }
 
-export function TestProviders({ children, initialEntries = ["/"] }: TestProvidersProps) {
+export function TestProviders({ children, initialEntries = ["/"], routePath }: TestProvidersProps) {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false, gcTime: 0 },
@@ -18,7 +19,7 @@ export function TestProviders({ children, initialEntries = ["/"] }: TestProvider
   });
 
   // Data router (createMemoryRouter) is required so hooks like useBlocker work.
-  const router = createMemoryRouter([{ path: "*", element: <>{children}</> }], { initialEntries });
+  const router = createMemoryRouter([{ path: routePath ?? "*", element: <>{children}</> }], { initialEntries });
 
   return (
     <QueryClientProvider client={queryClient}>
