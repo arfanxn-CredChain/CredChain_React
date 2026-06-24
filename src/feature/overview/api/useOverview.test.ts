@@ -51,6 +51,6 @@ describe("useOverview", () => {
       { wrapper: TestProviders },
     );
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(capturedParams?.getAll("filters")).toEqual(["date..2026-01-01,2026-06-30"]);
+    expect(capturedParams!.getAll("filters")).toEqual(["date..2026-01-01,2026-06-30"]);
   });
 });

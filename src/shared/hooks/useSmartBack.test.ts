@@ -35,12 +35,12 @@ describe("useSmartBack", () => {
     expect(navigateMock).toHaveBeenCalledWith(-1);
   });
 
-  it("falls back to /dashboard when authenticated and no prior history", () => {
+  it("falls back to /overview when authenticated and no prior history", () => {
     locationPathname = "/about";
     useStore.setState({ isAuthenticated: true });
     const { result } = renderHook(() => useSmartBack());
     result.current();
-    expect(navigateMock).toHaveBeenCalledWith("/dashboard");
+    expect(navigateMock).toHaveBeenCalledWith("/overview");
   });
 
   it("falls back to / when unauthenticated and no prior history", () => {
@@ -62,7 +62,7 @@ describe("useSmartBack", () => {
 
   it("redirects to / when on login with protected-redirect state (unauthenticated)", () => {
     locationPathname = "/login";
-    locationState = { from: { pathname: "/dashboard" } };
+    locationState = { from: { pathname: "/overview" } };
     useStore.setState({ isAuthenticated: false });
     const { result } = renderHook(() => useSmartBack());
     result.current();
@@ -70,13 +70,13 @@ describe("useSmartBack", () => {
     expect(navigateMock).not.toHaveBeenCalledWith(-1);
   });
 
-  it("redirects to /dashboard when on login with protected-redirect state (authenticated)", () => {
+  it("redirects to /overview when on login with protected-redirect state (authenticated)", () => {
     locationPathname = "/login";
-    locationState = { from: { pathname: "/dashboard" } };
+    locationState = { from: { pathname: "/overview" } };
     useStore.setState({ isAuthenticated: true });
     const { result } = renderHook(() => useSmartBack());
     result.current();
-    expect(navigateMock).toHaveBeenCalledWith("/dashboard");
+    expect(navigateMock).toHaveBeenCalledWith("/overview");
     expect(navigateMock).not.toHaveBeenCalledWith(-1);
   });
 

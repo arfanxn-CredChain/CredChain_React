@@ -52,7 +52,7 @@ describe("PageHeader back button", () => {
     useStore.setState({ isAuthenticated: true });
     renderHeader({ title: "User Profile", onBack: true });
     await userEvent.click(screen.getByRole("button", { name: /go back/i }));
-    expect(navigateMock).toHaveBeenCalledWith("/dashboard");
+    expect(navigateMock).toHaveBeenCalledWith("/overview");
   });
 
   it("uses smart back (unauth fallback) when onBack is true and no history", async () => {

@@ -802,6 +802,8 @@
       "confirmAction": "Re-extract"
     }
   },
+  "success_overview": "Overview loaded.",
+  "error_overview_internal": "Failed to load overview data.",
   "overview.success": "Overview loaded",
   "overview.internal_error": "Failed to load overview",
   "overview.welcome": "Welcome, {{name}}",

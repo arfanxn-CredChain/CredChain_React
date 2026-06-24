@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 import { FileBadge, User, AlertTriangle } from "lucide-react";
 import { useStore } from "@app/store";
-import { Role, canAccessAny } from "@shared/auth/role";
+import { Role } from "@shared/auth/role";
 import { RoleGate } from "@shared/auth/guards";
 import { useOverview } from "./api/useOverview";
 import { useDebouncedValue } from "@shared/hooks/useDebouncedValue";
@@ -63,12 +63,6 @@ export function Overview() {
   const user = useStore((s) => s.user);
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
-
-  const isIssuerPlus = canAccessAny(user?.role, [
-    Role.ISSUER,
-    Role.ADMIN,
-    Role.SUPER_ADMIN,
-  ]);
 
   const [dateFrom, setDateFrom] = useState(
     searchParams.get("dateFrom") ?? "",

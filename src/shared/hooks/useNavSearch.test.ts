@@ -47,7 +47,7 @@ describe("useNavSearch", () => {
     });
     const { result } = renderHook(() => useNavSearch(""));
     const hrefs = result.current.map((i) => i.href);
-    expect(hrefs).toContain("/dashboard");
+    expect(hrefs).toContain("/overview");
     expect(hrefs).toContain("/users");
     expect(hrefs).toContain("/settings");
     expect(hrefs).toContain("/help");
@@ -62,7 +62,7 @@ describe("useNavSearch", () => {
     const { result } = renderHook(() => useNavSearch("USER"));
     const hrefs = result.current.map((i) => i.href);
     expect(hrefs).toContain("/users");
-    expect(hrefs).not.toContain("/dashboard");
+    expect(hrefs).not.toContain("/overview");
   });
 
   it("returns empty array for query with no matches", () => {
@@ -93,7 +93,7 @@ describe("useNavSearch", () => {
     const hrefs = result.current.map((i) => i.href);
     expect(hrefs).toContain("/help");
     expect(hrefs).toContain("/about");
-    expect(hrefs).not.toContain("/dashboard");
+    expect(hrefs).not.toContain("/overview");
   });
 
   it("matches by displayed label not raw key", () => {
@@ -115,13 +115,13 @@ describe("useNavSearch", () => {
     expect(result.current.map((i) => i.href)).toContain("/users");
   });
 
-  it("matches Indonesian label 'dasbor' for dashboard", () => {
+  it("matches Indonesian label 'dasbor' for overview", () => {
     useStore.setState({
       user: { role: Role.ADMIN } as never,
       isAuthenticated: true,
     });
     const { result } = renderHook(() => useNavSearch("dasbor"));
-    expect(result.current.map((i) => i.href)).toContain("/dashboard");
+    expect(result.current.map((i) => i.href)).toContain("/overview");
   });
 
   it("matches Indonesian label 'bantu' for help", () => {

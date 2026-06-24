@@ -44,12 +44,12 @@ describe("BackLink", () => {
     expect(navigateMock).toHaveBeenCalledWith(-1);
   });
 
-  it("falls back to /dashboard when authenticated and no prior history", async () => {
+  it("falls back to /overview when authenticated and no prior history", async () => {
     locationPathname = "/about";
     useStore.setState({ isAuthenticated: true });
     render(<BackLink />, { wrapper: TestProviders });
     await userEvent.click(screen.getByRole("button", { name: /back/i }));
-    expect(navigateMock).toHaveBeenCalledWith("/dashboard");
+    expect(navigateMock).toHaveBeenCalledWith("/overview");
   });
 
   it("falls back to / when unauthenticated and no prior history", async () => {
@@ -62,7 +62,7 @@ describe("BackLink", () => {
 
   it("redirects to / when on login with protected-redirect state (unauthenticated)", async () => {
     locationPathname = "/login";
-    locationState = { from: { pathname: "/dashboard" } };
+    locationState = { from: { pathname: "/overview" } };
     useStore.setState({ isAuthenticated: false });
     render(<BackLink />, { wrapper: TestProviders });
     await userEvent.click(screen.getByRole("button", { name: /back/i }));
@@ -70,13 +70,13 @@ describe("BackLink", () => {
     expect(navigateMock).not.toHaveBeenCalledWith(-1);
   });
 
-  it("redirects to /dashboard when on login with protected-redirect state (authenticated)", async () => {
+  it("redirects to /overview when on login with protected-redirect state (authenticated)", async () => {
     locationPathname = "/login";
-    locationState = { from: { pathname: "/dashboard" } };
+    locationState = { from: { pathname: "/overview" } };
     useStore.setState({ isAuthenticated: true });
     render(<BackLink />, { wrapper: TestProviders });
     await userEvent.click(screen.getByRole("button", { name: /back/i }));
-    expect(navigateMock).toHaveBeenCalledWith("/dashboard");
+    expect(navigateMock).toHaveBeenCalledWith("/overview");
     expect(navigateMock).not.toHaveBeenCalledWith(-1);
   });
 });

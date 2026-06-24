@@ -802,6 +802,8 @@
       "confirmAction": "Ekstrak Ulang"
     }
   },
+  "success_overview": "Ringkasan berhasil dimuat.",
+  "error_overview_internal": "Gagal memuat data ringkasan.",
   "overview.success": "Ringkasan dimuat",
   "overview.internal_error": "Gagal memuat ringkasan",
   "overview.welcome": "Selamat datang, {{name}}",
