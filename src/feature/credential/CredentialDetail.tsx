@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { AlertCircle, ChevronDown, Hash, RotateCw } from "lucide-react";
+import { AlertCircle, ChevronDown, RotateCw } from "lucide-react";
 import { useCredential } from "./api/useCredential";
 import { useReExtractCredentials } from "./api/useReExtractCredentials";
 import { PageHeader } from "@shared/components/PageHeader";
@@ -16,7 +16,7 @@ import { Button } from "@ui/button";
 import { Skeleton } from "@ui/skeleton";
 import { CredentialStatusBadge } from "./components/CredentialStatusBadge";
 import { CredentialViewFilePreview } from "./components/CredentialViewFilePreview";
-import { formatDateTime } from "@shared/lib/format";
+import { formatDateTime, truncateAddress } from "@shared/lib/format";
 import { cn } from "@shared/lib/cn";
 
 export function CredentialDetail() {
@@ -53,10 +53,7 @@ export function CredentialDetail() {
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <BackLink />
-      <PageHeader
-        title={cred?.name ?? t("cred.detail.title")}
-        description={isLoading ? undefined : cred?.id ?? undefined}
-      />
+      <PageHeader title={cred?.name ?? t("cred.detail.title")} />
 
       {isLoading || !cred ? (
         <>
@@ -117,20 +114,18 @@ export function CredentialDetail() {
             {/* Detail grid */}
             <div className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
               <DetailRow
-                label={t("cred.detail.issuanceStatus")}
-                value={
-                  <span className={cn("text-sm", revoked ? "text-error" : "text-navy")}>
-                    {revoked ? t("cred.status.revoked") : t("cred.status.active")}
-                  </span>
-                }
-              />
-              <DetailRow
                 label={t("cred.detail.fileHash")}
-                icon={Hash}
                 value={
-                  <code className="block rounded-xl border border-gray-100 bg-gray-50 p-4 font-mono text-xs break-all text-gray-700">
-                    {cred.file_hash}
-                  </code>
+                  <div className="flex items-center gap-1">
+                    <span className="font-mono text-xs text-gray-500">
+                      {truncateAddress(cred.file_hash)}
+                    </span>
+                    <CopyInlineButton
+                      value={cred.file_hash}
+                      ariaLabel={t("cred.copy.credentialId")}
+                      className="shrink-0"
+                    />
+                  </div>
                 }
               />
               {cred.token_id && (
@@ -138,7 +133,9 @@ export function CredentialDetail() {
                   label={t("cred.detail.tokenId")}
                   value={
                     <div className="flex items-center gap-1">
-                      <MonoId value={cred.token_id} mode="full" />
+                      <span className="font-mono text-xs text-gray-500">
+                        {truncateAddress(cred.token_id)}
+                      </span>
                       <CopyInlineButton
                         value={cred.token_id}
                         ariaLabel={t("cred.copy.credentialId")}
@@ -175,9 +172,16 @@ export function CredentialDetail() {
                   />
                 </button>
                 {metaOpen && (
-                  <pre className="mt-4 overflow-x-auto rounded-xl bg-gray-50 p-4 font-mono text-xs text-gray-600">
-                    {JSON.stringify(cred.meta, null, 2)}
-                  </pre>
+                  <div className="mt-4 flex flex-col gap-2 rounded-xl bg-gray-50 p-4">
+                    {Object.entries(cred.meta!).map(([key, value]) => (
+                      <div key={key} className="flex items-baseline gap-2">
+                        <span className="shrink-0 font-mono text-xs font-semibold text-navy">{key}</span>
+                        <span className="min-w-0 break-all text-xs text-gray-600">
+                          {typeof value === "object" ? JSON.stringify(value) : String(value)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             )}
