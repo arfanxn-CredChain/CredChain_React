@@ -11,6 +11,7 @@ import {
   ArrowRightLeft,
   Trash2,
   RotateCcw,
+  Calendar,
 } from "lucide-react";
 import { useLoadMore } from "@shared/hooks/useLoadMore";
 import { api } from "@shared/api/client";
@@ -27,7 +28,6 @@ import type { UserDTO } from "@shared/types/api";
 
 import { PageHeader } from "@shared/components/PageHeader";
 import { EmptyState } from "@shared/components/EmptyState";
-import { UserAvatar } from "@shared/components/UserAvatar";
 import { RoleGate } from "@shared/auth/guards";
 import { Button } from "@ui/button";
 import { Card } from "@ui/card";
@@ -41,15 +41,13 @@ import {
 } from "@ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@ui/table";
 
-import { UserRoleBadge } from "@shared/components/UserRoleBadge";
-import { UserStatusBadge } from "@shared/components/UserStatusBadge";
 import { SortMenu } from "./components/SortMenu";
 import { RoleFilterMenu } from "./components/RoleFilterMenu";
 import { StatusFilterMenu } from "./components/StatusFilterMenu";
 import { LoadMoreBar } from "@shared/components/LoadMoreBar";
-import { CopyInlineButton } from "@shared/components/CopyInlineButton";
 import { UserEditDrawer } from "./components/UserEditDrawer";
-import { truncateAddress, relativeTime } from "@shared/lib/format";
+import { UserContactBlock } from "@shared/components/UserContactBlock";
+import { relativeTime } from "@shared/lib/format";
 
 export function UserList() {
   const { t, i18n } = useTranslation();
@@ -167,8 +165,6 @@ export function UserList() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>{t("user.column.entity")}</TableHead>
-                    <TableHead>{t("user.column.role")}</TableHead>
-                    <TableHead>{t("user.column.walletStatus")}</TableHead>
                     <TableHead className="relative">
                       <span className="sr-only">{t("user.column.actions")}</span>
                     </TableHead>
@@ -179,23 +175,15 @@ export function UserList() {
                     ? Array.from({ length: 5 }).map((_, i) => (
                         <TableRow key={`sk-${i}`}>
                           <TableCell>
-                            <div className="flex items-center gap-3">
-                              <Skeleton className="h-10 w-10 rounded-full" />
-                              <div className="space-y-2">
+                            <div className="flex items-start gap-3">
+                              <Skeleton className="h-10 w-10 shrink-0 rounded-full" />
+                              <div className="min-w-0 flex-1 space-y-2">
                                 <Skeleton className="h-4 w-32" />
                                 <Skeleton className="h-3 w-40" />
-                                <Skeleton className="h-3 w-16" />
+                                <Skeleton className="h-3 w-24" />
+                                <Skeleton className="h-3 w-36" />
+                                <Skeleton className="h-3 w-28" />
                               </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Skeleton className="h-5 w-20" />
-                          </TableCell>
-                          <TableCell>
-                            <div className="space-y-1">
-                              <Skeleton className="h-4 w-32" />
-                              <Skeleton className="h-5 w-20" />
-                              <Skeleton className="h-3 w-24" />
                             </div>
                           </TableCell>
                           <TableCell>
@@ -207,81 +195,32 @@ export function UserList() {
                         <TableRow
                           key={user.id}
                           className={cn("cursor-pointer", user.deleted_at && "bg-error/5")}
-                          // TODO: navigate to UserDetail on row click
                         >
                           <TableCell>
-                            <div className="flex items-center">
-                              <UserAvatar user={user} size="md" className="shrink-0" />
-                              <div className="ml-4 min-w-0">
-                                <div
-                                  className={cn(
-                                    "max-w-[14rem] truncate text-sm font-bold text-navy",
-                                    user.deleted_at && "text-gray-400 line-through",
-                                  )}
-                                  title={user.name ?? t("user.edit.unnamed")}
-                                >
-                                  {user.name ?? t("user.edit.unnamed")}
-                                </div>
-                                <div className="mt-0.5 flex min-w-0 items-center gap-1">
-                                  <span className="max-w-[12rem] truncate text-xs font-medium text-gray-500">
-                                    {user.email}
-                                  </span>
-                                  <CopyInlineButton
-                                    value={user.email}
-                                    ariaLabel={t("user.copy.email")}
-                                  />
-                                </div>
-                                {user.phone_number && (
-                                  <div className="mt-0.5 flex min-w-0 items-center gap-1">
-                                    <span className="max-w-[12rem] truncate text-xs text-gray-400">
-                                      {user.phone_number}
-                                    </span>
-                                    <CopyInlineButton
-                                      value={user.phone_number}
-                                      ariaLabel={t("user.copy.phone")}
-                                    />
-                                  </div>
-                                )}
-                                {user.gender && (
-                                  <div className="mt-1 inline-flex items-center text-[10px] font-bold tracking-wider text-gray-400 uppercase">
-                                    {t(`user.field.gender.${user.gender}`)}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <UserRoleBadge role={user.role} />
-                          </TableCell>
-                          <TableCell>
-                            <div className="mb-1 flex items-center gap-1 font-mono text-xs text-gray-500">
-                              {user.wallet_address ? (
-                                truncateAddress(user.wallet_address)
-                              ) : (
-                                <span className="font-sans text-sm text-gray-400 italic">
-                                  {t("common.notSet")}
+                            <div className="min-w-0">
+                              <UserContactBlock
+                                labelType="full"
+                                user={user}
+                                fallbackId={user.id}
+                                copyPrefix="user"
+                                blockLinks
+                              />
+                              <div className="ml-13 mt-1 flex items-center gap-1.5 text-xs text-gray-500">
+                                <Calendar className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
+                                <span>
+                                  {user.deleted_at
+                                    ? t("user.list.trashed", {
+                                        time: relativeTime(user.deleted_at, i18n.language),
+                                      })
+                                    : user.updated_at !== user.created_at
+                                      ? t("user.list.updated", {
+                                          time: relativeTime(user.updated_at, i18n.language),
+                                        })
+                                      : t("user.list.created", {
+                                          time: relativeTime(user.created_at, i18n.language),
+                                        })}
                                 </span>
-                              )}
-                              {user.wallet_address && (
-                                <CopyInlineButton
-                                  value={user.wallet_address}
-                                  ariaLabel={t("user.copy.wallet")}
-                                />
-                              )}
-                            </div>
-                            <UserStatusBadge deletedAt={user.deleted_at} />
-                            <div className="mt-1 text-[10px] text-gray-400">
-                              {user.deleted_at
-                                ? t("user.list.trashed", {
-                                    time: relativeTime(user.deleted_at, i18n.language),
-                                  })
-                                : user.updated_at !== user.created_at
-                                  ? t("user.list.updated", {
-                                      time: relativeTime(user.updated_at, i18n.language),
-                                    })
-                                  : t("user.list.created", {
-                                      time: relativeTime(user.created_at, i18n.language),
-                                    })}
+                              </div>
                             </div>
                           </TableCell>
                           <TableCell className="text-right">
