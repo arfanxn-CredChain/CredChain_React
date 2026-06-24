@@ -15,9 +15,11 @@ const MAX_ZOOM = 3;
 const ZOOM_STEP = 0.25;
 
 interface CredentialFileModalProps {
-  file: File;
+  file: File | Blob;
   open: boolean;
   onClose: () => void;
+  /** Display name for the file (Blob has no .name). Falls back to "Credential File". */
+  name?: string;
 }
 
 function formatFileSize(bytes: number): string {
@@ -26,7 +28,7 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function CredentialFileModal({ file, open, onClose }: CredentialFileModalProps) {
+export function CredentialFileModal({ file, open, onClose, name }: CredentialFileModalProps) {
   const { t } = useTranslation();
   const isPdf = file.type === "application/pdf";
 
@@ -34,7 +36,7 @@ export function CredentialFileModal({ file, open, onClose }: CredentialFileModal
     <Dialog open={open} onOpenChange={(next) => { if (!next) onClose(); }}>
       <DialogContent className="max-w-5xl">
         <DialogHeader>
-          <DialogTitle>{file.name}</DialogTitle>
+          <DialogTitle>{name || (file instanceof File ? file.name : "Credential File")}</DialogTitle>
           <DialogDescription>
             {formatFileSize(file.size)}{" · "}{file.type || t("credential.issue.preview.notAvailable")}
           </DialogDescription>
@@ -42,9 +44,9 @@ export function CredentialFileModal({ file, open, onClose }: CredentialFileModal
 
         <div className="flex min-h-[40vh] items-center justify-center overflow-auto rounded-xl bg-gray-100">
           {isPdf ? (
-            <PdfViewer file={file} key={file.name + file.size} />
+            <PdfViewer file={file} key={file.size + (file instanceof File ? file.name : "")} />
           ) : (
-            <ImageViewer file={file} key={file.name + file.size} />
+            <ImageViewer file={file} key={file.size + (file instanceof File ? file.name : "")} />
           )}
         </div>
 
@@ -54,7 +56,7 @@ export function CredentialFileModal({ file, open, onClose }: CredentialFileModal
   );
 }
 
-function ImageViewer({ file }: { file: File }) {
+function ImageViewer({ file }: { file: File | Blob }) {
   const { t } = useTranslation();
   const [zoom, setZoom] = useState(1);
   const objectUrlRef = useRef<string | null>(null);
@@ -79,7 +81,7 @@ function ImageViewer({ file }: { file: File }) {
         {objectUrl ? (
           <img
             src={objectUrl}
-            alt={file.name}
+            alt={file instanceof File ? file.name : ""}
             className="max-h-full max-w-full object-contain transition-transform duration-200"
             style={{ transform: `scale(${zoom})` }}
             draggable={false}
@@ -126,7 +128,7 @@ interface PdfDocumentProxy {
   destroy: () => void;
 }
 
-function PdfViewer({ file }: { file: File }) {
+function PdfViewer({ file }: { file: File | Blob }) {
   const { t } = useTranslation();
   const tRef = useRef(t);
   useEffect(() => {
