@@ -132,7 +132,7 @@ export interface OverviewRecentUser {
   id: string;
   name: string;
   email: string;
-  role: string;
+  role: Role;
   created_at: string;
 }
 
