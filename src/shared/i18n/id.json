@@ -832,6 +832,8 @@
   "overview.recents.revokedBy": "oleh {{revoker}}",
   "overview.recents.joined": "bergabung {{date}}",
   "overview.recents.noName": "Tanpa nama",
+  "overview.recents.viewAllCredentials": "Lihat semua kredensial",
+  "overview.recents.viewAllUsers": "Lihat semua pengguna",
   "overview.chainDetails": "Info Rantai",
   "overview.chainDetails.authorityContract": "Kontrak Otoritas",
   "overview.chainDetails.copyAuthority": "Salin alamat kontrak otoritas",

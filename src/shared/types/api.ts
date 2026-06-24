@@ -121,9 +121,9 @@ export interface OverviewChainDetails {
 export interface OverviewRecentCredential {
   id: string;
   name: string;
-  holder?: { id: string; name: string; email: string };
-  issuer?: { id: string; name: string; email: string };
-  revoker?: { id: string; name: string; email: string };
+  holder?: { id: string; name: string; email: string; role: Role };
+  issuer?: { id: string; name: string; email: string; role: Role };
+  revoker?: { id: string; name: string; email: string; role: Role };
   issued_at: string;
   revoked_at?: string;
 }

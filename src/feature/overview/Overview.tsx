@@ -7,9 +7,10 @@ import {
   Ban,
   Layers,
   Calendar,
+  ArrowRight,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { useStore } from "@app/store";
 import { Role } from "@shared/auth/role";
 import { RoleGate } from "@shared/auth/guards";
@@ -109,7 +110,6 @@ interface RecentSectionProps {
   title: string;
   icon: LucideIcon;
   tone?: "gold" | "error" | "navy";
-  count: number;
   children: React.ReactNode;
 }
 
@@ -119,7 +119,7 @@ const toneBlock = {
   navy: "bg-navy/10 text-navy",
 };
 
-function RecentSection({ title, icon: Icon, tone = "gold", count, children }: RecentSectionProps) {
+function RecentSection({ title, icon: Icon, tone = "gold", children }: RecentSectionProps) {
   return (
     <div>
       <div className="mb-4 flex items-center gap-3">
@@ -129,9 +129,6 @@ function RecentSection({ title, icon: Icon, tone = "gold", count, children }: Re
         <h4 className="flex-1 text-xs font-bold tracking-wider text-gray-400 uppercase">
           {title}
         </h4>
-        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-bold text-gray-500">
-          {count}
-        </span>
       </div>
       {children}
     </div>
@@ -151,8 +148,6 @@ function CredentialRow({
 }) {
   const navigate = useNavigate();
   const isRevoked = variant === "revoked";
-  const Icon = isRevoked ? Ban : FileBadge;
-  const tone = isRevoked ? ("error" as const) : ("gold" as const);
   const actor = isRevoked ? cred.revoker : cred.issuer;
   const actorPrefix = isRevoked ? "revoker" : "issuer";
   const time = isRevoked && cred.revoked_at ? relativeTime(cred.revoked_at, t) : relativeTime(cred.issued_at, t);
@@ -171,44 +166,52 @@ function CredentialRow({
       tabIndex={0}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      className="group -mx-2 flex cursor-pointer items-start gap-4 rounded-lg border-t border-gray-100 px-2 py-3 transition-colors first:border-t-0 hover:bg-gray-50/70 focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none"
+      className="group -mx-2 cursor-pointer rounded-lg border-t border-gray-100 px-2 py-3 transition-colors first:border-t-0 hover:bg-gray-50/70 focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none"
     >
-      <div className={cn("mt-0.5 shrink-0 rounded-lg p-1.5", toneBlock[tone])}>
-        <Icon className="h-4 w-4" aria-hidden="true" />
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-navy">
-          {cred.name || t("overview.recents.noName")}
-        </p>
-        {cred.holder && (
-          <div className="mt-2">
-            <UserContactBlock
-              user={cred.holder as UserDTO}
-              fallbackId={cred.holder.id}
-              copyPrefix="holder"
-              labelType="full"
-              blockLinks
+      <div className="flex items-start gap-3">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold text-navy">
+            {cred.name || t("overview.recents.noName")}
+          </p>
+          <div className="mt-0.5 flex items-center gap-1">
+            <MonoId value={cred.id} mode="id" />
+            <CopyInlineButton
+              value={cred.id}
+              ariaLabel={t("cred.copy.credentialId")}
+              className="shrink-0"
             />
           </div>
-        )}
-        {actor && (
-          <div className="mt-2">
-            <UserContactBlock
-              user={actor as UserDTO}
-              fallbackId={actor.id}
-              copyPrefix={actorPrefix}
-              labelType="full"
-              blockLinks
-            />
-          </div>
-        )}
+          {cred.holder && (
+            <div className="mt-2">
+              <UserContactBlock
+                user={cred.holder as UserDTO}
+                fallbackId={cred.holder.id}
+                copyPrefix="holder"
+                labelType="full"
+                blockLinks
+              />
+            </div>
+          )}
+          {actor && (
+            <div className="mt-2">
+              <UserContactBlock
+                user={actor as UserDTO}
+                fallbackId={actor.id}
+                copyPrefix={actorPrefix}
+                labelType="compact"
+                tone={isRevoked ? "error" : "default"}
+                blockLinks
+              />
+            </div>
+          )}
+        </div>
+        <time
+          dateTime={isRevoked && cred.revoked_at ? cred.revoked_at : cred.issued_at}
+          className="mt-0.5 shrink-0 text-xs text-gray-400"
+        >
+          {time}
+        </time>
       </div>
-      <time
-        dateTime={isRevoked && cred.revoked_at ? cred.revoked_at : cred.issued_at}
-        className="mt-0.5 shrink-0 text-xs text-gray-400"
-      >
-        {time}
-      </time>
     </div>
   );
 }
@@ -416,140 +419,170 @@ export function Overview() {
             )}
           </RoleGate>
 
-          {/* ── recent activity ── */}
-          <Card className="p-6 sm:p-8">
-            <EyebrowLabel tone="navy" className="mb-6">
-              {t("overview.recents")}
-            </EyebrowLabel>
-            <div className="space-y-8">
-              <RecentSection
-                title={t("overview.recents.activeCredentials")}
-                icon={FileBadge}
-                tone="gold"
-                count={data.recents.active_credentials.length}
-              >
-                {data.recents.active_credentials.length === 0 ? (
-                  <p className="py-6 text-center text-sm text-gray-400 italic">
-                    {t("overview.recents.empty")}
-                  </p>
-                ) : (
-                  data.recents.active_credentials.map((cred) => (
-                    <CredentialRow
-                      key={cred.id}
-                      cred={cred}
-                      variant="active"
-                      t={t}
-                    />
-                  ))
-                )}
-              </RecentSection>
-
-              <RecentSection
-                title={t("overview.recents.revokedCredentials")}
-                icon={Ban}
-                tone="error"
-                count={data.recents.revoked_credentials.length}
-              >
-                {data.recents.revoked_credentials.length === 0 ? (
-                  <p className="py-6 text-center text-sm text-gray-400 italic">
-                    {t("overview.recents.empty")}
-                  </p>
-                ) : (
-                  data.recents.revoked_credentials.map((cred) => (
-                    <CredentialRow
-                      key={cred.id}
-                      cred={cred}
-                      variant="revoked"
-                      t={t}
-                    />
-                  ))
-                )}
-              </RecentSection>
-
-              {data.recents.stored_users && data.recents.stored_users.length > 0 && (
+          {/* ── recent activity & chain info ── */}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <Card className="p-6 sm:p-8">
+              <EyebrowLabel tone="navy" className="mb-6">
+                {t("overview.recents")}
+              </EyebrowLabel>
+              <div className="space-y-8">
                 <RecentSection
-                  title={t("overview.recents.storedUsers")}
-                  icon={User}
-                  tone="navy"
-                  count={data.recents.stored_users.length}
+                  title={t("overview.recents.activeCredentials")}
+                  icon={FileBadge}
+                  tone="gold"
                 >
-                  {data.recents.stored_users.map((u) => (
-                    <UserRow key={u.id} user={u} t={t} />
-                  ))}
+                  {data.recents.active_credentials.length === 0 ? (
+                    <p className="py-6 text-center text-sm text-gray-400 italic">
+                      {t("overview.recents.empty")}
+                    </p>
+                  ) : (
+                    <>
+                      {data.recents.active_credentials.slice(0, 3).map((cred) => (
+                        <CredentialRow
+                          key={cred.id}
+                          cred={cred}
+                          variant="active"
+                          t={t}
+                        />
+                      ))}
+                      <div className="mt-3 flex justify-end">
+                        <Link
+                          to="/credentials"
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-navy hover:underline focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none"
+                        >
+                          {t("overview.recents.viewAllCredentials")}
+                          <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                        </Link>
+                      </div>
+                    </>
+                  )}
                 </RecentSection>
-              )}
-            </div>
-          </Card>
 
-          {/* ── chain details ── */}
-          <RoleGate allowed={[Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]}>
-            {data.chain_details && (
-              <Card className="relative overflow-hidden p-6 shadow-lg ring-1 shadow-gold/20 ring-gold/10 sm:p-8">
-                <DecorBlob tone="gold" position="top-right" size="lg" />
-                <div className="relative z-10">
-                  <EyebrowLabel tone="navy" className="mb-6">
-                    {t("overview.chainDetails")}
-                  </EyebrowLabel>
-                  <dl className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-                    <div>
-                      <EyebrowLabel
-                        as="dt"
-                        className="flex items-center gap-1.5"
+                <RecentSection
+                  title={t("overview.recents.revokedCredentials")}
+                  icon={Ban}
+                  tone="error"
+                >
+                  {data.recents.revoked_credentials.length === 0 ? (
+                    <p className="py-6 text-center text-sm text-gray-400 italic">
+                      {t("overview.recents.empty")}
+                    </p>
+                  ) : (
+                    <>
+                      {data.recents.revoked_credentials.slice(0, 3).map((cred) => (
+                        <CredentialRow
+                          key={cred.id}
+                          cred={cred}
+                          variant="revoked"
+                          t={t}
+                        />
+                      ))}
+                      <div className="mt-3 flex justify-end">
+                        <Link
+                          to="/credentials"
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-navy hover:underline focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none"
+                        >
+                          {t("overview.recents.viewAllCredentials")}
+                          <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                        </Link>
+                      </div>
+                    </>
+                  )}
+                </RecentSection>
+
+                {data.recents.stored_users && data.recents.stored_users.length > 0 && (
+                  <RecentSection
+                    title={t("overview.recents.storedUsers")}
+                    icon={User}
+                    tone="navy"
+                  >
+                    {data.recents.stored_users.slice(0, 3).map((u) => (
+                      <UserRow key={u.id} user={u} t={t} />
+                    ))}
+                    <div className="mt-3 flex justify-end">
+                      <Link
+                        to="/users"
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-navy hover:underline focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none"
                       >
-                        <Layers className="h-3.5 w-3.5" aria-hidden="true" />
-                        {t("overview.chainDetails.authorityContract")}
-                      </EyebrowLabel>
-                      <dd className="flex items-center gap-2">
-                        <MonoId
-                          value={data.chain_details.authority_contract}
-                          mode="address"
-                          className="text-sm text-navy"
-                        />
-                        <CopyInlineButton
-                          value={data.chain_details.authority_contract}
-                          ariaLabel={t("overview.chainDetails.copyAuthority")}
-                        />
-                      </dd>
+                        {t("overview.recents.viewAllUsers")}
+                        <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                      </Link>
                     </div>
-                    <div>
-                      <EyebrowLabel
-                        as="dt"
-                        className="flex items-center gap-1.5"
-                      >
-                        <Layers className="h-3.5 w-3.5" aria-hidden="true" />
-                        {t("overview.chainDetails.registryContract")}
-                      </EyebrowLabel>
-                      <dd className="flex items-center gap-2">
-                        <MonoId
-                          value={data.chain_details.registry_contract}
-                          mode="address"
-                          className="text-sm text-navy"
-                        />
-                        <CopyInlineButton
-                          value={data.chain_details.registry_contract}
-                          ariaLabel={t("overview.chainDetails.copyRegistry")}
-                        />
-                      </dd>
-                    </div>
-                    <div>
-                      <EyebrowLabel
-                        as="dt"
-                        className="flex items-center gap-1.5"
-                      >
-                        <Layers className="h-3.5 w-3.5" aria-hidden="true" />
-                        {t("overview.chainDetails.lastBlock")}
-                      </EyebrowLabel>
-                      <dd className="font-display text-2xl font-bold tracking-tight text-navy">
-                        {data.chain_details.last_block === 0
-                          ? t("overview.chainDetails.unavailable")
-                          : data.chain_details.last_block.toLocaleString()}
-                      </dd>
-                    </div>
-                  </dl>
-                </div>
-              </Card>
-            )}
-          </RoleGate>
+                  </RecentSection>
+                )}
+              </div>
+            </Card>
+
+            {/* ── chain details ── */}
+            <RoleGate allowed={[Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]}>
+              {data.chain_details && (
+                <Card className="relative overflow-hidden p-6 shadow-lg ring-1 shadow-gold/20 ring-gold/10 sm:p-8">
+                  <DecorBlob tone="gold" position="top-right" size="lg" />
+                  <div className="relative z-10">
+                    <EyebrowLabel tone="navy" className="mb-6">
+                      {t("overview.chainDetails")}
+                    </EyebrowLabel>
+                    <dl className="grid grid-cols-1 gap-6">
+                      <div>
+                        <EyebrowLabel
+                          as="dt"
+                          className="flex items-center gap-1.5"
+                        >
+                          <Layers className="h-3.5 w-3.5" aria-hidden="true" />
+                          {t("overview.chainDetails.authorityContract")}
+                        </EyebrowLabel>
+                        <dd className="flex items-center gap-2">
+                          <MonoId
+                            value={data.chain_details.authority_contract}
+                            mode="address"
+                            className="text-sm text-navy"
+                          />
+                          <CopyInlineButton
+                            value={data.chain_details.authority_contract}
+                            ariaLabel={t("overview.chainDetails.copyAuthority")}
+                          />
+                        </dd>
+                      </div>
+                      <div>
+                        <EyebrowLabel
+                          as="dt"
+                          className="flex items-center gap-1.5"
+                        >
+                          <Layers className="h-3.5 w-3.5" aria-hidden="true" />
+                          {t("overview.chainDetails.registryContract")}
+                        </EyebrowLabel>
+                        <dd className="flex items-center gap-2">
+                          <MonoId
+                            value={data.chain_details.registry_contract}
+                            mode="address"
+                            className="text-sm text-navy"
+                          />
+                          <CopyInlineButton
+                            value={data.chain_details.registry_contract}
+                            ariaLabel={t("overview.chainDetails.copyRegistry")}
+                          />
+                        </dd>
+                      </div>
+                      <div>
+                        <EyebrowLabel
+                          as="dt"
+                          className="flex items-center gap-1.5"
+                        >
+                          <Layers className="h-3.5 w-3.5" aria-hidden="true" />
+                          {t("overview.chainDetails.lastBlock")}
+                        </EyebrowLabel>
+                        <dd className="font-display text-2xl font-bold tracking-tight text-navy">
+                          {data.chain_details.last_block === 0
+                            ? t("overview.chainDetails.unavailable")
+                            : data.chain_details.last_block.toLocaleString()}
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
+                </Card>
+              )}
+            </RoleGate>
+          </div>
         </>
       ) : null}
     </div>

@@ -435,10 +435,10 @@ export const handlers = [
         user_counts: { total: 150, holder: 120, issuer: 20, admin: 8, super_admin: 1, active: 145, trashed: 5 },
         recents: {
           active_credentials: [
-            { id: "01J1", name: "Bachelor's Degree", holder: { id: "01H1", name: "John", email: "john@example.com" }, issuer: { id: "01I1", name: "UI", email: "admin@ui.ac.id" }, issued_at: "2026-06-20T10:00:00Z" },
+            { id: "01J1", name: "Bachelor's Degree", holder: { id: "01H1", name: "John", email: "john@example.com", role: "holder" }, issuer: { id: "01I1", name: "UI", email: "admin@ui.ac.id", role: "issuer" }, issued_at: "2026-06-20T10:00:00Z" },
           ],
           revoked_credentials: [
-            { id: "01J2", name: "Diploma", holder: { id: "01H2", name: "Jane", email: "jane@example.com" }, revoker: { id: "01R1", name: "Admin", email: "admin@example.com" }, issued_at: "2026-04-01T00:00:00Z", revoked_at: "2026-06-19T08:00:00Z" },
+            { id: "01J2", name: "Diploma", holder: { id: "01H2", name: "Jane", email: "jane@example.com", role: "holder" }, revoker: { id: "01R1", name: "Admin", email: "admin@example.com", role: "admin" }, issued_at: "2026-04-01T00:00:00Z", revoked_at: "2026-06-19T08:00:00Z" },
           ],
           stored_users: [
             { id: "01H3", name: "Jane", email: "jane@example.com", role: "holder", created_at: "2026-06-18T00:00:00Z" },

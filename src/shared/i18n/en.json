@@ -832,6 +832,8 @@
   "overview.recents.revokedBy": "by {{revoker}}",
   "overview.recents.joined": "joined {{date}}",
   "overview.recents.noName": "Unnamed",
+  "overview.recents.viewAllCredentials": "View all credentials",
+  "overview.recents.viewAllUsers": "View all users",
   "overview.chainDetails": "Chain Info",
   "overview.chainDetails.authorityContract": "Authority Contract",
   "overview.chainDetails.copyAuthority": "Copy authority contract address",

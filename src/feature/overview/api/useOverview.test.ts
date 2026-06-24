@@ -11,7 +11,7 @@ const mockData: OverviewDTO = {
   user_counts: { total: 5, holder: 3, issuer: 1, admin: 1, super_admin: 0, active: 5, trashed: 0 },
   recents: {
     active_credentials: [
-      { id: "c1", name: "Degree", issuer: { id: "i1", name: "UI", email: "ui@test.com" }, issued_at: "2026-06-20T10:00:00Z" },
+      { id: "c1", name: "Degree", issuer: { id: "i1", name: "UI", email: "ui@test.com", role: "issuer" }, issued_at: "2026-06-20T10:00:00Z" },
     ],
     revoked_credentials: [],
     stored_users: [],
