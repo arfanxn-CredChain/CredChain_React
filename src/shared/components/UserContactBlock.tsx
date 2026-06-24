@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Hash, Mail, Phone, User, Wallet } from "lucide-react";
+import { Hash, Mail, Phone, VenusAndMars, Wallet } from "lucide-react";
 import { cn } from "@shared/lib/cn";
 import { truncateAddress } from "@shared/lib/format";
 import { CopyInlineButton } from "@shared/components/CopyInlineButton";
@@ -38,7 +38,7 @@ export function UserContactBlock({
   return (
     <div className="flex items-start gap-3">
       <UserAvatar user={user ?? null} size="sm" className="mt-0.5 shrink-0" />
-      <div className="flex min-w-0 flex-col space-y-0.5">
+      <div className="flex min-w-0 flex-col space-y-1">
         <div className="flex flex-wrap items-center gap-2">
           {blockLinks ? (
             <span
@@ -70,9 +70,9 @@ export function UserContactBlock({
         </div>
 
         {labelType === "full" && (
-          <>
+          <div className="flex flex-wrap gap-x-4 gap-y-0.5">
             {user?.number && (
-              <div className="flex items-center gap-1 text-xs text-gray-500">
+              <div className="inline-flex items-center gap-1 text-xs text-gray-500">
                 <Hash className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
                 <span className="truncate">{user.number}</span>
                 <CopyInlineButton
@@ -84,7 +84,7 @@ export function UserContactBlock({
             )}
 
             {user?.email && (
-              <div className="flex items-center gap-1 text-xs text-gray-500">
+              <div className="inline-flex items-center gap-1 text-xs text-gray-500">
                 <Mail className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
                 <span className="truncate">{user.email}</span>
                 <CopyInlineButton
@@ -96,7 +96,7 @@ export function UserContactBlock({
             )}
 
             {user?.phone_number && (
-              <div className="flex items-center gap-1 text-xs text-gray-500">
+              <div className="inline-flex items-center gap-1 text-xs text-gray-500">
                 <Phone className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
                 <span className="truncate">{user.phone_number}</span>
                 <CopyInlineButton
@@ -108,14 +108,14 @@ export function UserContactBlock({
             )}
 
             {user?.gender && (
-              <div className="flex items-center gap-1 text-xs text-gray-500">
-                <User className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
+              <div className="inline-flex items-center gap-1 text-xs text-gray-500">
+                <VenusAndMars className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
                 <span>{t(`user.field.gender.${user.gender}`)}</span>
               </div>
             )}
 
             {user?.wallet_address && (
-              <div className="flex items-center gap-1 font-mono text-xs text-gray-500">
+              <div className="inline-flex items-center gap-1 font-mono text-xs text-gray-500">
                 <Wallet className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
                 <span className="truncate" title={user.wallet_address}>
                   {truncateAddress(user.wallet_address)}
@@ -127,7 +127,7 @@ export function UserContactBlock({
                 />
               </div>
             )}
-          </>
+          </div>
         )}
       </div>
     </div>
