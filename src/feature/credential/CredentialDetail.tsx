@@ -1,16 +1,21 @@
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { AlertCircle, Hash, RotateCw } from "lucide-react";
+import { AlertCircle, ChevronDown, Hash, RotateCw } from "lucide-react";
 import { useCredential } from "./api/useCredential";
 import { useReExtractCredentials } from "./api/useReExtractCredentials";
 import { PageHeader } from "@shared/components/PageHeader";
+import { BackLink } from "@shared/components/BackLink";
 import { EmptyState } from "@shared/components/EmptyState";
 import { DetailRow } from "@shared/components/DetailRow";
 import { MonoId } from "@shared/components/MonoId";
+import { CopyInlineButton } from "@shared/components/CopyInlineButton";
+import { UserContactBlock } from "@shared/components/UserContactBlock";
 import { Card } from "@ui/card";
 import { Button } from "@ui/button";
 import { Skeleton } from "@ui/skeleton";
 import { CredentialStatusBadge } from "./components/CredentialStatusBadge";
+import { CredentialViewFilePreview } from "./components/CredentialViewFilePreview";
 import { formatDateTime } from "@shared/lib/format";
 import { cn } from "@shared/lib/cn";
 
@@ -23,14 +28,19 @@ export function CredentialDetail() {
     "revoker",
   ]);
   const reExtract = useReExtractCredentials();
+  const [metaOpen, setMetaOpen] = useState(false);
 
   const revoked = cred?.revoked_at !== null;
   const extractFailed = cred?.extract_status === "failed";
+  const extractSucceeded = cred?.extract_status === "succeeded";
+  const hasFileUri = cred?.file_uri != null;
+  const hasMeta = cred?.meta != null && Object.keys(cred.meta).length > 0;
 
   if (isError) {
     return (
       <div className="mx-auto max-w-4xl space-y-6">
-        <PageHeader title={t("cred.detail.title")} onBack />
+        <BackLink />
+        <PageHeader title={t("cred.detail.title")} />
         <EmptyState
           icon={AlertCircle}
           title={t("cred.detail.notFound.title")}
@@ -42,132 +52,184 @@ export function CredentialDetail() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
+      <BackLink />
       <PageHeader
         title={cred?.name ?? t("cred.detail.title")}
-        description={cred?.id ?? undefined}
-        onBack
+        description={isLoading ? undefined : cred?.id ?? undefined}
       />
 
       {isLoading || !cred ? (
-        <Card className="space-y-6 p-8">
-          <Skeleton className="h-6 w-1/3" />
-          <Skeleton className="h-4 w-2/3" />
-          <Skeleton className="h-32 w-full" />
-        </Card>
+        <>
+          <Card className="space-y-4 p-6 sm:p-8">
+            <Skeleton className="h-[92px] w-full" />
+          </Card>
+          <Card className="space-y-4 p-6 sm:p-8">
+            <Skeleton className="h-6 w-1/3" />
+            <Skeleton className="h-4 w-2/3" />
+            <Skeleton className="h-4 w-1/2" />
+          </Card>
+          <Card className="space-y-4 p-6 sm:p-8">
+            <Skeleton className="h-20 w-full" />
+            <Skeleton className="h-20 w-full" />
+          </Card>
+        </>
       ) : (
         <>
-          {/* Status Card */}
-          <Card className={cn("flex flex-col gap-4 p-6 sm:flex-row sm:items-start sm:justify-between sm:p-8")}>
-            <div>
-              <DetailRow
-                label={t("cred.detail.status")}
-                value={<CredentialStatusBadge revoked={revoked} />}
+          {/* Card 1: File Preview */}
+          {hasFileUri && (
+            <Card className="p-6 sm:p-8">
+              <CredentialViewFilePreview
+                credentialId={cred.id}
+                credentialName={cred.name}
+                hasFileUri={true}
               />
-              <div className="mt-3">
-                <DetailRow
-                  label={t("cred.detail.extractionStatus")}
-                  value={
-                    <CredentialStatusBadge
-                      revoked={false}
-                      extractStatus={cred.extract_status}
-                      showExtractStatus
-                    />
-                  }
-                />
-                {cred.extract_error && (
-                  <p className="mt-1 text-xs text-error">{cred.extract_error}</p>
-                )}
-              </div>
-              <p className="mt-3 text-sm text-gray-500">
-                {t("cred.detail.issued")} {formatDateTime(cred.issued_at)}
-                {cred.revoked_at && ` · ${formatDateTime(cred.revoked_at)}`}
-              </p>
-            </div>
-            {extractFailed && (
-              <Button
-                variant="outline"
-                onClick={() => cred.id && reExtract.mutate([cred.id])}
-                disabled={reExtract.isPending}
-              >
-                <RotateCw className="h-4 w-4" />
-                {t("cred.detail.reExtract")}
-              </Button>
-            )}
-          </Card>
+            </Card>
+          )}
 
-          {/* Holder/Issuer/Revoker */}
+          {/* Card 2: Info */}
           <Card className="p-6 sm:p-8">
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            {/* Status badges */}
+            <div className="mb-4 flex flex-wrap items-center gap-2">
+              <CredentialStatusBadge revoked={revoked} />
+              {!extractSucceeded && (
+                <CredentialStatusBadge
+                  revoked={false}
+                  extractStatus={cred.extract_status}
+                  showExtractStatus
+                />
+              )}
+              {cred.extract_error && (
+                <span className="text-xs text-error">{cred.extract_error}</span>
+              )}
+            </div>
+
+            {/* Name + ID */}
+            <h3 className="font-sans text-base font-bold text-navy">{cred.name}</h3>
+            <div className="mb-6 mt-0.5 flex items-center gap-1">
+              <MonoId value={cred.id} mode="id" />
+              <CopyInlineButton
+                value={cred.id}
+                ariaLabel={t("cred.copy.credentialId")}
+                className="shrink-0"
+              />
+            </div>
+
+            {/* Detail grid */}
+            <div className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
               <DetailRow
-                label={t("cred.detail.holder")}
+                label={t("cred.detail.issuanceStatus")}
                 value={
-                  <>
-                    <p className="text-sm font-bold break-all text-navy">
-                      {cred.holder?.name ?? cred.holder?.email ?? cred.holder_user_id}
-                    </p>
-                    <MonoId value={cred.holder_user_id} className="mt-0.5 block" />
-                  </>
+                  <span className={cn("text-sm", revoked ? "text-error" : "text-navy")}>
+                    {revoked ? t("cred.status.revoked") : t("cred.status.active")}
+                  </span>
                 }
               />
               <DetailRow
-                label={t("cred.detail.issuer")}
+                label={t("cred.detail.fileHash")}
+                icon={Hash}
                 value={
-                  <>
-                    <p className="text-sm font-bold break-all text-navy">
-                      {cred.issuer?.name ?? cred.issuer?.email ?? cred.issuer_user_id}
-                    </p>
-                    <MonoId value={cred.issuer_user_id} className="mt-0.5 block" />
-                  </>
+                  <code className="block rounded-xl border border-gray-100 bg-gray-50 p-4 font-mono text-xs break-all text-gray-700">
+                    {cred.file_hash}
+                  </code>
                 }
               />
-              {cred.revoker && (
+              {cred.token_id && (
                 <DetailRow
-                  label={t("cred.detail.revoker")}
+                  label={t("cred.detail.tokenId")}
                   value={
-                    <>
-                      <p className="text-sm font-bold break-all text-navy">
-                        {cred.revoker.name ?? cred.revoker.email ?? cred.revoker_user_id ?? ""}
-                      </p>
-                      <MonoId value={cred.revoker_user_id ?? ""} className="mt-0.5 block" />
-                    </>
+                    <div className="flex items-center gap-1">
+                      <MonoId value={cred.token_id} mode="full" />
+                      <CopyInlineButton
+                        value={cred.token_id}
+                        ariaLabel={t("cred.copy.credentialId")}
+                        className="shrink-0"
+                      />
+                    </div>
                   }
                 />
               )}
+              <DetailRow
+                label={t("cred.detail.issuedDate")}
+                value={<span className="text-sm text-navy">{formatDateTime(cred.issued_at)}</span>}
+              />
+              {cred.revoked_at && (
+                <DetailRow
+                  label={t("cred.detail.revokedDate")}
+                  value={<span className="text-sm text-error">{formatDateTime(cred.revoked_at)}</span>}
+                  tone="error"
+                />
+              )}
             </div>
+
+            {/* Collapsible Meta */}
+            {hasMeta && (
+              <div className="mt-6 border-t border-gray-100 pt-6">
+                <button
+                  type="button"
+                  onClick={() => setMetaOpen(!metaOpen)}
+                  className="flex items-center gap-1.5 py-2 text-sm font-medium text-gray-500 hover:text-navy"
+                >
+                  {t("cred.field.meta")}
+                  <ChevronDown
+                    className={cn("h-4 w-4 transition-transform", metaOpen && "rotate-180")}
+                  />
+                </button>
+                {metaOpen && (
+                  <pre className="mt-4 overflow-x-auto rounded-xl bg-gray-50 p-4 font-mono text-xs text-gray-600">
+                    {JSON.stringify(cred.meta, null, 2)}
+                  </pre>
+                )}
+              </div>
+            )}
+
+            {/* Re-Extract */}
+            {extractFailed && (
+              <div className="mt-6 flex justify-end border-t border-gray-100 pt-6">
+                <Button
+                  variant="outline"
+                  onClick={() => cred.id && reExtract.mutate([cred.id])}
+                  disabled={reExtract.isPending}
+                >
+                  <RotateCw className="h-4 w-4" />
+                  {reExtract.isPending ? t("cred.issue.submitting") : t("cred.detail.reExtract")}
+                </Button>
+              </div>
+            )}
           </Card>
 
-          {/* File Hash */}
-          <Card className="p-6 sm:p-8">
-            <DetailRow
-              label={t("cred.detail.fileHash")}
-              icon={Hash}
-              value={
-                <code className="block rounded-xl border border-gray-100 bg-gray-50 p-4 font-mono text-xs break-all text-gray-700 sm:text-sm">
-                  {cred.file_hash}
-                </code>
-              }
-            />
+          {/* Card 3: Parties */}
+          <Card className="divide-y divide-gray-100 p-6 sm:p-8">
+            <div className="pb-5">
+              <UserContactBlock
+                user={cred.holder}
+                fallbackId={cred.holder_user_id}
+                copyPrefix="holder"
+                labelType="full"
+                layout="grid"
+              />
+            </div>
+            <div className="py-5">
+              <UserContactBlock
+                user={cred.issuer}
+                fallbackId={cred.issuer_user_id}
+                copyPrefix="issuer"
+                labelType="full"
+                layout="grid"
+              />
+            </div>
+            {revoked && cred.revoker && (
+              <div className="rounded-b-2xl bg-error/5 pt-5">
+                <UserContactBlock
+                  user={cred.revoker}
+                  fallbackId={cred.revoker_user_id ?? ""}
+                  copyPrefix="revoker"
+                  labelType="full"
+                  layout="grid"
+                  tone="error"
+                />
+              </div>
+            )}
           </Card>
-
-          {/* Token ID */}
-          {cred.token_id && (
-            <Card className="p-6 sm:p-8">
-              <DetailRow
-                label={t("cred.detail.tokenId")}
-                value={<MonoId value={cred.token_id} mode="full" />}
-              />
-            </Card>
-          )}
-
-          {/* File URI */}
-          {cred.file_uri && (
-            <Card className="p-6 sm:p-8">
-              <DetailRow
-                label={t("cred.detail.fileUri")}
-                value={<code className="font-mono text-xs break-all text-gray-600">{cred.file_uri}</code>}
-              />
-            </Card>
-          )}
         </>
       )}
     </div>
