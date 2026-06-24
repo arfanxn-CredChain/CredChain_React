@@ -6,9 +6,10 @@ import {
   FileBadge,
   Ban,
   Layers,
+  Calendar,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useStore } from "@app/store";
 import { Role } from "@shared/auth/role";
 import { RoleGate } from "@shared/auth/guards";
@@ -19,12 +20,14 @@ import { EmptyState } from "@shared/components/EmptyState";
 import { DecorBlob } from "@shared/components/DecorBlob";
 import { EyebrowLabel } from "@shared/components/EyebrowLabel";
 import { MonoId } from "@shared/components/MonoId";
+import { CopyInlineButton } from "@shared/components/CopyInlineButton";
+import { UserContactBlock } from "@shared/components/UserContactBlock";
 import { Card } from "@ui/card";
 import { Skeleton } from "@ui/skeleton";
 import { Button } from "@ui/button";
 import { cn } from "@shared/lib/cn";
 import { DateFilterMenu } from "./components/DateFilterMenu";
-import type { OverviewRecentCredential, OverviewRecentUser } from "@shared/types/api";
+import type { OverviewRecentCredential, OverviewRecentUser, UserDTO } from "@shared/types/api";
 
 /* ── helpers ── */
 
@@ -146,15 +149,30 @@ function CredentialRow({
   variant: "active" | "revoked";
   t: ReturnType<typeof useTranslation>["t"];
 }) {
+  const navigate = useNavigate();
   const isRevoked = variant === "revoked";
   const Icon = isRevoked ? Ban : FileBadge;
   const tone = isRevoked ? ("error" as const) : ("gold" as const);
   const actor = isRevoked ? cred.revoker : cred.issuer;
-  const key = isRevoked ? "overview.recents.revokedBy" : "overview.recents.issuedBy";
+  const actorPrefix = isRevoked ? "revoker" : "issuer";
   const time = isRevoked && cred.revoked_at ? relativeTime(cred.revoked_at, t) : relativeTime(cred.issued_at, t);
 
+  const handleClick = () => navigate(`/credentials/${cred.id}`);
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
   return (
-    <div className="group -mx-2 flex items-start gap-4 rounded-lg border-t border-gray-100 px-2 py-3 transition-colors first:border-t-0 hover:bg-gray-50/70">
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      className="group -mx-2 flex cursor-pointer items-start gap-4 rounded-lg border-t border-gray-100 px-2 py-3 transition-colors first:border-t-0 hover:bg-gray-50/70 focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none"
+    >
       <div className={cn("mt-0.5 shrink-0 rounded-lg p-1.5", toneBlock[tone])}>
         <Icon className="h-4 w-4" aria-hidden="true" />
       </div>
@@ -162,10 +180,28 @@ function CredentialRow({
         <p className="truncate text-sm font-semibold text-navy">
           {cred.name || t("overview.recents.noName")}
         </p>
-        <p className="mt-0.5 text-xs text-gray-500">
-          {cred.holder ? `${cred.holder.name} · ` : ""}
-          {t(key, { [isRevoked ? "revoker" : "issuer"]: actor?.name ?? t("overview.recents.noName") })}
-        </p>
+        {cred.holder && (
+          <div className="mt-2">
+            <UserContactBlock
+              user={cred.holder as UserDTO}
+              fallbackId={cred.holder.id}
+              copyPrefix="holder"
+              labelType="full"
+              blockLinks
+            />
+          </div>
+        )}
+        {actor && (
+          <div className="mt-2">
+            <UserContactBlock
+              user={actor as UserDTO}
+              fallbackId={actor.id}
+              copyPrefix={actorPrefix}
+              labelType="full"
+              blockLinks
+            />
+          </div>
+        )}
       </div>
       <time
         dateTime={isRevoked && cred.revoked_at ? cred.revoked_at : cred.issued_at}
@@ -184,18 +220,36 @@ function UserRow({
   user: OverviewRecentUser;
   t: ReturnType<typeof useTranslation>["t"];
 }) {
+  const navigate = useNavigate();
+  const handleClick = () => navigate(`/users/${user.id}`);
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
   return (
-    <div className="group -mx-2 flex items-start gap-4 rounded-lg border-t border-gray-100 px-2 py-3 transition-colors first:border-t-0 hover:bg-gray-50/70">
-      <div className="mt-0.5 shrink-0 rounded-lg bg-navy/10 p-1.5">
-        <User className="h-4 w-4 text-navy" aria-hidden="true" />
-      </div>
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      className="group -mx-2 flex cursor-pointer items-start gap-4 rounded-lg border-t border-gray-100 px-2 py-3 transition-colors first:border-t-0 hover:bg-gray-50/70 focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none"
+    >
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-navy">
-          {user.name || t("overview.recents.noName")}
-        </p>
-        <p className="mt-0.5 text-xs text-gray-500">
-          {t("overview.recents.joined", { date: formatDate(user.created_at) })}
-        </p>
+        <UserContactBlock
+          user={user as UserDTO}
+          fallbackId={user.id}
+          copyPrefix="user"
+          labelType="full"
+          blockLinks
+        >
+          <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-500">
+            <Calendar className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
+            <span>{t("overview.recents.joined", { date: formatDate(user.created_at) })}</span>
+          </div>
+        </UserContactBlock>
       </div>
       <time dateTime={user.created_at} className="mt-0.5 shrink-0 text-xs text-gray-400">
         {relativeTime(user.created_at, t)}
@@ -287,7 +341,7 @@ export function Overview() {
           <Card className="relative overflow-hidden p-6 shadow-lg ring-1 shadow-gold/20 ring-gold/10 sm:p-8">
             <DecorBlob tone="gold" position="top-right" size="lg" />
             <div className="relative z-10">
-              <EyebrowLabel className="mb-6">
+              <EyebrowLabel tone="navy" className="mb-6">
                 {t("overview.credentialCounts")}
               </EyebrowLabel>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-5">
@@ -322,7 +376,7 @@ export function Overview() {
               <Card className="relative overflow-hidden p-6 shadow-lg ring-1 shadow-gold/20 ring-gold/10 sm:p-8">
                 <DecorBlob tone="gold" position="top-right" size="lg" />
                 <div className="relative z-10">
-                  <EyebrowLabel className="mb-6">
+                  <EyebrowLabel tone="navy" className="mb-6">
                     {t("overview.userCounts")}
                   </EyebrowLabel>
                   <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -364,7 +418,7 @@ export function Overview() {
 
           {/* ── recent activity ── */}
           <Card className="p-6 sm:p-8">
-            <EyebrowLabel className="mb-6">
+            <EyebrowLabel tone="navy" className="mb-6">
               {t("overview.recents")}
             </EyebrowLabel>
             <div className="space-y-8">
@@ -433,7 +487,7 @@ export function Overview() {
               <Card className="relative overflow-hidden p-6 shadow-lg ring-1 shadow-gold/20 ring-gold/10 sm:p-8">
                 <DecorBlob tone="gold" position="top-right" size="lg" />
                 <div className="relative z-10">
-                  <EyebrowLabel className="mb-6">
+                  <EyebrowLabel tone="navy" className="mb-6">
                     {t("overview.chainDetails")}
                   </EyebrowLabel>
                   <dl className="grid grid-cols-1 gap-6 sm:grid-cols-3">
@@ -445,11 +499,15 @@ export function Overview() {
                         <Layers className="h-3.5 w-3.5" aria-hidden="true" />
                         {t("overview.chainDetails.authorityContract")}
                       </EyebrowLabel>
-                      <dd>
+                      <dd className="flex items-center gap-2">
                         <MonoId
                           value={data.chain_details.authority_contract}
                           mode="address"
                           className="text-sm text-navy"
+                        />
+                        <CopyInlineButton
+                          value={data.chain_details.authority_contract}
+                          ariaLabel={t("overview.chainDetails.copyAuthority")}
                         />
                       </dd>
                     </div>
@@ -461,11 +519,15 @@ export function Overview() {
                         <Layers className="h-3.5 w-3.5" aria-hidden="true" />
                         {t("overview.chainDetails.registryContract")}
                       </EyebrowLabel>
-                      <dd>
+                      <dd className="flex items-center gap-2">
                         <MonoId
                           value={data.chain_details.registry_contract}
                           mode="address"
                           className="text-sm text-navy"
+                        />
+                        <CopyInlineButton
+                          value={data.chain_details.registry_contract}
+                          ariaLabel={t("overview.chainDetails.copyRegistry")}
                         />
                       </dd>
                     </div>
