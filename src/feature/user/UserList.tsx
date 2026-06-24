@@ -197,30 +197,33 @@ export function UserList() {
                           className={cn("cursor-pointer", user.deleted_at && "bg-error/5")}
                         >
                           <TableCell>
-                            <div className="min-w-0">
-                              <UserContactBlock
-                                labelType="full"
-                                user={user}
-                                fallbackId={user.id}
-                                copyPrefix="user"
-                                blockLinks
-                                layout="grid"
-                              />
-                              <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-500">
-                                <Calendar className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
-                                <span>
-                                  {user.deleted_at
-                                    ? t("user.list.trashed", {
-                                        time: relativeTime(user.deleted_at, i18n.language),
-                                      })
-                                    : user.updated_at !== user.created_at
-                                      ? t("user.list.updated", {
-                                          time: relativeTime(user.updated_at, i18n.language),
+                            <div className="flex items-start gap-3">
+                              <div className="mt-0.5 w-6 shrink-0" />
+                              <div className="min-w-0 flex-1">
+                                <UserContactBlock
+                                  labelType="full"
+                                  user={user}
+                                  fallbackId={user.id}
+                                  copyPrefix="user"
+                                  blockLinks
+                                  layout="grid"
+                                />
+                                <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-500">
+                                  <Calendar className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
+                                  <span>
+                                    {user.deleted_at
+                                      ? t("user.list.trashed", {
+                                          time: relativeTime(user.deleted_at, i18n.language),
                                         })
-                                      : t("user.list.created", {
-                                          time: relativeTime(user.created_at, i18n.language),
-                                        })}
-                                </span>
+                                      : user.updated_at !== user.created_at
+                                        ? t("user.list.updated", {
+                                            time: relativeTime(user.updated_at, i18n.language),
+                                          })
+                                        : t("user.list.created", {
+                                            time: relativeTime(user.created_at, i18n.language),
+                                          })}
+                                  </span>
+                                </div>
                               </div>
                             </div>
                           </TableCell>
