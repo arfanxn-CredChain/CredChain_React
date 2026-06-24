@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Hash, Mail, Phone, VenusAndMars, Wallet } from "lucide-react";
@@ -17,6 +18,7 @@ interface UserContactBlockProps {
   tone?: "default" | "error";
   blockLinks?: boolean;
   layout?: "flex" | "grid";
+  children?: ReactNode;
 }
 
 export function UserContactBlock({
@@ -27,6 +29,7 @@ export function UserContactBlock({
   tone = "default",
   blockLinks,
   layout = "flex",
+  children,
 }: UserContactBlockProps) {
   const { t } = useTranslation();
 
@@ -138,6 +141,7 @@ export function UserContactBlock({
             )}
           </div>
         )}
+        {children}
       </div>
     </div>
   );

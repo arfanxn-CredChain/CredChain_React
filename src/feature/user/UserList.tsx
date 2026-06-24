@@ -197,15 +197,14 @@ export function UserList() {
                           className={cn("cursor-pointer", user.deleted_at && "bg-error/5")}
                         >
                           <TableCell>
-                            <div className="min-w-0">
-                              <UserContactBlock
-                                labelType="full"
-                                user={user}
-                                fallbackId={user.id}
-                                copyPrefix="user"
-                                blockLinks
-                                layout="grid"
-                              />
+                            <UserContactBlock
+                              labelType="full"
+                              user={user}
+                              fallbackId={user.id}
+                              copyPrefix="user"
+                              blockLinks
+                              layout="grid"
+                            >
                               <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-500">
                                 <Calendar className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
                                 <span>
@@ -222,7 +221,7 @@ export function UserList() {
                                         })}
                                 </span>
                               </div>
-                            </div>
+                            </UserContactBlock>
                           </TableCell>
                           <TableCell className="text-right">
                             <DropdownMenu>
