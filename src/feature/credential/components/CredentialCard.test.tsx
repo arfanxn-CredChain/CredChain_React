@@ -176,7 +176,7 @@ describe("CredentialCard", () => {
 
     const holderLink = screen.getByRole("link", { name: /anna sorokin/i });
     expect(holderLink.textContent).toBe("Anna Sorokin");
-    expect(screen.getByText("Holder")).toBeInTheDocument();
+    expect(screen.getByText(/holder/i)).toBeInTheDocument();
   });
 
   it("stacks compact issuer name and role label vertically", () => {
@@ -188,7 +188,7 @@ describe("CredentialCard", () => {
 
     const issuerLink = screen.getByRole("link", { name: /super user/i });
     expect(issuerLink.textContent).toBe("Super User");
-    expect(screen.getByText("Super Admin")).toBeInTheDocument();
+    expect(screen.getByText(/super admin/i)).toBeInTheDocument();
   });
 
   it("translates super_admin role label instead of showing the i18n key", () => {

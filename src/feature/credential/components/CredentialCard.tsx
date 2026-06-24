@@ -1,14 +1,14 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Calendar, Hash, Mail, Phone, Wallet } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { cn } from "@shared/lib/cn";
 import { MonoId } from "@shared/components/MonoId";
-import { formatDate, truncateAddress } from "@shared/lib/format";
+import { formatDate } from "@shared/lib/format";
 import { Card } from "@ui/card";
 import { CopyInlineButton } from "@shared/components/CopyInlineButton";
-import { UserAvatar } from "@shared/components/UserAvatar";
 import { notify } from "@shared/lib/notify";
-import type { CredentialDTO, UserDTO } from "@shared/types/api";
+import { UserContactBlock } from "@shared/components/UserContactBlock";
+import type { CredentialDTO } from "@shared/types/api";
 import { CredentialStatusBadge } from "./CredentialStatusBadge";
 
 interface CredentialCardProps {
@@ -119,7 +119,7 @@ export function CredentialCard({
         </div>
 
         <div className="mb-4">
-          <h3 className="truncate font-sans text-base font-bold text-navy">{credential.name}</h3>
+          <h3 className="line-clamp-2 font-sans text-base font-bold text-navy">{credential.name}</h3>
           <div className="mt-0.5 flex items-center gap-1">
             <MonoId value={credential.id} mode="id" />
             <CopyInlineButton
@@ -180,124 +180,4 @@ export function CredentialCard({
   );
 }
 
-interface UserContactBlockProps {
-  user?: UserDTO;
-  fallbackId: string;
-  copyPrefix: "holder" | "issuer" | "revoker";
-  labelType: "full" | "compact";
-  tone?: "default" | "error";
-  blockLinks?: boolean;
-}
 
-function UserContactBlock({
-  user,
-  fallbackId,
-  copyPrefix,
-  labelType,
-  tone = "default",
-  blockLinks,
-}: UserContactBlockProps) {
-  const { t } = useTranslation();
-
-  const name = user?.name ?? user?.email ?? fallbackId;
-  const userId = user?.id ?? fallbackId;
-  const roleLabel = user?.role ? t(`user.edit.role.${user.role}`) : undefined;
-  const isDeleted = user?.deleted_at !== null;
-
-  const textColor = tone === "error" ? "text-error" : "text-navy";
-  const nameWeight = labelType === "full" ? "font-bold" : "font-semibold";
-
-  return (
-    <div className="flex items-start gap-3">
-      <UserAvatar user={user ?? null} size="sm" className="mt-0.5 shrink-0" />
-      <div className="flex min-w-0 flex-col space-y-0.5">
-        <div className="flex flex-wrap items-center gap-2">
-          {blockLinks ? (
-            <span
-              className={cn(
-                "truncate text-left text-sm",
-                nameWeight,
-                textColor,
-              )}
-            >
-              {name}
-            </span>
-          ) : (
-            <Link
-              to={`/users/${userId}`}
-              onClick={(e) => e.stopPropagation()}
-              className={cn(
-                "truncate text-left text-sm hover:underline focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none",
-                nameWeight,
-                textColor,
-              )}
-            >
-              {name}
-            </Link>
-          )}
-          {isDeleted && (
-            <span className="rounded-md bg-gray-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gray-600">
-              {t("user.status.trashed")}
-            </span>
-          )}
-        </div>
-
-        {roleLabel && <span className="text-sm text-gray-500">{roleLabel}</span>}
-
-        {labelType === "full" && (
-          <>
-            {user?.number && (
-              <div className="flex items-center gap-1 text-xs text-gray-500">
-                <Hash className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
-                <span className="truncate">{user.number}</span>
-                <CopyInlineButton
-                  value={user.number}
-                  ariaLabel={t(`cred.copy.${copyPrefix}Number`)}
-                  className="shrink-0"
-                />
-              </div>
-            )}
-
-            {user?.email && (
-              <div className="flex items-center gap-1 text-xs text-gray-500">
-                <Mail className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
-                <span className="truncate">{user.email}</span>
-                <CopyInlineButton
-                  value={user.email}
-                  ariaLabel={t(`cred.copy.${copyPrefix}Email`)}
-                  className="shrink-0"
-                />
-              </div>
-            )}
-
-            {user?.phone_number && (
-              <div className="flex items-center gap-1 text-xs text-gray-500">
-                <Phone className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
-                <span className="truncate">{user.phone_number}</span>
-                <CopyInlineButton
-                  value={user.phone_number}
-                  ariaLabel={t(`cred.copy.${copyPrefix}Phone`)}
-                  className="shrink-0"
-                />
-              </div>
-            )}
-
-            {user?.wallet_address && (
-              <div className="flex items-center gap-1 font-mono text-xs text-gray-500">
-                <Wallet className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
-                <span className="truncate" title={user.wallet_address}>
-                  {truncateAddress(user.wallet_address)}
-                </span>
-                <CopyInlineButton
-                  value={user.wallet_address}
-                  ariaLabel={t(`cred.copy.${copyPrefix}Wallet`)}
-                  className="shrink-0"
-                />
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
