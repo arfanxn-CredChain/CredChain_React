@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
-import { FileBadge, User, AlertTriangle } from "lucide-react";
+import { User, AlertTriangle, FileBadge, Ban } from "lucide-react";
 import { useStore } from "@app/store";
 import { Role } from "@shared/auth/role";
 import { RoleGate } from "@shared/auth/guards";
@@ -9,37 +9,16 @@ import { useOverview } from "./api/useOverview";
 import { useDebouncedValue } from "@shared/hooks/useDebouncedValue";
 import { PageHeader } from "@shared/components/PageHeader";
 import { EmptyState } from "@shared/components/EmptyState";
-import { DetailRow } from "@shared/components/DetailRow";
-import { Card, CardHeader, CardTitle } from "@ui/card";
+import { DecorBlob } from "@shared/components/DecorBlob";
+import { EyebrowLabel } from "@shared/components/EyebrowLabel";
+import { MonoId } from "@shared/components/MonoId";
+import { Card } from "@ui/card";
 import { Skeleton } from "@ui/skeleton";
 import { Button } from "@ui/button";
 import { Input } from "@ui/input";
+import { cn } from "@shared/lib/cn";
 
-interface StatItemProps {
-  value: number;
-  label: string;
-  note?: string;
-}
-
-function StatItem({ value, label, note }: StatItemProps) {
-  return (
-    <div className="rounded-xl border border-gray-100 bg-base p-4 text-center">
-      <div className="font-display text-2xl font-bold text-navy">{value.toLocaleString()}</div>
-      <div className="mt-1 text-xs font-sans text-gray-500">
-        {label}
-        {note && <span className="ml-1 text-gray-400 italic">{note}</span>}
-      </div>
-    </div>
-  );
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
+/* ── helpers ── */
 
 function relativeTime(
   iso: string,
@@ -58,6 +37,45 @@ function relativeTime(
   if (days < 7) return t("overview.relativeTime.days", { n: days });
   return t("overview.relativeTime.weeks", { n: weeks });
 }
+
+/* ── stat item ── */
+
+interface StatItemProps {
+  value: number;
+  label: string;
+  accent?: "gold" | "navy";
+  note?: string;
+}
+
+function StatItem({ value, label, accent, note }: StatItemProps) {
+  const isAccent = accent === "gold";
+  return (
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center rounded-2xl border p-6 h-40",
+        isAccent
+          ? "border-gold/20 bg-gold/10 shadow-sm shadow-gold/10"
+          : "border-gray-100 bg-surface shadow-sm",
+      )}
+    >
+      <span className="font-display text-4xl font-extrabold tracking-tight text-navy">
+        {value.toLocaleString()}
+      </span>
+      <span className="mt-2 text-xs font-bold tracking-wider text-gray-400 uppercase">
+        {label}
+        {note && <span className="ml-1 normal-case text-gray-400/70 font-normal">{note}</span>}
+      </span>
+    </div>
+  );
+}
+
+/* ── skeleton stat ── */
+
+function StatSkeleton() {
+  return <Skeleton className="h-40 rounded-2xl" />;
+}
+
+/* ── main page ── */
 
 export function Overview() {
   const user = useStore((s) => s.user);
@@ -166,50 +184,54 @@ export function Overview() {
         />
       ) : isLoading ? (
         <>
-          <Skeleton className="h-40 rounded-2xl" />
-          <Skeleton className="h-44 rounded-2xl" />
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <StatSkeleton />
+            <StatSkeleton />
+            <StatSkeleton />
+            <StatSkeleton />
+          </div>
+          <Skeleton className="h-60 rounded-2xl" />
           <Skeleton className="h-64 rounded-2xl" />
-          <Skeleton className="h-32 rounded-2xl" />
         </>
       ) : data ? (
         <>
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("overview.credentialCounts")}</CardTitle>
-            </CardHeader>
-            <div className="grid grid-cols-2 gap-4 px-6 pb-6 sm:grid-cols-3 lg:grid-cols-5 sm:px-8 sm:pb-8">
-              <StatItem
-                value={data.credential_counts.total}
-                label={t("overview.counts.total")}
-              />
-              <StatItem
-                value={data.credential_counts.active}
-                label={t("overview.counts.active")}
-              />
-              <StatItem
-                value={data.credential_counts.revoked}
-                label={t("overview.counts.revoked")}
-              />
-              <StatItem
-                value={data.credential_counts.pending}
-                label={t("overview.counts.pending")}
-              />
-              <StatItem
-                value={data.credential_counts.failed}
-                label={t("overview.counts.failed")}
-              />
+          {/* ── credential counts ── */}
+          <Card className="relative overflow-hidden p-6 shadow-lg ring-1 shadow-gold/20 ring-gold/10 sm:p-8">
+            <DecorBlob tone="gold" position="top-right" size="lg" />
+            <div className="relative z-10">
+              <EyebrowLabel className="mb-6">{t("overview.credentialCounts")}</EyebrowLabel>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                <StatItem
+                  value={data.credential_counts.active}
+                  label={t("overview.counts.active")}
+                  accent="gold"
+                />
+                <StatItem
+                  value={data.credential_counts.total}
+                  label={t("overview.counts.total")}
+                />
+                <StatItem
+                  value={data.credential_counts.revoked}
+                  label={t("overview.counts.revoked")}
+                />
+                <StatItem
+                  value={data.credential_counts.pending}
+                  label={t("overview.counts.pending")}
+                />
+                <StatItem
+                  value={data.credential_counts.failed}
+                  label={t("overview.counts.failed")}
+                />
+              </div>
             </div>
           </Card>
 
-          <RoleGate
-            allowed={[Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]}
-          >
+          {/* ── user counts ── */}
+          <RoleGate allowed={[Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]}>
             {data.user_counts && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>{t("overview.userCounts")}</CardTitle>
-                </CardHeader>
-                <div className="grid grid-cols-2 gap-4 px-6 pb-6 sm:grid-cols-3 lg:grid-cols-4 sm:px-8 sm:pb-8">
+              <Card className="p-6 sm:p-8">
+                <EyebrowLabel className="mb-6">{t("overview.userCounts")}</EyebrowLabel>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
                   <StatItem
                     value={data.user_counts.total}
                     label={t("overview.counts.total")}
@@ -244,42 +266,40 @@ export function Overview() {
             )}
           </RoleGate>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("overview.recents")}</CardTitle>
-            </CardHeader>
-            <div className="space-y-6 px-6 pb-6 sm:px-8 sm:pb-8">
+          {/* ── recent activity ── */}
+          <Card className="p-6 sm:p-8">
+            <EyebrowLabel className="mb-6">{t("overview.recents")}</EyebrowLabel>
+            <div className="space-y-8">
+              {/* active creds */}
               <div>
-                <h4 className="mb-3 text-xs font-bold tracking-wider text-gray-400 uppercase">
+                <h4 className="mb-4 text-xs font-bold tracking-wider text-gray-400 uppercase">
                   {t("overview.recents.activeCredentials")}
                 </h4>
                 {data.recents.active_credentials.length === 0 ? (
-                  <p className="py-4 text-center text-sm text-gray-400 italic">
+                  <p className="py-6 text-center text-sm text-gray-400 italic">
                     {t("overview.recents.empty")}
                   </p>
                 ) : (
                   data.recents.active_credentials.map((cred) => (
                     <div
                       key={cred.id}
-                      className="flex items-center gap-3 border-b border-gray-50 py-3 last:border-0"
+                      className="flex items-start gap-4 border-t border-gray-50 py-3 first:border-t-0"
                     >
-                      <FileBadge
-                        className="h-5 w-5 shrink-0 text-gray-300"
-                        aria-hidden="true"
-                      />
+                      <div className="mt-0.5 shrink-0 rounded-lg bg-gold/10 p-1.5">
+                        <FileBadge className="h-4 w-4 text-gold" aria-hidden="true" />
+                      </div>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-navy">
+                        <p className="truncate text-sm font-semibold text-navy">
                           {cred.name || t("overview.recents.noName")}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="mt-0.5 text-xs text-gray-500">
                           {cred.holder ? `${cred.holder.name} · ` : ""}
                           {t("overview.recents.issuedBy", {
-                            issuer:
-                              cred.issuer?.name ?? t("overview.recents.noName"),
+                            issuer: cred.issuer?.name ?? t("overview.recents.noName"),
                           })}
                         </p>
                       </div>
-                      <time className="shrink-0 text-xs text-gray-400">
+                      <time className="mt-0.5 shrink-0 text-xs text-gray-400">
                         {relativeTime(cred.issued_at, t)}
                       </time>
                     </div>
@@ -287,117 +307,116 @@ export function Overview() {
                 )}
               </div>
 
+              {/* revoked creds */}
               <div>
-                <h4 className="mb-3 text-xs font-bold tracking-wider text-gray-400 uppercase">
+                <h4 className="mb-4 text-xs font-bold tracking-wider text-gray-400 uppercase">
                   {t("overview.recents.revokedCredentials")}
                 </h4>
                 {data.recents.revoked_credentials.length === 0 ? (
-                  <p className="py-4 text-center text-sm text-gray-400 italic">
+                  <p className="py-6 text-center text-sm text-gray-400 italic">
                     {t("overview.recents.empty")}
                   </p>
                 ) : (
                   data.recents.revoked_credentials.map((cred) => (
                     <div
                       key={cred.id}
-                      className="flex items-center gap-3 border-b border-gray-50 py-3 last:border-0"
+                      className="flex items-start gap-4 border-t border-gray-50 py-3 first:border-t-0"
                     >
-                      <FileBadge
-                        className="h-5 w-5 shrink-0 text-gray-300"
-                        aria-hidden="true"
-                      />
+                      <div className="mt-0.5 shrink-0 rounded-lg bg-error/10 p-1.5">
+                        <Ban className="h-4 w-4 text-error" aria-hidden="true" />
+                      </div>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-navy">
+                        <p className="truncate text-sm font-semibold text-navy">
                           {cred.name || t("overview.recents.noName")}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="mt-0.5 text-xs text-gray-500">
                           {cred.holder ? `${cred.holder.name} · ` : ""}
                           {t("overview.recents.revokedBy", {
-                            revoker:
-                              cred.revoker?.name ??
-                              t("overview.recents.noName"),
+                            revoker: cred.revoker?.name ?? t("overview.recents.noName"),
                           })}
                         </p>
                       </div>
-                      <time className="shrink-0 text-xs text-gray-400">
-                        {cred.revoked_at
-                          ? relativeTime(cred.revoked_at, t)
-                          : ""}
+                      <time className="mt-0.5 shrink-0 text-xs text-gray-400">
+                        {cred.revoked_at ? relativeTime(cred.revoked_at, t) : ""}
                       </time>
                     </div>
                   ))
                 )}
               </div>
 
-              {data.recents.stored_users &&
-                data.recents.stored_users.length > 0 && (
-                  <div>
-                    <h4 className="mb-3 text-xs font-bold tracking-wider text-gray-400 uppercase">
-                      {t("overview.recents.storedUsers")}
-                    </h4>
-                    {data.recents.stored_users.map((u) => (
-                      <div
-                        key={u.id}
-                        className="flex items-center gap-3 border-b border-gray-50 py-3 last:border-0"
-                      >
-                        <User
-                          className="h-5 w-5 shrink-0 text-gray-300"
-                          aria-hidden="true"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium text-navy">
-                            {u.name || t("overview.recents.noName")}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {u.role} ·{" "}
-                            {t("overview.recents.joined", {
-                              date: formatDate(u.created_at),
-                            })}
-                          </p>
-                        </div>
-                        <time className="shrink-0 text-xs text-gray-400">
-                          {relativeTime(u.created_at, t)}
-                        </time>
+              {/* stored users */}
+              {data.recents.stored_users && data.recents.stored_users.length > 0 && (
+                <div>
+                  <h4 className="mb-4 text-xs font-bold tracking-wider text-gray-400 uppercase">
+                    {t("overview.recents.storedUsers")}
+                  </h4>
+                  {data.recents.stored_users.map((u) => (
+                    <div
+                      key={u.id}
+                      className="flex items-start gap-4 border-t border-gray-50 py-3 first:border-t-0"
+                    >
+                      <div className="mt-0.5 shrink-0 rounded-lg bg-navy/10 p-1.5">
+                        <User className="h-4 w-4 text-navy" aria-hidden="true" />
                       </div>
-                    ))}
-                  </div>
-                )}
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold text-navy">
+                          {u.name || t("overview.recents.noName")}
+                        </p>
+                        <p className="mt-0.5 text-xs text-gray-500">
+                          {u.role} · {new Date(u.created_at).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
+                        </p>
+                      </div>
+                      <time className="mt-0.5 shrink-0 text-xs text-gray-400">
+                        {relativeTime(u.created_at, t)}
+                      </time>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </Card>
 
-          <RoleGate
-            allowed={[Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]}
-          >
+          {/* ── chain details ── */}
+          <RoleGate allowed={[Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]}>
             {data.chain_details && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>{t("overview.chainDetails")}</CardTitle>
-                </CardHeader>
-                <div className="grid grid-cols-1 gap-4 px-6 pb-6 sm:grid-cols-3 sm:px-8 sm:pb-8">
-                  <DetailRow
-                    label={t("overview.chainDetails.authorityContract")}
-                    value={
-                      <code className="font-mono text-xs text-navy">
-                        {data.chain_details.authority_contract}
-                      </code>
-                    }
-                  />
-                  <DetailRow
-                    label={t("overview.chainDetails.registryContract")}
-                    value={
-                      <code className="font-mono text-xs text-navy">
-                        {data.chain_details.registry_contract}
-                      </code>
-                    }
-                  />
-                  <DetailRow
-                    label={t("overview.chainDetails.lastBlock")}
-                    value={
-                      data.chain_details.last_block === 0
+              <Card className="p-6 sm:p-8">
+                <EyebrowLabel className="mb-6">{t("overview.chainDetails")}</EyebrowLabel>
+                <dl className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+                  <div>
+                    <dt className="mb-1 text-xs font-bold tracking-wider text-gray-400 uppercase">
+                      {t("overview.chainDetails.authorityContract")}
+                    </dt>
+                    <dd>
+                      <MonoId
+                        value={data.chain_details.authority_contract}
+                        mode="address"
+                        className="text-sm text-navy"
+                      />
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="mb-1 text-xs font-bold tracking-wider text-gray-400 uppercase">
+                      {t("overview.chainDetails.registryContract")}
+                    </dt>
+                    <dd>
+                      <MonoId
+                        value={data.chain_details.registry_contract}
+                        mode="address"
+                        className="text-sm text-navy"
+                      />
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="mb-1 text-xs font-bold tracking-wider text-gray-400 uppercase">
+                      {t("overview.chainDetails.lastBlock")}
+                    </dt>
+                    <dd className="font-display text-2xl font-bold tracking-tight text-navy">
+                      {data.chain_details.last_block === 0
                         ? t("overview.chainDetails.unavailable")
-                        : data.chain_details.last_block.toLocaleString()
-                    }
-                  />
-                </div>
+                        : data.chain_details.last_block.toLocaleString()}
+                    </dd>
+                  </div>
+                </dl>
               </Card>
             )}
           </RoleGate>

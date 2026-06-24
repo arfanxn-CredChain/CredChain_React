@@ -27,13 +27,14 @@ describe("Overview", () => {
     );
   });
 
-  it("renders credential counts", async () => {
+  it("renders credential counts section", async () => {
     useStore.setState({ user: makeUser({ role: Role.HOLDER }) });
     renderOverview();
     await waitFor(() => {
       expect(screen.getByText("Credentials")).toBeDefined();
-      expect(screen.getByText("500")).toBeDefined();
     });
+    expect(screen.getByText("450")).toBeDefined();
+    expect(screen.getByText("500")).toBeDefined();
   });
 
   it("renders user counts for Issuer+", async () => {
@@ -71,11 +72,12 @@ describe("Overview", () => {
     expect(screen.queryByText("Chain Info")).toBeNull();
   });
 
-  it("shows super admin always-one note for Issuer+", async () => {
-    useStore.setState({ user: makeUser({ role: Role.ISSUER }) });
+  it("shows recent activity section", async () => {
+    useStore.setState({ user: makeUser({ role: Role.HOLDER }) });
     renderOverview();
     await waitFor(() => {
-      expect(screen.getByText("Always 1")).toBeDefined();
+      expect(screen.getByText("Recent Activity")).toBeDefined();
+      expect(screen.getByText("Recently Issued")).toBeDefined();
     });
   });
 });
