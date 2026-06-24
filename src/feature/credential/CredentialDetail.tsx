@@ -222,7 +222,7 @@ export function CredentialDetail() {
               />
             </div>
             {revoked && cred.revoker && (
-              <div className="rounded-b-2xl bg-error/5 pt-5">
+              <div className="pt-5">
                 <UserContactBlock
                   user={cred.revoker}
                   fallbackId={cred.revoker_user_id ?? ""}
