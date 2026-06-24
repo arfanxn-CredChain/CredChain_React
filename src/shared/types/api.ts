@@ -93,3 +93,58 @@ export interface PaginationParams {
   filters?: string[];
   includes?: string[];
 }
+
+export interface OverviewCredentialCounts {
+  total: number;
+  active: number;
+  revoked: number;
+  pending: number;
+  failed: number;
+}
+
+export interface OverviewUserCounts {
+  total: number;
+  holder: number;
+  issuer: number;
+  admin: number;
+  super_admin: number;
+  active: number;
+  trashed: number;
+}
+
+export interface OverviewChainDetails {
+  authority_contract: string;
+  registry_contract: string;
+  last_block: number;
+}
+
+export interface OverviewRecentCredential {
+  id: string;
+  name: string;
+  holder?: { id: string; name: string; email: string };
+  issuer?: { id: string; name: string; email: string };
+  revoker?: { id: string; name: string; email: string };
+  issued_at: string;
+  revoked_at?: string;
+}
+
+export interface OverviewRecentUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  created_at: string;
+}
+
+export interface OverviewRecents {
+  active_credentials: OverviewRecentCredential[];
+  revoked_credentials: OverviewRecentCredential[];
+  stored_users?: OverviewRecentUser[];
+}
+
+export interface OverviewDTO {
+  credential_counts: OverviewCredentialCounts;
+  user_counts?: OverviewUserCounts;
+  recents: OverviewRecents;
+  chain_details?: OverviewChainDetails;
+}
