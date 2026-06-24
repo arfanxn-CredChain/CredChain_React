@@ -204,8 +204,9 @@ export function UserList() {
                                 fallbackId={user.id}
                                 copyPrefix="user"
                                 blockLinks
+                                layout="grid"
                               />
-                              <div className="ml-13 mt-1 flex items-center gap-1.5 text-xs text-gray-500">
+                              <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-500">
                                 <Calendar className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
                                 <span>
                                   {user.deleted_at

@@ -16,6 +16,7 @@ interface UserContactBlockProps {
   labelType: "full" | "compact";
   tone?: "default" | "error";
   blockLinks?: boolean;
+  layout?: "flex" | "grid";
 }
 
 export function UserContactBlock({
@@ -25,6 +26,7 @@ export function UserContactBlock({
   labelType,
   tone = "default",
   blockLinks,
+  layout = "flex",
 }: UserContactBlockProps) {
   const { t } = useTranslation();
 
@@ -70,9 +72,16 @@ export function UserContactBlock({
         </div>
 
         {labelType === "full" && (
-          <div className="flex flex-wrap gap-x-4 gap-y-0.5">
+          <div
+            className={cn(
+              "gap-x-4 gap-y-0.5",
+              layout === "grid"
+                ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                : "flex flex-wrap",
+            )}
+          >
             {user?.number && (
-              <div className="inline-flex items-center gap-1 text-xs text-gray-500">
+              <div className="flex items-center gap-1 text-xs text-gray-500">
                 <Hash className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
                 <span className="truncate">{user.number}</span>
                 <CopyInlineButton
@@ -84,7 +93,7 @@ export function UserContactBlock({
             )}
 
             {user?.email && (
-              <div className="inline-flex items-center gap-1 text-xs text-gray-500">
+              <div className="flex items-center gap-1 text-xs text-gray-500">
                 <Mail className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
                 <span className="truncate">{user.email}</span>
                 <CopyInlineButton
@@ -96,7 +105,7 @@ export function UserContactBlock({
             )}
 
             {user?.phone_number && (
-              <div className="inline-flex items-center gap-1 text-xs text-gray-500">
+              <div className="flex items-center gap-1 text-xs text-gray-500">
                 <Phone className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
                 <span className="truncate">{user.phone_number}</span>
                 <CopyInlineButton
@@ -108,14 +117,14 @@ export function UserContactBlock({
             )}
 
             {user?.gender && (
-              <div className="inline-flex items-center gap-1 text-xs text-gray-500">
+              <div className="flex items-center gap-1 text-xs text-gray-500">
                 <VenusAndMars className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
                 <span>{t(`user.field.gender.${user.gender}`)}</span>
               </div>
             )}
 
             {user?.wallet_address && (
-              <div className="inline-flex items-center gap-1 font-mono text-xs text-gray-500">
+              <div className="flex items-center gap-1 font-mono text-xs text-gray-500">
                 <Wallet className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
                 <span className="truncate" title={user.wallet_address}>
                   {truncateAddress(user.wallet_address)}
