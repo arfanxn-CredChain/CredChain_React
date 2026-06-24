@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { truncateAddress, truncateId, truncateHash, formatDate } from "./format";
+import {
+  truncateAddress,
+  truncateId,
+  truncateHash,
+  formatDate,
+  toKebabCase,
+} from "./format";
 
 describe("format", () => {
   describe("truncateAddress", () => {
@@ -49,6 +55,40 @@ describe("format", () => {
 
     it("returns a dash for null values", () => {
       expect(formatDate(null)).toBe("-");
+    });
+  });
+
+  describe("toKebabCase", () => {
+    it("converts space-separated words to kebab-case", () => {
+      expect(toKebabCase("Bachelor of Computer Science")).toBe("bachelor-of-computer-science");
+    });
+
+    it("lowercases the input", () => {
+      expect(toKebabCase("UPPER CASE")).toBe("upper-case");
+    });
+
+    it("removes non-alphanumeric characters except hyphens and spaces", () => {
+      expect(toKebabCase("Hello! @World #2024")).toBe("hello-world-2024");
+    });
+
+    it("collapses multiple spaces and hyphens", () => {
+      expect(toKebabCase("a   b---c")).toBe("a-b-c");
+    });
+
+    it("trims leading and trailing hyphens", () => {
+      expect(toKebabCase("  hello world  ")).toBe("hello-world");
+    });
+
+    it("returns empty string for empty input", () => {
+      expect(toKebabCase("")).toBe("");
+    });
+
+    it("handles single word", () => {
+      expect(toKebabCase("Diploma")).toBe("diploma");
+    });
+
+    it("handles mixed case with punctuation", () => {
+      expect(toKebabCase("Bachelor's Degree")).toBe("bachelors-degree");
     });
   });
 });

@@ -40,6 +40,14 @@ export function formatDateTime(value: string | number | Date | null, locale = "e
   }).format(date);
 }
 
+export function toKebabCase(str: string): string {
+  return str
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/[\s-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export function relativeTime(value: string | number | Date, locale = "en"): string {
   const now = Date.now();
   const then = new Date(value).getTime();
