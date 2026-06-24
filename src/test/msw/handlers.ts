@@ -302,6 +302,17 @@ export const handlers = [
     });
   }),
 
+  http.get("*/api/credentials/:id/file", () => {
+    const testPdfBytes = new Uint8Array([37, 80, 68, 70, 45, 49, 46, 52]);
+    return new HttpResponse(testPdfBytes, {
+      status: 200,
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": 'inline; filename="test.pdf"',
+      },
+    });
+  }),
+
   http.get("*/api/users/self/credentials", () => {
     return HttpResponse.json({
       code: 400100,
