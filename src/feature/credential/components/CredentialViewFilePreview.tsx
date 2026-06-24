@@ -157,7 +157,8 @@ function PdfBlobThumbnail({ blob }: { blob: Blob }) {
         const ctx = canvas.getContext("2d")!;
         canvas.height = viewport.height;
         canvas.width = viewport.width;
-        await (page.render({ canvasContext: ctx, viewport }) as { promise: Promise<void> }).promise;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await page.render({ canvasContext: ctx, viewport } as any).promise;
         pdf.destroy();
       } catch {
         if (!cancelled) setError(true);
