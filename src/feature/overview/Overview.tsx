@@ -418,6 +418,9 @@ function RecentActivityCard({
   showUsers?: boolean;
 }) {
   const { t } = useTranslation();
+  const activeCredentials = recents.active_credentials ?? [];
+  const revokedCredentials = recents.revoked_credentials ?? [];
+  const storedUsers = recents.stored_users ?? [];
   return (
     <Card className="p-6 sm:p-8">
       <EyebrowLabel tone="navy" className="mb-6">
@@ -429,13 +432,13 @@ function RecentActivityCard({
           icon={ShieldCheck}
           tone="green"
         >
-          {recents.active_credentials.length === 0 ? (
+          {activeCredentials.length === 0 ? (
             <p className="py-6 text-center text-sm text-gray-400 italic">
               {t("overview.recents.empty")}
             </p>
           ) : (
             <>
-              {recents.active_credentials.slice(0, 1).map((cred) => (
+              {activeCredentials.slice(0, 1).map((cred) => (
                 <CredentialRow
                   key={cred.id}
                   cred={cred}
@@ -461,13 +464,13 @@ function RecentActivityCard({
           icon={ShieldAlert}
           tone="error"
         >
-          {recents.revoked_credentials.length === 0 ? (
+          {revokedCredentials.length === 0 ? (
             <p className="py-6 text-center text-sm text-gray-400 italic">
               {t("overview.recents.empty")}
             </p>
           ) : (
             <>
-              {recents.revoked_credentials.slice(0, 1).map((cred) => (
+              {revokedCredentials.slice(0, 1).map((cred) => (
                 <CredentialRow
                   key={cred.id}
                   cred={cred}
@@ -488,13 +491,13 @@ function RecentActivityCard({
           )}
         </RecentSection>
 
-        {showUsers && recents.stored_users && recents.stored_users.length > 0 && (
+        {showUsers && storedUsers.length > 0 && (
           <RecentSection
             title={t("overview.recents.storedUsers")}
             icon={User}
             tone="navy"
           >
-            {recents.stored_users.slice(0, 1).map((u) => (
+            {storedUsers.slice(0, 1).map((u) => (
               <UserRow key={u.id} user={u} t={t} />
             ))}
             <div className="mt-3 flex justify-end">

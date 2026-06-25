@@ -1,6 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { screen, waitFor, render } from "@testing-library/react";
+import { http, HttpResponse } from "msw";
 import { TestProviders } from "@/test/TestProviders";
+import { server } from "@/test/msw/server";
 import { useStore } from "@app/store";
 import { makeUser } from "@/test/fixtures";
 import { Role } from "@shared/auth/role";
@@ -79,5 +81,25 @@ describe("Overview", () => {
       expect(screen.getByText("Recent Activity")).toBeDefined();
       expect(screen.getByText("Recently Issued")).toBeDefined();
     });
+  });
+
+  it("does not crash when the backend omits recent credential arrays", async () => {
+    server.use(
+      http.get("*/api/overview", () =>
+        HttpResponse.json({
+          code: 100100,
+          data: {
+            credential_counts: { total: 0, active: 0, revoked: 0, pending: 0, failed: 0 },
+            recents: {},
+          },
+        }),
+      ),
+    );
+    useStore.setState({ user: makeUser({ role: Role.HOLDER }) });
+    renderOverview();
+    await waitFor(() => {
+      expect(screen.getByText("Recent Activity")).toBeDefined();
+    });
+    expect(screen.getAllByText("No recent activity").length).toBeGreaterThanOrEqual(2);
   });
 });

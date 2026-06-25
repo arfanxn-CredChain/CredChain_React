@@ -137,8 +137,8 @@ export interface OverviewRecentUser {
 }
 
 export interface OverviewRecents {
-  active_credentials: OverviewRecentCredential[];
-  revoked_credentials: OverviewRecentCredential[];
+  active_credentials?: OverviewRecentCredential[];
+  revoked_credentials?: OverviewRecentCredential[];
   stored_users?: OverviewRecentUser[];
 }
 
