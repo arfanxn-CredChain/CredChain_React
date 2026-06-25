@@ -13,7 +13,6 @@ import { useTranslation } from "react-i18next";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { useStore } from "@app/store";
 import { Role } from "@shared/auth/role";
-import { RoleGate } from "@shared/auth/guards";
 import { useOverview } from "./api/useOverview";
 import { useDebouncedValue } from "@shared/hooks/useDebouncedValue";
 import { PageHeader } from "@shared/components/PageHeader";
@@ -634,25 +633,21 @@ export function Overview() {
           <Skeleton className="h-64 rounded-2xl" />
         </>
       ) : data ? (
-        <>
-          <RoleGate allowed={[Role.HOLDER]}>
+        user?.role === Role.HOLDER ? (
+          <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
+            <CredentialCountsCard counts={data.credential_counts} compact />
+            <RecentActivityCard recents={data.recents} />
+          </div>
+        ) : (
+          <div className="space-y-6">
+            <CredentialCountsCard counts={data.credential_counts} />
+            {data.user_counts && <UserCountsCard counts={data.user_counts} />}
             <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
-              <CredentialCountsCard counts={data.credential_counts} compact />
-              <RecentActivityCard recents={data.recents} />
+              <RecentActivityCard recents={data.recents} showUsers />
+              {data.chain_details && <ChainInfoCard details={data.chain_details} />}
             </div>
-          </RoleGate>
-
-          <RoleGate allowed={[Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]}>
-            <div className="space-y-6">
-              <CredentialCountsCard counts={data.credential_counts} />
-              {data.user_counts && <UserCountsCard counts={data.user_counts} />}
-              <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
-                <RecentActivityCard recents={data.recents} showUsers />
-                {data.chain_details && <ChainInfoCard details={data.chain_details} />}
-              </div>
-            </div>
-          </RoleGate>
-        </>
+          </div>
+        )
       ) : null}
     </div>
   );
