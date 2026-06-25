@@ -635,14 +635,8 @@ export function Overview() {
           </div>
         ) : (
           <div className="space-y-6">
-            {data.user_counts ? (
-              <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
-                <CredentialCountsCard counts={data.credential_counts} />
-                <UserCountsCard counts={data.user_counts} />
-              </div>
-            ) : (
-              <CredentialCountsCard counts={data.credential_counts} />
-            )}
+            <CredentialCountsCard counts={data.credential_counts} />
+            {data.user_counts && <UserCountsCard counts={data.user_counts} />}
             <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
               <RecentActivityCard recents={data.recents} showUsers />
               {data.chain_details && <ChainInfoCard details={data.chain_details} />}
