@@ -4,8 +4,10 @@ import { notify } from "@shared/lib/notify";
 import { isApiError } from "@shared/api/envelope";
 import { setServerErrors } from "@shared/lib/forms";
 import { mergeMeta } from "@shared/lib/meta";
+import type { AxiosResponse } from "axios";
 import type { UseFormReturn, FieldValues } from "react-hook-form";
 import type { CredentialIssueRowInput } from "../schemas/credential";
+import type { ApiResponse } from "@shared/api/envelope";
 import { credentialKeys } from "./keys";
 
 const BACKEND_TO_FRONTEND_PATH: Record<string, string> = {
@@ -48,11 +50,23 @@ export function useIssueCredentials<T extends FieldValues>(form?: UseFormReturn<
       const response = await api.post("/credentials/batch/issue", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      return response.data;
+      const enveloped = response as AxiosResponse<ApiResponse> & {
+        __envelope?: { errors?: Record<string, string[]> };
+      };
+      return {
+        data: response.data,
+        fieldErrors: enveloped.__envelope?.errors ?? {},
+      };
     },
-    onSuccess: () => {
+    onSuccess: (result: { data: unknown; fieldErrors: Record<string, string[]> }) => {
       void queryClient.invalidateQueries({ queryKey: credentialKeys.all() });
-      notify.success("credential.issue.success");
+      if (result.fieldErrors && Object.keys(result.fieldErrors).length > 0) {
+        if (form) {
+          setServerErrors(form, normalizeBatchErrorPaths(result.fieldErrors));
+        }
+      } else {
+        notify.success("credential.issue.success");
+      }
     },
     onError: (error) => {
       if (isApiError(error) && error.fieldErrors && form) {
