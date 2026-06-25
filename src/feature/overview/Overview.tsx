@@ -598,8 +598,14 @@ export function Overview() {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [dateFrom, setDateFrom] = useState(searchParams.get("dateFrom") ?? "");
-  const [dateTo, setDateTo] = useState(searchParams.get("dateTo") ?? "");
+  function parseDateParam(value: string | null): [string, string] {
+    if (!value || !value.startsWith("..")) return ["", ""];
+    const parts = value.slice(2).split(",");
+    return [parts[0] ?? "", parts[1] ?? ""];
+  }
+
+  const [dateFrom, setDateFrom] = useState(parseDateParam(searchParams.get("date"))[0]);
+  const [dateTo, setDateTo] = useState(parseDateParam(searchParams.get("date"))[1]);
   const debouncedFrom = useDebouncedValue(dateFrom, 300);
   const debouncedTo = useDebouncedValue(dateTo, 300);
 
@@ -621,10 +627,14 @@ export function Overview() {
     setDateTo(to);
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
-      if (from) next.set("dateFrom", from);
-      else next.delete("dateFrom");
-      if (to) next.set("dateTo", to);
-      else next.delete("dateTo");
+      if (from && to) {
+        next.set("date", `..${from},${to}`);
+      } else {
+        next.delete("date");
+      }
+      // Remove any legacy params that may still be present in old bookmarks.
+      next.delete("dateFrom");
+      next.delete("dateTo");
       return next;
     });
   };

@@ -1,5 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { screen, waitFor, render } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { useLocation } from "react-router-dom";
 import { http, HttpResponse } from "msw";
 import { TestProviders } from "@/test/TestProviders";
 import { server } from "@/test/msw/server";
@@ -8,6 +10,11 @@ import { makeUser } from "@/test/fixtures";
 import { Role } from "@shared/auth/role";
 import { i18n } from "@shared/i18n/config";
 import { Overview } from "./Overview";
+
+function SearchDisplay() {
+  const location = useLocation();
+  return <div data-testid="search">{location.search}</div>;
+}
 
 function renderOverview(initialEntries?: string[]) {
   return render(<Overview />, {
@@ -143,5 +150,57 @@ describe("Overview", () => {
     expect(screen.queryAllByText("Recently Revoked").length).toBe(0);
     expect(screen.queryAllByText("New User").length).toBe(0);
     expect(screen.queryAllByText("No recent activity").length).toBe(0);
+  });
+
+  it("parses single date URL param into API filter", async () => {
+    let capturedParams: URLSearchParams | null = null;
+    server.use(
+      http.get("*/api/overview", ({ request }) => {
+        capturedParams = new URL(request.url).searchParams;
+        return HttpResponse.json({
+          code: 100100,
+          data: {
+            credential_counts: { total: 0, active: 0, revoked: 0, pending: 0, failed: 0 },
+            recents: {},
+          },
+        });
+      }),
+    );
+    useStore.setState({ user: makeUser({ role: Role.HOLDER }) });
+    renderOverview(["/overview?date=..2026-01-01,2026-06-30"]);
+    await waitFor(() => expect(capturedParams).not.toBeNull());
+    expect(capturedParams!.getAll("filters")).toEqual(["date..2026-01-01,2026-06-30"]);
+  });
+
+  it("writes single date URL param when date range changes", async () => {
+    const u = userEvent.setup();
+    const user = makeUser({ role: Role.HOLDER });
+    useStore.setState({ user });
+    render(
+      <>
+        <Overview />
+        <SearchDisplay />
+      </>,
+      {
+        wrapper: ({ children }) => (
+          <TestProviders initialEntries={["/overview"]}>{children}</TestProviders>
+        ),
+      },
+    );
+    await waitFor(() => {
+      expect(screen.getByText("Recent Activity")).toBeDefined();
+    });
+
+    const filterButton = screen.getByRole("button", { name: /date range/i });
+    await u.click(filterButton);
+
+    const last7Days = screen.getByText("Last 7 days");
+    await u.click(last7Days);
+
+    await waitFor(() => {
+      const search = screen.getByTestId("search").textContent ?? "";
+      const params = new URLSearchParams(search);
+      expect(params.get("date")).toMatch(/^\.\.\d{4}-\d{2}-\d{2},\d{4}-\d{2}-\d{2}$/);
+    });
   });
 });
