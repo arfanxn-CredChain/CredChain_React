@@ -3,6 +3,10 @@ import { env } from "@shared/lib/env";
 import { ApiError, type ApiErrorResponse, type ApiResponse } from "./envelope";
 import { codeToMessageKey } from "./codes";
 
+type EnvelopeResponse<T = unknown> = AxiosResponse<ApiResponse<T>> & {
+  __envelope: ApiResponse<T>;
+};
+
 /**
  * Single axios instance.
  * - withCredentials: true sends httpOnly cookies (auth strategy)
@@ -56,7 +60,7 @@ api.interceptors.response.use(
   (response: AxiosResponse<ApiResponse<unknown>>) => {
     const envelope = response.data;
     if (envelope && typeof envelope === "object" && "data" in envelope) {
-      (response as any).__envelope = envelope;
+      (response as EnvelopeResponse).__envelope = envelope;
       response.data = envelope.data as never;
     }
     return response;
