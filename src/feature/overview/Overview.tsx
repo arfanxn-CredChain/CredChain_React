@@ -346,8 +346,38 @@ function CredentialCountsCard({
   );
 }
 
-function UserCountsCard({ counts }: { counts: OverviewUserCounts }) {
+function UserCountsCard({
+  counts,
+  compact,
+}: {
+  counts: OverviewUserCounts;
+  compact?: boolean;
+}) {
   const { t } = useTranslation();
+  const activeStat = (
+    <StatItem
+      value={counts.active}
+      label={t("overview.counts.activeUsers")}
+      accent="gold"
+      compact={compact}
+      className={compact ? "col-span-2" : undefined}
+    />
+  );
+  const otherStats = (
+    <>
+      <StatItem value={counts.total} label={t("overview.counts.total")} compact={compact} />
+      <StatItem value={counts.holder} label={t("overview.counts.holder")} compact={compact} />
+      <StatItem value={counts.issuer} label={t("overview.counts.issuer")} compact={compact} />
+      <StatItem value={counts.admin} label={t("overview.counts.admin")} compact={compact} />
+      <StatItem
+        value={counts.super_admin}
+        label={t("overview.counts.superAdmin")}
+        note={t("overview.superAdminAlwaysOne")}
+        compact={compact}
+      />
+      <StatItem value={counts.trashed} label={t("overview.counts.trashed")} compact={compact} />
+    </>
+  );
   return (
     <Card className="relative overflow-hidden p-6 shadow-lg ring-1 shadow-gold/20 ring-gold/10 sm:p-8">
       <DecorBlob tone="gold" position="top-right" size="lg" />
@@ -355,22 +385,25 @@ function UserCountsCard({ counts }: { counts: OverviewUserCounts }) {
         <EyebrowLabel tone="navy" className="mb-6">
           {t("overview.userCounts")}
         </EyebrowLabel>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <StatItem value={counts.total} label={t("overview.counts.total")} />
-          <StatItem value={counts.holder} label={t("overview.counts.holder")} />
-          <StatItem value={counts.issuer} label={t("overview.counts.issuer")} />
-          <StatItem value={counts.admin} label={t("overview.counts.admin")} />
-          <StatItem
-            value={counts.super_admin}
-            label={t("overview.counts.superAdmin")}
-            note={t("overview.superAdminAlwaysOne")}
-          />
-          <StatItem
-            value={counts.active}
-            label={t("overview.counts.activeUsers")}
-            accent="gold"
-          />
-          <StatItem value={counts.trashed} label={t("overview.counts.trashed")} />
+        <div
+          className={cn(
+            "grid",
+            compact
+              ? "grid-cols-2 gap-4"
+              : "grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4",
+          )}
+        >
+          {compact ? (
+            <>
+              {activeStat}
+              {otherStats}
+            </>
+          ) : (
+            <>
+              {otherStats}
+              {activeStat}
+            </>
+          )}
         </div>
       </div>
     </Card>
@@ -634,11 +667,13 @@ export function Overview() {
             <RecentActivityCard recents={data.recents} />
           </div>
         ) : (
-          <div className="space-y-6">
-            <CredentialCountsCard counts={data.credential_counts} compact />
-            {data.user_counts && <UserCountsCard counts={data.user_counts} />}
-            <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
+          <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
+            <div className="space-y-6">
+              <CredentialCountsCard counts={data.credential_counts} compact />
               <RecentActivityCard recents={data.recents} showUsers />
+            </div>
+            <div className="space-y-6">
+              {data.user_counts && <UserCountsCard counts={data.user_counts} compact />}
               {data.chain_details && <ChainInfoCard details={data.chain_details} />}
             </div>
           </div>
