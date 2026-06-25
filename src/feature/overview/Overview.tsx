@@ -667,24 +667,27 @@ export function Overview() {
             <RecentActivityCard recents={data.recents} />
           </div>
         ) : (
-          <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
-            <div className="lg:col-start-1 lg:row-start-1">
+          <>
+            {/* Desktop: stacked columns, no gap */}
+            <div className="hidden items-start gap-6 lg:grid lg:grid-cols-2">
+              <div className="space-y-6">
+                <CredentialCountsCard counts={data.credential_counts} compact />
+                <RecentActivityCard recents={data.recents} showUsers />
+              </div>
+              <div className="space-y-6">
+                {data.user_counts && <UserCountsCard counts={data.user_counts} compact />}
+                {data.chain_details && <ChainInfoCard details={data.chain_details} />}
+              </div>
+            </div>
+
+            {/* Mobile: single column, correct order */}
+            <div className="space-y-6 lg:hidden">
               <CredentialCountsCard counts={data.credential_counts} compact />
-            </div>
-            {data.user_counts && (
-              <div className="lg:col-start-2 lg:row-start-1">
-                <UserCountsCard counts={data.user_counts} compact />
-              </div>
-            )}
-            <div className="lg:col-start-1 lg:row-start-2">
+              {data.user_counts && <UserCountsCard counts={data.user_counts} compact />}
               <RecentActivityCard recents={data.recents} showUsers />
+              {data.chain_details && <ChainInfoCard details={data.chain_details} />}
             </div>
-            {data.chain_details && (
-              <div className="lg:col-start-2 lg:row-start-2">
-                <ChainInfoCard details={data.chain_details} />
-              </div>
-            )}
-          </div>
+          </>
         )
       ) : null}
     </div>

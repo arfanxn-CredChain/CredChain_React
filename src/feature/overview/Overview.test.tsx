@@ -41,8 +41,8 @@ describe("Overview", () => {
     useStore.setState({ user: makeUser({ role: Role.ISSUER }) });
     renderOverview();
     await waitFor(() => {
-      expect(screen.getByText("Users")).toBeDefined();
-      expect(screen.getByText("Holders")).toBeDefined();
+      expect(screen.getAllByText("Users").length).toBe(2);
+      expect(screen.getAllByText("Holders").length).toBe(2);
     });
   });
 
@@ -59,7 +59,7 @@ describe("Overview", () => {
     useStore.setState({ user: makeUser({ role: Role.ISSUER }) });
     renderOverview();
     await waitFor(() => {
-      expect(screen.getByText("Chain Info")).toBeDefined();
+      expect(screen.getAllByText("Chain Info").length).toBe(2);
     });
   });
 
