@@ -162,6 +162,26 @@ function RecentSection({ title, icon: Icon, tone = "gold", children }: RecentSec
   );
 }
 
+function RecentSectionFooter({
+  to,
+  label,
+}: {
+  to: string;
+  label: string;
+}) {
+  return (
+    <div className="mt-3 flex justify-end">
+      <Link
+        to={to}
+        className="inline-flex items-center gap-1 text-xs font-semibold text-navy hover:underline focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none"
+      >
+        {label}
+        <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+      </Link>
+    </div>
+  );
+}
+
 /* ── recent rows ── */
 
 function CredentialRow({
@@ -421,23 +441,25 @@ function RecentActivityCard({
   const activeCredentials = recents.active_credentials ?? [];
   const revokedCredentials = recents.revoked_credentials ?? [];
   const storedUsers = recents.stored_users ?? [];
+
+  const hasAnyActivity =
+    activeCredentials.length > 0 ||
+    revokedCredentials.length > 0 ||
+    (showUsers && storedUsers.length > 0);
+
   return (
     <Card className="p-6 sm:p-8">
       <EyebrowLabel tone="navy" className="mb-6">
         {t("overview.recents")}
       </EyebrowLabel>
-      <div className="space-y-6">
-        <RecentSection
-          title={t("overview.recents.activeCredentials")}
-          icon={ShieldCheck}
-          tone="green"
-        >
-          {activeCredentials.length === 0 ? (
-            <p className="py-6 text-center text-sm text-gray-400 italic">
-              {t("overview.recents.empty")}
-            </p>
-          ) : (
-            <>
+      {hasAnyActivity ? (
+        <div className="space-y-6">
+          {activeCredentials.length > 0 && (
+            <RecentSection
+              title={t("overview.recents.activeCredentials")}
+              icon={ShieldCheck}
+              tone="green"
+            >
               {activeCredentials.slice(0, 1).map((cred) => (
                 <CredentialRow
                   key={cred.id}
@@ -446,30 +468,19 @@ function RecentActivityCard({
                   t={t}
                 />
               ))}
-              <div className="mt-3 flex justify-end">
-                <Link
-                  to="/credentials"
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-navy hover:underline focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none"
-                >
-                  {t("overview.recents.viewAllCredentials")}
-                  <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-                </Link>
-              </div>
-            </>
+              <RecentSectionFooter
+                to="/credentials"
+                label={t("overview.recents.viewAllCredentials")}
+              />
+            </RecentSection>
           )}
-        </RecentSection>
 
-        <RecentSection
-          title={t("overview.recents.revokedCredentials")}
-          icon={ShieldAlert}
-          tone="error"
-        >
-          {revokedCredentials.length === 0 ? (
-            <p className="py-6 text-center text-sm text-gray-400 italic">
-              {t("overview.recents.empty")}
-            </p>
-          ) : (
-            <>
+          {revokedCredentials.length > 0 && (
+            <RecentSection
+              title={t("overview.recents.revokedCredentials")}
+              icon={ShieldAlert}
+              tone="error"
+            >
               {revokedCredentials.slice(0, 1).map((cred) => (
                 <CredentialRow
                   key={cred.id}
@@ -478,40 +489,34 @@ function RecentActivityCard({
                   t={t}
                 />
               ))}
-              <div className="mt-3 flex justify-end">
-                <Link
-                  to="/credentials"
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-navy hover:underline focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none"
-                >
-                  {t("overview.recents.viewAllCredentials")}
-                  <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-                </Link>
-              </div>
-            </>
+              <RecentSectionFooter
+                to="/credentials"
+                label={t("overview.recents.viewAllCredentials")}
+              />
+            </RecentSection>
           )}
-        </RecentSection>
 
-        {showUsers && storedUsers.length > 0 && (
-          <RecentSection
-            title={t("overview.recents.storedUsers")}
-            icon={User}
-            tone="navy"
-          >
-            {storedUsers.slice(0, 1).map((u) => (
-              <UserRow key={u.id} user={u} t={t} />
-            ))}
-            <div className="mt-3 flex justify-end">
-              <Link
+          {showUsers && storedUsers.length > 0 && (
+            <RecentSection
+              title={t("overview.recents.storedUsers")}
+              icon={User}
+              tone="navy"
+            >
+              {storedUsers.slice(0, 1).map((u) => (
+                <UserRow key={u.id} user={u} t={t} />
+              ))}
+              <RecentSectionFooter
                 to="/users"
-                className="inline-flex items-center gap-1 text-xs font-semibold text-navy hover:underline focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none"
-              >
-                {t("overview.recents.viewAllUsers")}
-                <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-              </Link>
-            </div>
-          </RecentSection>
-        )}
-      </div>
+                label={t("overview.recents.viewAllUsers")}
+              />
+            </RecentSection>
+          )}
+        </div>
+      ) : (
+        <p className="py-10 text-center text-sm text-gray-400 italic">
+          {t("overview.recents.empty")}
+        </p>
+      )}
     </Card>
   );
 }

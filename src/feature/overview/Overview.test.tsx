@@ -9,8 +9,14 @@ import { Role } from "@shared/auth/role";
 import { i18n } from "@shared/i18n/config";
 import { Overview } from "./Overview";
 
-function renderOverview() {
-  return render(<Overview />, { wrapper: TestProviders });
+function renderOverview(initialEntries?: string[]) {
+  return render(<Overview />, {
+    wrapper: ({ children }) => (
+      <TestProviders initialEntries={initialEntries ?? ["/"]}>
+        {children}
+      </TestProviders>
+    ),
+  });
 }
 
 describe("Overview", () => {
@@ -100,6 +106,42 @@ describe("Overview", () => {
     await waitFor(() => {
       expect(screen.getByText("Recent Activity")).toBeDefined();
     });
-    expect(screen.getAllByText("No recent activity").length).toBeGreaterThanOrEqual(2);
+    // Card-level empty state only; individual sections are hidden.
+    expect(screen.getAllByText("No recent activity").length).toBe(1);
+  });
+
+  it("hides empty recent sections", async () => {
+    server.use(
+      http.get("*/api/overview", () =>
+        HttpResponse.json({
+          code: 100100,
+          data: {
+            credential_counts: { total: 1, active: 1, revoked: 0, pending: 0, failed: 0 },
+            user_counts: { total: 0, holder: 0, issuer: 0, admin: 0, super_admin: 0, active: 0, trashed: 0 },
+            recents: {
+              active_credentials: [
+                {
+                  id: "01J1",
+                  name: "Bachelor's Degree",
+                  holder: { id: "01H1", name: "John", email: "john@example.com", role: "holder" },
+                  issuer: { id: "01I1", name: "UI", email: "admin@ui.ac.id", role: "issuer" },
+                  issued_at: "2026-06-20T10:00:00Z",
+                },
+              ],
+              revoked_credentials: [],
+              stored_users: [],
+            },
+          },
+        }),
+      ),
+    );
+    useStore.setState({ user: makeUser({ role: Role.ISSUER }) });
+    renderOverview();
+    await waitFor(() => {
+      expect(screen.getAllByText("Recently Issued").length).toBeGreaterThanOrEqual(1);
+    });
+    expect(screen.queryAllByText("Recently Revoked").length).toBe(0);
+    expect(screen.queryAllByText("New User").length).toBe(0);
+    expect(screen.queryAllByText("No recent activity").length).toBe(0);
   });
 });
