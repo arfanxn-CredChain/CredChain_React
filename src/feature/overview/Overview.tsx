@@ -668,14 +668,22 @@ export function Overview() {
           </div>
         ) : (
           <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
-            <div className="space-y-6">
+            <div className="lg:col-start-1 lg:row-start-1">
               <CredentialCountsCard counts={data.credential_counts} compact />
+            </div>
+            {data.user_counts && (
+              <div className="lg:col-start-2 lg:row-start-1">
+                <UserCountsCard counts={data.user_counts} compact />
+              </div>
+            )}
+            <div className="lg:col-start-1 lg:row-start-2">
               <RecentActivityCard recents={data.recents} showUsers />
             </div>
-            <div className="space-y-6">
-              {data.user_counts && <UserCountsCard counts={data.user_counts} compact />}
-              {data.chain_details && <ChainInfoCard details={data.chain_details} />}
-            </div>
+            {data.chain_details && (
+              <div className="lg:col-start-2 lg:row-start-2">
+                <ChainInfoCard details={data.chain_details} />
+              </div>
+            )}
           </div>
         )
       ) : null}
