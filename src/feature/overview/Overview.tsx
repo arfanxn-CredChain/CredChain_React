@@ -178,8 +178,6 @@ function CredentialRow({
   const actor = isRevoked ? cred.revoker : cred.issuer;
   const actorPrefix = isRevoked ? "revoker" : "issuer";
   const time = isRevoked && cred.revoked_at ? relativeTime(cred.revoked_at, t) : relativeTime(cred.issued_at, t);
-  const StatusIcon = isRevoked ? ShieldAlert : ShieldCheck;
-  const statusTone = isRevoked ? "error" : "green";
 
   const handleClick = () => navigate(`/credentials/${cred.id}`);
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -198,9 +196,6 @@ function CredentialRow({
       className="group -mx-2 cursor-pointer rounded-lg border-t border-gray-100 px-2 py-3 transition-colors first:border-t-0 hover:bg-gray-50/70 focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none"
     >
       <div className="flex items-start gap-3">
-        <div className={cn("mt-0.5 shrink-0 rounded-lg p-1.5", toneBlock[statusTone])}>
-          <StatusIcon className="h-4 w-4" aria-hidden="true" />
-        </div>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-navy">
             {cred.name || t("overview.recents.noName")}
@@ -640,8 +635,14 @@ export function Overview() {
           </div>
         ) : (
           <div className="space-y-6">
-            <CredentialCountsCard counts={data.credential_counts} />
-            {data.user_counts && <UserCountsCard counts={data.user_counts} />}
+            {data.user_counts ? (
+              <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
+                <CredentialCountsCard counts={data.credential_counts} />
+                <UserCountsCard counts={data.user_counts} />
+              </div>
+            ) : (
+              <CredentialCountsCard counts={data.credential_counts} />
+            )}
             <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
               <RecentActivityCard recents={data.recents} showUsers />
               {data.chain_details && <ChainInfoCard details={data.chain_details} />}
