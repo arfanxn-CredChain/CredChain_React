@@ -490,7 +490,7 @@ function RecentActivityCard({
                 />
               ))}
               <RecentSectionFooter
-                to="/credentials"
+                to="/credentials?status=revoked"
                 label={t("overview.recents.viewAllCredentials")}
               />
             </RecentSection>

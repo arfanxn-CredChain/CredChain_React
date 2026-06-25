@@ -152,6 +152,40 @@ describe("Overview", () => {
     expect(screen.queryAllByText("No recent activity").length).toBe(0);
   });
 
+  it("links revoked section to credential list with revoked filter", async () => {
+    server.use(
+      http.get("*/api/overview", () =>
+        HttpResponse.json({
+          code: 100100,
+          data: {
+            credential_counts: { total: 1, active: 0, revoked: 1, pending: 0, failed: 0 },
+            recents: {
+              active_credentials: [],
+              revoked_credentials: [
+                {
+                  id: "01J2",
+                  name: "Diploma",
+                  holder: { id: "01H2", name: "Jane", email: "jane@example.com", role: "holder" },
+                  revoker: { id: "01R1", name: "Admin", email: "admin@example.com", role: "admin" },
+                  issued_at: "2026-04-01T00:00:00Z",
+                  revoked_at: "2026-06-19T08:00:00Z",
+                },
+              ],
+              stored_users: [],
+            },
+          },
+        }),
+      ),
+    );
+    useStore.setState({ user: makeUser({ role: Role.HOLDER }) });
+    renderOverview();
+    await waitFor(() => {
+      expect(screen.getByText("Recently Revoked")).toBeDefined();
+    });
+    const link = screen.getByRole("link", { name: /view all credentials/i });
+    expect(link).toHaveAttribute("href", "/credentials?status=revoked");
+  });
+
   it("parses single date URL param into API filter", async () => {
     let capturedParams: URLSearchParams | null = null;
     server.use(
