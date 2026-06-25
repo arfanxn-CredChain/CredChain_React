@@ -12,6 +12,7 @@ export function useOverview(params?: UseOverviewParams) {
     queryKey: overviewKeys.all(params?.filters),
     queryFn: async () => {
       const q: Record<string, unknown> = {};
+      q.limit = 1;
       if (params?.filters && params.filters.length > 0) {
         q.filters = params.filters;
       }

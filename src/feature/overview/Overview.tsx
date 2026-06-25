@@ -3,8 +3,8 @@ import type { LucideIcon } from "lucide-react";
 import {
   User,
   AlertTriangle,
-  FileBadge,
-  Ban,
+  ShieldCheck,
+  ShieldAlert,
   Layers,
   Calendar,
   ArrowRight,
@@ -28,7 +28,15 @@ import { Skeleton } from "@ui/skeleton";
 import { Button } from "@ui/button";
 import { cn } from "@shared/lib/cn";
 import { DateFilterMenu } from "./components/DateFilterMenu";
-import type { OverviewRecentCredential, OverviewRecentUser, UserDTO } from "@shared/types/api";
+import type {
+  OverviewRecentCredential,
+  OverviewRecentUser,
+  UserDTO,
+  OverviewCredentialCounts,
+  OverviewUserCounts,
+  OverviewRecents,
+  OverviewChainDetails,
+} from "@shared/types/api";
 
 /* ── helpers ── */
 
@@ -65,23 +73,37 @@ interface StatItemProps {
   label: string;
   accent?: "gold" | "navy";
   note?: string;
+  compact?: boolean;
+  className?: string;
 }
 
-function StatItem({ value, label, accent, note }: StatItemProps) {
+function StatItem({ value, label, accent, note, compact, className }: StatItemProps) {
   const isAccent = accent === "gold";
   return (
     <div
       className={cn(
-        "flex h-40 flex-col items-center justify-center rounded-2xl border p-6",
+        "flex flex-col items-center justify-center rounded-2xl border",
+        compact ? "h-28 p-4" : "h-40 p-6",
         isAccent
           ? "border-gold/20 bg-gold/10 shadow-sm shadow-gold/10"
           : "border-gray-100 bg-surface shadow-sm",
+        className,
       )}
     >
-      <span className="font-display text-4xl font-extrabold tracking-tight text-navy">
+      <span
+        className={cn(
+          "font-display font-extrabold tracking-tight text-navy",
+          compact ? "text-3xl" : "text-4xl",
+        )}
+      >
         {value.toLocaleString()}
       </span>
-      <span className="mt-2 text-center text-xs font-bold tracking-wider text-gray-400 uppercase">
+      <span
+        className={cn(
+          "mt-2 text-center font-bold tracking-wider text-gray-400 uppercase",
+          compact ? "text-[10px]" : "text-xs",
+        )}
+      >
         {label}
         {note && (
           <span className="ml-1 block font-normal normal-case text-gray-400/70">
@@ -95,11 +117,16 @@ function StatItem({ value, label, accent, note }: StatItemProps) {
 
 /* ── skeleton stat ── */
 
-function StatSkeleton() {
+function StatSkeleton({ compact }: { compact?: boolean }) {
   return (
-    <div className="flex h-40 flex-col items-center justify-center gap-3 rounded-2xl border border-gray-100 bg-surface p-6 shadow-sm">
-      <Skeleton className="h-10 w-20 rounded-lg" />
-      <Skeleton className="h-4 w-24 rounded-md" />
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center gap-3 rounded-2xl border border-gray-100 bg-surface shadow-sm",
+        compact ? "h-28 p-4" : "h-40 p-6",
+      )}
+    >
+      <Skeleton className={cn("rounded-lg", compact ? "h-8 w-16" : "h-10 w-20")} />
+      <Skeleton className={cn("rounded-md", compact ? "h-3 w-20" : "h-4 w-24")} />
     </div>
   );
 }
@@ -109,7 +136,7 @@ function StatSkeleton() {
 interface RecentSectionProps {
   title: string;
   icon: LucideIcon;
-  tone?: "gold" | "error" | "navy";
+  tone?: "gold" | "error" | "navy" | "green";
   children: React.ReactNode;
 }
 
@@ -117,6 +144,7 @@ const toneBlock = {
   gold: "bg-gold/10 text-gold",
   error: "bg-error/10 text-error",
   navy: "bg-navy/10 text-navy",
+  green: "bg-green-100 text-green-700",
 };
 
 function RecentSection({ title, icon: Icon, tone = "gold", children }: RecentSectionProps) {
@@ -151,6 +179,8 @@ function CredentialRow({
   const actor = isRevoked ? cred.revoker : cred.issuer;
   const actorPrefix = isRevoked ? "revoker" : "issuer";
   const time = isRevoked && cred.revoked_at ? relativeTime(cred.revoked_at, t) : relativeTime(cred.issued_at, t);
+  const StatusIcon = isRevoked ? ShieldAlert : ShieldCheck;
+  const statusTone = isRevoked ? "error" : "green";
 
   const handleClick = () => navigate(`/credentials/${cred.id}`);
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -169,6 +199,9 @@ function CredentialRow({
       className="group -mx-2 cursor-pointer rounded-lg border-t border-gray-100 px-2 py-3 transition-colors first:border-t-0 hover:bg-gray-50/70 focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none"
     >
       <div className="flex items-start gap-3">
+        <div className={cn("mt-0.5 shrink-0 rounded-lg p-1.5", toneBlock[statusTone])}>
+          <StatusIcon className="h-4 w-4" aria-hidden="true" />
+        </div>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-navy">
             {cred.name || t("overview.recents.noName")}
@@ -261,6 +294,268 @@ function UserRow({
   );
 }
 
+/* ── cards ── */
+
+function CredentialCountsCard({
+  counts,
+  compact,
+}: {
+  counts: OverviewCredentialCounts;
+  compact?: boolean;
+}) {
+  const { t } = useTranslation();
+  return (
+    <Card className="relative overflow-hidden p-6 shadow-lg ring-1 shadow-gold/20 ring-gold/10 sm:p-8">
+      <DecorBlob tone="gold" position="top-right" size="lg" />
+      <div className="relative z-10">
+        <EyebrowLabel tone="navy" className="mb-6">
+          {t("overview.credentialCounts")}
+        </EyebrowLabel>
+        <div
+          className={cn(
+            "grid",
+            compact
+              ? "grid-cols-2 gap-4"
+              : "grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-5",
+          )}
+        >
+          <StatItem
+            value={counts.active}
+            label={t("overview.counts.active")}
+            accent="gold"
+            compact={compact}
+            className={compact ? "col-span-2" : undefined}
+          />
+          <StatItem
+            value={counts.total}
+            label={t("overview.counts.total")}
+            compact={compact}
+          />
+          <StatItem
+            value={counts.revoked}
+            label={t("overview.counts.revoked")}
+            compact={compact}
+          />
+          <StatItem
+            value={counts.pending}
+            label={t("overview.counts.pending")}
+            compact={compact}
+          />
+          <StatItem
+            value={counts.failed}
+            label={t("overview.counts.failed")}
+            compact={compact}
+          />
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function UserCountsCard({ counts }: { counts: OverviewUserCounts }) {
+  const { t } = useTranslation();
+  return (
+    <Card className="relative overflow-hidden p-6 shadow-lg ring-1 shadow-gold/20 ring-gold/10 sm:p-8">
+      <DecorBlob tone="gold" position="top-right" size="lg" />
+      <div className="relative z-10">
+        <EyebrowLabel tone="navy" className="mb-6">
+          {t("overview.userCounts")}
+        </EyebrowLabel>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <StatItem value={counts.total} label={t("overview.counts.total")} />
+          <StatItem value={counts.holder} label={t("overview.counts.holder")} />
+          <StatItem value={counts.issuer} label={t("overview.counts.issuer")} />
+          <StatItem value={counts.admin} label={t("overview.counts.admin")} />
+          <StatItem
+            value={counts.super_admin}
+            label={t("overview.counts.superAdmin")}
+            note={t("overview.superAdminAlwaysOne")}
+          />
+          <StatItem
+            value={counts.active}
+            label={t("overview.counts.activeUsers")}
+            accent="gold"
+          />
+          <StatItem value={counts.trashed} label={t("overview.counts.trashed")} />
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function RecentActivityCard({
+  recents,
+  showUsers = false,
+}: {
+  recents: OverviewRecents;
+  showUsers?: boolean;
+}) {
+  const { t } = useTranslation();
+  return (
+    <Card className="p-6 sm:p-8">
+      <EyebrowLabel tone="navy" className="mb-6">
+        {t("overview.recents")}
+      </EyebrowLabel>
+      <div className="space-y-6">
+        <RecentSection
+          title={t("overview.recents.activeCredentials")}
+          icon={ShieldCheck}
+          tone="green"
+        >
+          {recents.active_credentials.length === 0 ? (
+            <p className="py-6 text-center text-sm text-gray-400 italic">
+              {t("overview.recents.empty")}
+            </p>
+          ) : (
+            <>
+              {recents.active_credentials.slice(0, 1).map((cred) => (
+                <CredentialRow
+                  key={cred.id}
+                  cred={cred}
+                  variant="active"
+                  t={t}
+                />
+              ))}
+              <div className="mt-3 flex justify-end">
+                <Link
+                  to="/credentials"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-navy hover:underline focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none"
+                >
+                  {t("overview.recents.viewAllCredentials")}
+                  <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                </Link>
+              </div>
+            </>
+          )}
+        </RecentSection>
+
+        <RecentSection
+          title={t("overview.recents.revokedCredentials")}
+          icon={ShieldAlert}
+          tone="error"
+        >
+          {recents.revoked_credentials.length === 0 ? (
+            <p className="py-6 text-center text-sm text-gray-400 italic">
+              {t("overview.recents.empty")}
+            </p>
+          ) : (
+            <>
+              {recents.revoked_credentials.slice(0, 1).map((cred) => (
+                <CredentialRow
+                  key={cred.id}
+                  cred={cred}
+                  variant="revoked"
+                  t={t}
+                />
+              ))}
+              <div className="mt-3 flex justify-end">
+                <Link
+                  to="/credentials"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-navy hover:underline focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none"
+                >
+                  {t("overview.recents.viewAllCredentials")}
+                  <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                </Link>
+              </div>
+            </>
+          )}
+        </RecentSection>
+
+        {showUsers && recents.stored_users && recents.stored_users.length > 0 && (
+          <RecentSection
+            title={t("overview.recents.storedUsers")}
+            icon={User}
+            tone="navy"
+          >
+            {recents.stored_users.slice(0, 1).map((u) => (
+              <UserRow key={u.id} user={u} t={t} />
+            ))}
+            <div className="mt-3 flex justify-end">
+              <Link
+                to="/users"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-navy hover:underline focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none"
+              >
+                {t("overview.recents.viewAllUsers")}
+                <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </Link>
+            </div>
+          </RecentSection>
+        )}
+      </div>
+    </Card>
+  );
+}
+
+function ChainInfoCard({ details }: { details: OverviewChainDetails }) {
+  const { t } = useTranslation();
+  return (
+    <Card className="relative overflow-hidden p-6 shadow-lg ring-1 shadow-gold/20 ring-gold/10 sm:p-8">
+      <DecorBlob tone="gold" position="top-right" size="lg" />
+      <div className="relative z-10">
+        <EyebrowLabel tone="navy" className="mb-6">
+          {t("overview.chainDetails")}
+        </EyebrowLabel>
+        <dl className="grid grid-cols-1 gap-6">
+          <div>
+            <EyebrowLabel
+              as="dt"
+              className="flex items-center gap-1.5"
+            >
+              <Layers className="h-3.5 w-3.5" aria-hidden="true" />
+              {t("overview.chainDetails.authorityContract")}
+            </EyebrowLabel>
+            <dd className="flex items-center gap-2">
+              <MonoId
+                value={details.authority_contract}
+                mode="address"
+                className="text-sm text-navy"
+              />
+              <CopyInlineButton
+                value={details.authority_contract}
+                ariaLabel={t("overview.chainDetails.copyAuthority")}
+              />
+            </dd>
+          </div>
+          <div>
+            <EyebrowLabel
+              as="dt"
+              className="flex items-center gap-1.5"
+            >
+              <Layers className="h-3.5 w-3.5" aria-hidden="true" />
+              {t("overview.chainDetails.registryContract")}
+            </EyebrowLabel>
+            <dd className="flex items-center gap-2">
+              <MonoId
+                value={details.registry_contract}
+                mode="address"
+                className="text-sm text-navy"
+              />
+              <CopyInlineButton
+                value={details.registry_contract}
+                ariaLabel={t("overview.chainDetails.copyRegistry")}
+              />
+            </dd>
+          </div>
+          <div>
+            <EyebrowLabel
+              as="dt"
+              className="flex items-center gap-1.5"
+            >
+              <Layers className="h-3.5 w-3.5" aria-hidden="true" />
+              {t("overview.chainDetails.lastBlock")}
+            </EyebrowLabel>
+            <dd className="font-display text-2xl font-bold tracking-tight text-navy">
+              {details.last_block === 0
+                ? t("overview.chainDetails.unavailable")
+                : details.last_block.toLocaleString()}
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </Card>
+  );
+}
+
 /* ── main page ── */
 
 export function Overview() {
@@ -340,249 +635,23 @@ export function Overview() {
         </>
       ) : data ? (
         <>
-          {/* ── credential counts ── */}
-          <Card className="relative overflow-hidden p-6 shadow-lg ring-1 shadow-gold/20 ring-gold/10 sm:p-8">
-            <DecorBlob tone="gold" position="top-right" size="lg" />
-            <div className="relative z-10">
-              <EyebrowLabel tone="navy" className="mb-6">
-                {t("overview.credentialCounts")}
-              </EyebrowLabel>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-5">
-                <StatItem
-                  value={data.credential_counts.active}
-                  label={t("overview.counts.active")}
-                  accent="gold"
-                />
-                <StatItem
-                  value={data.credential_counts.total}
-                  label={t("overview.counts.total")}
-                />
-                <StatItem
-                  value={data.credential_counts.revoked}
-                  label={t("overview.counts.revoked")}
-                />
-                <StatItem
-                  value={data.credential_counts.pending}
-                  label={t("overview.counts.pending")}
-                />
-                <StatItem
-                  value={data.credential_counts.failed}
-                  label={t("overview.counts.failed")}
-                />
-              </div>
+          <RoleGate allowed={[Role.HOLDER]}>
+            <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
+              <CredentialCountsCard counts={data.credential_counts} compact />
+              <RecentActivityCard recents={data.recents} />
             </div>
-          </Card>
-
-          {/* ── user counts ── */}
-          <RoleGate allowed={[Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]}>
-            {data.user_counts && (
-              <Card className="relative overflow-hidden p-6 shadow-lg ring-1 shadow-gold/20 ring-gold/10 sm:p-8">
-                <DecorBlob tone="gold" position="top-right" size="lg" />
-                <div className="relative z-10">
-                  <EyebrowLabel tone="navy" className="mb-6">
-                    {t("overview.userCounts")}
-                  </EyebrowLabel>
-                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-                    <StatItem
-                      value={data.user_counts.total}
-                      label={t("overview.counts.total")}
-                    />
-                    <StatItem
-                      value={data.user_counts.holder}
-                      label={t("overview.counts.holder")}
-                    />
-                    <StatItem
-                      value={data.user_counts.issuer}
-                      label={t("overview.counts.issuer")}
-                    />
-                    <StatItem
-                      value={data.user_counts.admin}
-                      label={t("overview.counts.admin")}
-                    />
-                    <StatItem
-                      value={data.user_counts.super_admin}
-                      label={t("overview.counts.superAdmin")}
-                      note={t("overview.superAdminAlwaysOne")}
-                    />
-                    <StatItem
-                      value={data.user_counts.active}
-                      label={t("overview.counts.activeUsers")}
-                      accent="gold"
-                    />
-                    <StatItem
-                      value={data.user_counts.trashed}
-                      label={t("overview.counts.trashed")}
-                    />
-                  </div>
-                </div>
-              </Card>
-            )}
           </RoleGate>
 
-          {/* ── recent activity & chain info ── */}
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <Card className="p-6 sm:p-8">
-              <EyebrowLabel tone="navy" className="mb-6">
-                {t("overview.recents")}
-              </EyebrowLabel>
-              <div className="space-y-8">
-                <RecentSection
-                  title={t("overview.recents.activeCredentials")}
-                  icon={FileBadge}
-                  tone="gold"
-                >
-                  {data.recents.active_credentials.length === 0 ? (
-                    <p className="py-6 text-center text-sm text-gray-400 italic">
-                      {t("overview.recents.empty")}
-                    </p>
-                  ) : (
-                    <>
-                      {data.recents.active_credentials.slice(0, 3).map((cred) => (
-                        <CredentialRow
-                          key={cred.id}
-                          cred={cred}
-                          variant="active"
-                          t={t}
-                        />
-                      ))}
-                      <div className="mt-3 flex justify-end">
-                        <Link
-                          to="/credentials"
-                          className="inline-flex items-center gap-1 text-xs font-semibold text-navy hover:underline focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none"
-                        >
-                          {t("overview.recents.viewAllCredentials")}
-                          <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-                        </Link>
-                      </div>
-                    </>
-                  )}
-                </RecentSection>
-
-                <RecentSection
-                  title={t("overview.recents.revokedCredentials")}
-                  icon={Ban}
-                  tone="error"
-                >
-                  {data.recents.revoked_credentials.length === 0 ? (
-                    <p className="py-6 text-center text-sm text-gray-400 italic">
-                      {t("overview.recents.empty")}
-                    </p>
-                  ) : (
-                    <>
-                      {data.recents.revoked_credentials.slice(0, 3).map((cred) => (
-                        <CredentialRow
-                          key={cred.id}
-                          cred={cred}
-                          variant="revoked"
-                          t={t}
-                        />
-                      ))}
-                      <div className="mt-3 flex justify-end">
-                        <Link
-                          to="/credentials"
-                          className="inline-flex items-center gap-1 text-xs font-semibold text-navy hover:underline focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none"
-                        >
-                          {t("overview.recents.viewAllCredentials")}
-                          <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-                        </Link>
-                      </div>
-                    </>
-                  )}
-                </RecentSection>
-
-                {data.recents.stored_users && data.recents.stored_users.length > 0 && (
-                  <RecentSection
-                    title={t("overview.recents.storedUsers")}
-                    icon={User}
-                    tone="navy"
-                  >
-                    {data.recents.stored_users.slice(0, 3).map((u) => (
-                      <UserRow key={u.id} user={u} t={t} />
-                    ))}
-                    <div className="mt-3 flex justify-end">
-                      <Link
-                        to="/users"
-                        className="inline-flex items-center gap-1 text-xs font-semibold text-navy hover:underline focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none"
-                      >
-                        {t("overview.recents.viewAllUsers")}
-                        <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-                      </Link>
-                    </div>
-                  </RecentSection>
-                )}
+          <RoleGate allowed={[Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]}>
+            <div className="space-y-6">
+              <CredentialCountsCard counts={data.credential_counts} />
+              {data.user_counts && <UserCountsCard counts={data.user_counts} />}
+              <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
+                <RecentActivityCard recents={data.recents} showUsers />
+                {data.chain_details && <ChainInfoCard details={data.chain_details} />}
               </div>
-            </Card>
-
-            {/* ── chain details ── */}
-            <RoleGate allowed={[Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]}>
-              {data.chain_details && (
-                <Card className="relative overflow-hidden p-6 shadow-lg ring-1 shadow-gold/20 ring-gold/10 sm:p-8">
-                  <DecorBlob tone="gold" position="top-right" size="lg" />
-                  <div className="relative z-10">
-                    <EyebrowLabel tone="navy" className="mb-6">
-                      {t("overview.chainDetails")}
-                    </EyebrowLabel>
-                    <dl className="grid grid-cols-1 gap-6">
-                      <div>
-                        <EyebrowLabel
-                          as="dt"
-                          className="flex items-center gap-1.5"
-                        >
-                          <Layers className="h-3.5 w-3.5" aria-hidden="true" />
-                          {t("overview.chainDetails.authorityContract")}
-                        </EyebrowLabel>
-                        <dd className="flex items-center gap-2">
-                          <MonoId
-                            value={data.chain_details.authority_contract}
-                            mode="address"
-                            className="text-sm text-navy"
-                          />
-                          <CopyInlineButton
-                            value={data.chain_details.authority_contract}
-                            ariaLabel={t("overview.chainDetails.copyAuthority")}
-                          />
-                        </dd>
-                      </div>
-                      <div>
-                        <EyebrowLabel
-                          as="dt"
-                          className="flex items-center gap-1.5"
-                        >
-                          <Layers className="h-3.5 w-3.5" aria-hidden="true" />
-                          {t("overview.chainDetails.registryContract")}
-                        </EyebrowLabel>
-                        <dd className="flex items-center gap-2">
-                          <MonoId
-                            value={data.chain_details.registry_contract}
-                            mode="address"
-                            className="text-sm text-navy"
-                          />
-                          <CopyInlineButton
-                            value={data.chain_details.registry_contract}
-                            ariaLabel={t("overview.chainDetails.copyRegistry")}
-                          />
-                        </dd>
-                      </div>
-                      <div>
-                        <EyebrowLabel
-                          as="dt"
-                          className="flex items-center gap-1.5"
-                        >
-                          <Layers className="h-3.5 w-3.5" aria-hidden="true" />
-                          {t("overview.chainDetails.lastBlock")}
-                        </EyebrowLabel>
-                        <dd className="font-display text-2xl font-bold tracking-tight text-navy">
-                          {data.chain_details.last_block === 0
-                            ? t("overview.chainDetails.unavailable")
-                            : data.chain_details.last_block.toLocaleString()}
-                        </dd>
-                      </div>
-                    </dl>
-                  </div>
-                </Card>
-              )}
-            </RoleGate>
-          </div>
+            </div>
+          </RoleGate>
         </>
       ) : null}
     </div>

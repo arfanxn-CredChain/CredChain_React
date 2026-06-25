@@ -826,7 +826,7 @@
   "overview.recents": "Recent Activity",
   "overview.recents.activeCredentials": "Recently Issued",
   "overview.recents.revokedCredentials": "Recently Revoked",
-  "overview.recents.storedUsers": "New Users",
+  "overview.recents.storedUsers": "New User",
   "overview.recents.empty": "No recent activity",
   "overview.recents.issuedBy": "by {{issuer}}",
   "overview.recents.revokedBy": "by {{revoker}}",
