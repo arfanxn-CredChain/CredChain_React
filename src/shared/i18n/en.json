@@ -75,6 +75,7 @@
   "user.column.phone": "Phone",
   "user.copy.email": "Copy email",
   "user.copy.phone": "Copy phone number",
+  "user.copy.number": "Copy number",
   "user.copy.wallet": "Copy wallet address",
   "cred.copy.credentialId": "Copy credential ID",
 "cred.copy.holderEmail": "Copy holder email",
@@ -391,12 +392,6 @@
   "cred.list.empty.none.title": "No credentials yet",
   "cred.list.empty.none.body": "Issue the first credential to get started",
   "cred.list.error": "Failed to load credentials",
-  "cred.mine.title": "My Credentials",
-  "cred.mine.description": "Credentials issued to you",
-  "cred.mine.empty.title": "No credentials yet",
-  "cred.mine.empty.body": "When an issuer grants you a credential, it will appear here",
-  "cred.mine.error.title": "Failed to load",
-  "cred.mine.error.body": "Could not load your credentials",
   "cred.revoke.confirmTitle": "Revoke {{count}} credential(s)?",
   "cred.revoke.confirmBody": "This action cannot be undone. Revoked credentials remain on-chain but are permanently invalidated.",
   "cred.revoke.confirmAction": "Yes, Revoke",
@@ -419,6 +414,15 @@
   "cred.verify.cryptoHash": "Computed Hash",
   "cred.verify.matchedCredential": "Matched Credential",
   "cred.verify.viewCredential": "View Credential",
+  "cred.verify.method.hash": "Verified via cryptographic hash match",
+  "cred.verify.method.fuzzy": "Verified via AI similarity analysis",
+  "cred.verify.signInNudge": "Sign in to view full credential details",
+  "cred.verify.signInNudgeDesc": "Including holder info, issuer details, and blockchain data",
+  "cred.verify.whatThisMeans": "What this means:",
+  "cred.verify.noMatchReason1": "This document was not issued through CredChain",
+  "cred.verify.noMatchReason2": "Or the document has been significantly altered",
+  "cred.verify.noMatchReason3": "Contact the issuing organization for verification",
+  "cred.verify.verifyAnother": "Verify Another Document",
   "nav.overview": "Overview",
   "nav.users": "Users",
   "nav.credentials": "Credentials",
@@ -639,7 +643,7 @@
     "phone": "Phone",
     "number": "Number",
     "birthDate": "Birth date",
-    "onChain": "On-chain identity",
+    "walletAddress": "Wallet Address",
     "audit": "Audit",
     "created": "Created",
     "updated": "Updated",
@@ -648,6 +652,15 @@
     "notFound": {
       "title": "User not found",
       "body": "This user does not exist or has been removed."
+    },
+    "credentialSection": "Credentials",
+    "credentials": {
+      "empty": {
+        "title": "No credentials",
+        "body": "This user has no credentials yet."
+      },
+      "searchPlaceholder": "Search credentials...",
+      "error": "Failed to load credentials."
     }
   },
   "user.status": {

@@ -75,6 +75,7 @@
   "user.column.phone": "Telepon",
   "user.copy.email": "Salin email",
   "user.copy.phone": "Salin nomor telepon",
+  "user.copy.number": "Salin nomor",
   "user.copy.wallet": "Salin alamat wallet",
   "cred.copy.credentialId": "Salin ID kredensial",
   "cred.copy.holderEmail": "Salin email pemegang",
@@ -391,12 +392,6 @@
   "cred.list.empty.none.title": "Belum ada kredensial",
   "cred.list.empty.none.body": "Terbitkan kredensial pertama untuk memulai",
   "cred.list.error": "Gagal memuat kredensial",
-  "cred.mine.title": "Kredensial Saya",
-  "cred.mine.description": "Kredensial yang diterbitkan untuk Anda",
-  "cred.mine.empty.title": "Belum ada kredensial",
-  "cred.mine.empty.body": "Saat penerbit memberikan kredensial kepada Anda, akan muncul di sini",
-  "cred.mine.error.title": "Gagal memuat",
-  "cred.mine.error.body": "Tidak dapat memuat kredensial Anda",
   "cred.revoke.confirmTitle": "Cabut {{count}} kredensial?",
   "cred.revoke.confirmBody": "Tindakan ini tidak dapat dibatalkan. Kredensial yang dicabut tetap ada di blockchain tetapi dinonaktifkan secara permanen.",
   "cred.revoke.confirmAction": "Ya, Cabut",
@@ -419,6 +414,15 @@
   "cred.verify.cryptoHash": "Hash Terhitung",
   "cred.verify.matchedCredential": "Kredensial Cocok",
   "cred.verify.viewCredential": "Lihat Kredensial",
+  "cred.verify.method.hash": "Terverifikasi melalui pencocokan hash kriptografi",
+  "cred.verify.method.fuzzy": "Terverifikasi melalui analisis kemiripan AI",
+  "cred.verify.signInNudge": "Masuk untuk melihat detail kredensial lengkap",
+  "cred.verify.signInNudgeDesc": "Termasuk info pemegang, detail penerbit, dan data blockchain",
+  "cred.verify.whatThisMeans": "Apa artinya:",
+  "cred.verify.noMatchReason1": "Dokumen ini tidak diterbitkan melalui CredChain",
+  "cred.verify.noMatchReason2": "Atau dokumen telah diubah secara signifikan",
+  "cred.verify.noMatchReason3": "Hubungi organisasi penerbit untuk verifikasi",
+  "cred.verify.verifyAnother": "Verifikasi Dokumen Lain",
   "nav.overview": "Ringkasan",
   "nav.users": "Pengguna",
   "nav.credentials": "Kredensial",
@@ -639,7 +643,7 @@
     "phone": "Telepon",
     "number": "Nomor",
     "birthDate": "Tanggal lahir",
-    "onChain": "Identitas on-chain",
+    "walletAddress": "Alamat Wallet",
     "audit": "Audit",
     "created": "Dibuat",
     "updated": "Diperbarui",
@@ -648,6 +652,15 @@
     "notFound": {
       "title": "Pengguna tidak ditemukan",
       "body": "Pengguna ini tidak ada atau telah dihapus."
+    },
+    "credentialSection": "Kredensial",
+    "credentials": {
+      "empty": {
+        "title": "Belum ada kredensial",
+        "body": "Pengguna ini belum memiliki kredensial."
+      },
+      "searchPlaceholder": "Cari kredensial...",
+      "error": "Gagal memuat kredensial."
     }
   },
   "user.status": {
