@@ -53,6 +53,10 @@ describe("getVerdictTier", () => {
   it("returns red for party_disabled (400412)", () => {
     expect(getVerdictTier(400412)).toBe("red");
   });
+
+  it("returns light-gray for unknown verdict code", () => {
+    expect(getVerdictTier(999999)).toBe("light-gray");
+  });
 });
 
 describe("getMethodLabel", () => {
@@ -62,6 +66,10 @@ describe("getMethodLabel", () => {
 
   it("returns 'fuzzy' when similarity_score is defined", () => {
     expect(getMethodLabel(0.85)).toBe("fuzzy");
+  });
+
+  it("returns 'hash' when similarity_score is undefined", () => {
+    expect(getMethodLabel(undefined)).toBe("hash");
   });
 });
 

@@ -1,27 +1,46 @@
 export type VerdictTier = "green" | "orange" | "red" | "amber" | "gray" | "light-gray";
 
+const VERDICT_CODE = {
+  AUTHENTIC: 400401,
+  REVOKED: 400402,
+  INTEGRITY_WARNING: 400403,
+  TAMPERED: 400404,
+  SUSPICIOUS: 400405,
+  LOW_SIMILARITY: 400406,
+  NOT_SIMILAR: 400407,
+  NO_IDENTIFIERS: 400408,
+  NO_MATCH: 400409,
+  HOLDER_DISABLED: 400410,
+  ISSUER_DISABLED: 400411,
+  PARTY_DISABLED: 400412,
+} as const;
+
 const VERDICT_TIER_MAP: Record<number, VerdictTier> = {
-  400401: "green",      // authentic
-  400402: "orange",     // revoked
-  400403: "orange",     // integrity_warning
-  400404: "red",        // tampered
-  400405: "amber",      // suspicious
-  400406: "gray",       // low_similarity
-  400407: "light-gray", // not_similar
-  400408: "light-gray", // no_identifiers
-  400409: "light-gray", // no_match
-  400410: "red",        // holder_disabled
-  400411: "red",        // issuer_disabled
-  400412: "red",        // party_disabled
+  [VERDICT_CODE.AUTHENTIC]: "green",
+  [VERDICT_CODE.REVOKED]: "orange",
+  [VERDICT_CODE.INTEGRITY_WARNING]: "orange",
+  [VERDICT_CODE.TAMPERED]: "red",
+  [VERDICT_CODE.SUSPICIOUS]: "amber",
+  [VERDICT_CODE.LOW_SIMILARITY]: "gray",
+  [VERDICT_CODE.NOT_SIMILAR]: "light-gray",
+  [VERDICT_CODE.NO_IDENTIFIERS]: "light-gray",
+  [VERDICT_CODE.NO_MATCH]: "light-gray",
+  [VERDICT_CODE.HOLDER_DISABLED]: "red",
+  [VERDICT_CODE.ISSUER_DISABLED]: "red",
+  [VERDICT_CODE.PARTY_DISABLED]: "red",
 };
 
-const EXACT_HASH_CODES = new Set([400401, 400402, 400403]);
+const EXACT_HASH_CODES = new Set([
+  VERDICT_CODE.AUTHENTIC,
+  VERDICT_CODE.REVOKED,
+  VERDICT_CODE.INTEGRITY_WARNING,
+]);
 
 export function getVerdictTier(verdictCode: number): VerdictTier {
   return VERDICT_TIER_MAP[verdictCode] ?? "light-gray";
 }
 
-export function getMethodLabel(similarityScore: number | null): "hash" | "fuzzy" {
+export function getMethodLabel(similarityScore: number | null | undefined): "hash" | "fuzzy" {
   return similarityScore != null ? "fuzzy" : "hash";
 }
 
