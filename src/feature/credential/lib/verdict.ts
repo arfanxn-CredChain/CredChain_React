@@ -30,7 +30,7 @@ const VERDICT_TIER_MAP: Record<number, VerdictTier> = {
   [VERDICT_CODE.PARTY_DISABLED]: "red",
 };
 
-const EXACT_HASH_CODES = new Set([
+const EXACT_HASH_CODES = new Set<number>([
   VERDICT_CODE.AUTHENTIC,
   VERDICT_CODE.REVOKED,
   VERDICT_CODE.INTEGRITY_WARNING,
