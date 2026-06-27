@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import {
   AlertTriangle,
   Calendar,
+  Hash,
   HelpCircle,
   Loader2,
   Minus,
@@ -23,9 +24,8 @@ import { CredentialFileInput } from "./components/CredentialFileInput";
 import { CredentialFileModal } from "./components/CredentialFileModal";
 import { CredentialStatusBadge } from "@shared/components/CredentialStatusBadge";
 import { UserContactBlock } from "@shared/components/UserContactBlock";
-import { MonoId } from "@shared/components/MonoId";
 import { CopyInlineButton } from "@shared/components/CopyInlineButton";
-import { formatDate } from "@shared/lib/format";
+import { formatDate, truncateId, truncateHash } from "@shared/lib/format";
 import { cn } from "@shared/lib/cn";
 
 const VERDICT_GRADIENT: Record<string, string> = {
@@ -276,12 +276,17 @@ export function VerifyCredential() {
                     />
                   </div>
 
-                  {/* Name + ID */}
+                  {/* Name */}
                   <h4 className="text-base font-bold text-navy">
                     {result.credential!.name}
                   </h4>
-                  <div className="mt-0.5 mb-4 flex items-center gap-1.5">
-                    <MonoId value={result.credential!.id} mode="id" />
+
+                  {/* Credential ULID — shield icon */}
+                  <div className="mt-2 flex items-center gap-2 text-xs">
+                    <ShieldCheck className="h-4 w-4 shrink-0 text-gray-400" aria-hidden="true" />
+                    <span className="min-w-0 flex-1 truncate font-mono text-gray-500">
+                      {truncateId(result.credential!.id)}
+                    </span>
                     <CopyInlineButton
                       value={result.credential!.id}
                       ariaLabel={t("cred.copy.credentialId")}
@@ -289,9 +294,39 @@ export function VerifyCredential() {
                     />
                   </div>
 
+                  {/* ID Token — credit card icon (issuer+ only) */}
+                  {isIssuerOrAbove && result.credential!.token_id && (
+                    <div className="mt-1.5 flex items-center gap-2 text-xs">
+                      <svg className="h-4 w-4 shrink-0 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M2 10h20"/></svg>
+                      <span className="min-w-0 flex-1 truncate font-mono text-gray-500">
+                        {truncateHash(result.credential!.token_id)}
+                      </span>
+                      <CopyInlineButton
+                        value={result.credential!.token_id}
+                        ariaLabel={t("cred.verify.tokenId")}
+                        className="shrink-0"
+                      />
+                    </div>
+                  )}
+
+                  {/* File Hash — hash icon */}
+                  {result.credential!.file_hash && (
+                    <div className="mt-1.5 flex items-center gap-2 text-xs">
+                      <Hash className="h-4 w-4 shrink-0 text-gray-400" aria-hidden="true" />
+                      <span className="min-w-0 flex-1 truncate font-mono text-gray-500">
+                        {truncateHash(result.credential!.file_hash)}
+                      </span>
+                      <CopyInlineButton
+                        value={result.credential!.file_hash}
+                        ariaLabel={t("cred.verify.fileHash")}
+                        className="shrink-0"
+                      />
+                    </div>
+                  )}
+
                   {/* Holder (auth-aware) */}
                   {canViewCredential && (
-                    <div className="mb-3">
+                    <div className="mt-3 border-t border-gray-100 pt-3">
                       <UserContactBlock
                         labelType="full"
                         user={result.credential!.holder}
@@ -327,18 +362,6 @@ export function VerifyCredential() {
                         />
                       </div>
                     )}
-
-                  {/* Token ID (issuer+ only) */}
-                  {isIssuerOrAbove && result.credential!.token_id && (
-                    <div className="mb-3 flex items-center gap-3 border-t border-gray-100 pt-3 text-xs">
-                      <span className="font-bold tracking-wider uppercase text-gray-400">
-                        {t("cred.verify.tokenId")}
-                      </span>
-                      <span className="font-mono text-navy">
-                        # {result.credential!.token_id}
-                      </span>
-                    </div>
-                  )}
 
                   {/* Issued Date */}
                   <div className="flex items-center gap-1.5 border-t border-gray-100 pt-3 text-xs text-gray-500">

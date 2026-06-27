@@ -423,6 +423,7 @@
   "cred.verify.verifyAnother": "Verify Another Document",
   "cred.verify.dragDrop": "Drag & drop a document here, or click to browse",
   "cred.verify.verifyNow": "Verify Document",
+  "cred.verify.fileHash": "File hash",
   "nav.overview": "Overview",
   "nav.users": "Users",
   "nav.credentials": "Credentials",

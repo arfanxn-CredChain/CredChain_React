@@ -423,6 +423,7 @@
   "cred.verify.verifyAnother": "Verifikasi Dokumen Lain",
   "cred.verify.dragDrop": "Seret & lepas dokumen di sini, atau klik untuk memilih",
   "cred.verify.verifyNow": "Verifikasi Dokumen",
+  "cred.verify.fileHash": "Hash file",
   "nav.overview": "Ringkasan",
   "nav.users": "Pengguna",
   "nav.credentials": "Kredensial",
