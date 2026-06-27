@@ -139,39 +139,41 @@ export function VerifyCredential() {
       </div>
 
       {/* Upload Card */}
-      <Card className="mx-auto max-w-[560px] overflow-hidden p-6 sm:p-8">
-        <CredentialFileInput
-          file={file}
-          onChange={handleFileChange}
-          onExpand={() => setPreviewOpen(true)}
-          error={fileError ?? undefined}
-        />
+      <Card className="mx-auto max-w-[560px] overflow-hidden">
+        <div className="p-5 md:p-6">
+          <CredentialFileInput
+            file={file}
+            onChange={handleFileChange}
+            onExpand={() => setPreviewOpen(true)}
+            error={fileError ?? undefined}
+          />
 
-        {error && (
-          <p className="mt-4 text-sm text-error" role="alert">
-            {error}
-          </p>
-        )}
-
-        <Button
-          variant="primary"
-          size="lg"
-          className="mt-5 w-full"
-          disabled={!file || state === "verifying"}
-          onClick={handleVerify}
-        >
-          {state === "verifying" ? (
-            <>
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" aria-hidden="true" />
-              {t("cred.verify.processing")}
-            </>
-          ) : (
-            <>
-              <Search className="mr-2 h-5 w-5" aria-hidden="true" />
-              {t("cred.verify.verifyNow")}
-            </>
+          {error && (
+            <p className="mt-4 text-sm text-error" role="alert">
+              {error}
+            </p>
           )}
-        </Button>
+
+          <Button
+            variant="primary"
+            size="lg"
+            className="mt-5 w-full"
+            disabled={!file || state === "verifying"}
+            onClick={handleVerify}
+          >
+            {state === "verifying" ? (
+              <>
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" aria-hidden="true" />
+                {t("cred.verify.processing")}
+              </>
+            ) : (
+              <>
+                <Search className="mr-2 h-5 w-5" aria-hidden="true" />
+                {t("cred.verify.verifyNow")}
+              </>
+            )}
+          </Button>
+        </div>
 
         {file && (
           <CredentialFileModal
