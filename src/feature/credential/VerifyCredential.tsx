@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import {
@@ -7,18 +7,20 @@ import {
   HelpCircle,
   Loader2,
   Minus,
+  Search,
   ShieldAlert,
   ShieldCheck,
-  Upload,
 } from "lucide-react";
 import { useVerifyCredential } from "./api/useVerifyCredential";
 import { getVerdictTier, getMethodLabel } from "./lib/verdict";
+import { verifyFileSchema } from "./schemas/credential";
 import type { CredentialVerifyDTO } from "@shared/types/api";
 import { useStore } from "@app/store";
 import { canAccess, Role } from "@shared/auth/role";
-import { DecorBlob } from "@shared/components/DecorBlob";
 import { Card } from "@ui/card";
 import { Button } from "@ui/button";
+import { CredentialFileInput } from "./components/CredentialFileInput";
+import { CredentialFileModal } from "./components/CredentialFileModal";
 import { CredentialStatusBadge } from "@shared/components/CredentialStatusBadge";
 import { UserContactBlock } from "@shared/components/UserContactBlock";
 import { MonoId } from "@shared/components/MonoId";
@@ -60,17 +62,37 @@ const SIMILARITY_BAR_COLOR: Record<string, string> = {
   "light-gray": "from-gray-300 to-gray-400",
 };
 
+type VerifyState = "idle" | "verifying" | "done";
+
 export function VerifyCredential() {
   const { t } = useTranslation();
-  const [state, setState] = useState<"idle" | "verifying" | "done">("idle");
+  const [state, setState] = useState<VerifyState>("idle");
+  const [file, setFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
   const [result, setResult] = useState<CredentialVerifyDTO | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const { user, isAuthenticated } = useStore();
   const verify = useVerifyCredential();
 
-  const handleFile = async (file: File) => {
+  const handleFileChange = (f: File | null) => {
+    if (!f) {
+      setFile(null);
+      setFileError(null);
+      return;
+    }
+    const parsed = verifyFileSchema.safeParse(f);
+    if (!parsed.success) {
+      setFileError(parsed.error.issues[0].message);
+      return;
+    }
+    setFile(f);
+    setFileError(null);
+  };
+
+  const handleVerify = async () => {
+    if (!file) return;
     setState("verifying");
     setError(null);
     setResult(null);
@@ -86,9 +108,10 @@ export function VerifyCredential() {
 
   const handleReset = () => {
     setState("idle");
+    setFile(null);
+    setFileError(null);
     setResult(null);
     setError(null);
-    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const tier = result ? getVerdictTier(result.verdict_code) : "light-gray";
@@ -105,11 +128,9 @@ export function VerifyCredential() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
+      {/* Page Header — no logo */}
       <div className="space-y-4 text-center">
-        <div className="mb-2 inline-flex items-center justify-center rounded-2xl bg-navy p-3 shadow-lg shadow-navy/20">
-          <ShieldCheck className="h-10 w-10 text-gold" aria-hidden="true" />
-        </div>
-        <h2 className="font-display text-4xl font-extrabold tracking-tight text-balance text-navy md:text-5xl">
+        <h2 className="font-display text-3xl font-extrabold tracking-tight text-balance text-navy sm:text-4xl md:text-5xl">
           {t("cred.verify.title")}
         </h2>
         <p className="mx-auto max-w-xl text-lg text-pretty text-gray-500">
@@ -117,54 +138,54 @@ export function VerifyCredential() {
         </p>
       </div>
 
-      <Card className="overflow-hidden p-6 sm:p-10">
-        <div className="flex min-h-[250px] flex-col items-center justify-center text-center">
-          <DecorBlob tone="gold" position="top-right" size="md" />
-          <Upload className="relative z-10 mx-auto mb-4 h-12 w-12 text-gold" aria-hidden="true" />
-          <h3 className="relative z-10 font-display text-lg font-bold text-navy">
-            {t("cred.verify.verifyDoc")}
-          </h3>
-          <p className="relative z-10 mt-2 mb-6 text-sm text-gray-500">
-            {t("cred.verify.verifyDocDesc")}
-          </p>
-          <div className="relative z-10 w-full max-w-sm">
-            <input
-              ref={fileInputRef}
-              type="file"
-              className="hidden"
-              id="file-upload"
-              accept=".pdf,.jpg,.jpeg,.png,.webp,.tiff"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) void handleFile(file);
-              }}
-              aria-label={t("cred.verify.uploadAriaLabel")}
-            />
-            <Button asChild variant="primary" size="lg" className="w-full">
-              <label htmlFor="file-upload" className="cursor-pointer">
-                {state === "verifying" ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" aria-hidden="true" />
-                    {t("cred.verify.processing")}
-                  </>
-                ) : (
-                  t("cred.verify.selectFile")
-                )}
-              </label>
-            </Button>
-          </div>
+      {/* Upload Card */}
+      <Card className="mx-auto max-w-[560px] overflow-hidden p-6 sm:p-8">
+        <CredentialFileInput
+          file={file}
+          onChange={handleFileChange}
+          onExpand={() => setPreviewOpen(true)}
+          error={fileError ?? undefined}
+        />
 
-          {error && (
-            <p className="relative z-10 mt-4 text-sm text-error" role="alert">
-              {error}
-            </p>
+        {error && (
+          <p className="mt-4 text-sm text-error" role="alert">
+            {error}
+          </p>
+        )}
+
+        <Button
+          variant="primary"
+          size="lg"
+          className="mt-5 w-full"
+          disabled={!file || state === "verifying"}
+          onClick={handleVerify}
+        >
+          {state === "verifying" ? (
+            <>
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" aria-hidden="true" />
+              {t("cred.verify.processing")}
+            </>
+          ) : (
+            <>
+              <Search className="mr-2 h-5 w-5" aria-hidden="true" />
+              {t("cred.verify.verifyNow")}
+            </>
           )}
-        </div>
+        </Button>
+
+        {file && (
+          <CredentialFileModal
+            file={file}
+            open={previewOpen}
+            onClose={() => setPreviewOpen(false)}
+          />
+        )}
       </Card>
 
+      {/* Result Card */}
       {result && state === "done" && (
         <div role="status" aria-live="polite">
-          <Card className="overflow-hidden">
+          <Card className="mx-auto max-w-[560px] overflow-hidden">
             {/* Verdict Banner */}
             <div
               className={cn(
