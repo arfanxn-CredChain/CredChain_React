@@ -25,7 +25,7 @@ import { CredentialFileModal } from "./components/CredentialFileModal";
 import { CredentialStatusBadge } from "@shared/components/CredentialStatusBadge";
 import { UserContactBlock } from "@shared/components/UserContactBlock";
 import { CopyInlineButton } from "@shared/components/CopyInlineButton";
-import { formatDate, truncateId, truncateHash } from "@shared/lib/format";
+import { formatDate, truncateId } from "@shared/lib/format";
 import { cn } from "@shared/lib/cn";
 
 const VERDICT_GRADIENT: Record<string, string> = {
@@ -284,7 +284,7 @@ export function VerifyCredential() {
                   {/* Credential ULID — shield icon */}
                   <div className="mt-2 flex items-center gap-2 text-xs">
                     <ShieldCheck className="h-4 w-4 shrink-0 text-gray-400" aria-hidden="true" />
-                    <span className="min-w-0 flex-1 truncate font-mono text-gray-500">
+                    <span className="shrink-0 truncate font-mono text-gray-500">
                       {truncateId(result.credential!.id)}
                     </span>
                     <CopyInlineButton
@@ -298,8 +298,8 @@ export function VerifyCredential() {
                   {isIssuerOrAbove && result.credential!.token_id && (
                     <div className="mt-1.5 flex items-center gap-2 text-xs">
                       <svg className="h-4 w-4 shrink-0 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M2 10h20"/></svg>
-                      <span className="min-w-0 flex-1 truncate font-mono text-gray-500">
-                        {truncateHash(result.credential!.token_id)}
+                      <span className="shrink-0 truncate font-mono text-gray-500">
+                        {truncateId(result.credential!.token_id)}
                       </span>
                       <CopyInlineButton
                         value={result.credential!.token_id}
@@ -313,8 +313,8 @@ export function VerifyCredential() {
                   {result.credential!.file_hash && (
                     <div className="mt-1.5 flex items-center gap-2 text-xs">
                       <Hash className="h-4 w-4 shrink-0 text-gray-400" aria-hidden="true" />
-                      <span className="min-w-0 flex-1 truncate font-mono text-gray-500">
-                        {truncateHash(result.credential!.file_hash)}
+                      <span className="shrink-0 truncate font-mono text-gray-500">
+                        {truncateId(result.credential!.file_hash)}
                       </span>
                       <CopyInlineButton
                         value={result.credential!.file_hash}
