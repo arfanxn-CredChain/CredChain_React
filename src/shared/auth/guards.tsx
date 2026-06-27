@@ -16,7 +16,7 @@ export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
   }
 
   if (allowedRoles && allowedRoles.length > 0 && !canAccessAny(user.role, allowedRoles)) {
-    const fallback = user.role === Role.HOLDER ? "/credentials/self" : "/overview";
+    const fallback = user.role === Role.HOLDER ? "/credentials" : "/overview";
     return <Navigate to={fallback} replace />;
   }
 

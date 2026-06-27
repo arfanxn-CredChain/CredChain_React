@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { File, Upload, Eye, X } from "lucide-react";
 import { Button } from "@ui/button";
 import { cn } from "@shared/lib/cn";
+import type { RenderParameters } from "pdfjs-dist/types/src/display/api";
 
 interface CredentialFilePreviewProps {
   file: File | null;
@@ -120,7 +121,7 @@ function PdfThumbnail({ file }: { file: File }) {
         const ctx = canvas.getContext("2d")!;
         canvas.height = viewport.height;
         canvas.width = viewport.width;
-        await page.render({ canvasContext: ctx, viewport } as any).promise;
+        await page.render({ canvasContext: ctx, viewport } as RenderParameters).promise;
         pdf.destroy();
       } catch {
         if (!cancelled) setError(true);

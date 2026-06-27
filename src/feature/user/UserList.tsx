@@ -12,6 +12,11 @@ import {
   Trash2,
   RotateCcw,
   Calendar,
+  Mail,
+  Phone,
+  Hash,
+  Wallet,
+  VenusAndMars,
 } from "lucide-react";
 import { useLoadMore } from "@shared/hooks/useLoadMore";
 import { api } from "@shared/api/client";
@@ -46,8 +51,11 @@ import { RoleFilterMenu } from "./components/RoleFilterMenu";
 import { StatusFilterMenu } from "./components/StatusFilterMenu";
 import { LoadMoreBar } from "@shared/components/LoadMoreBar";
 import { UserEditDrawer } from "./components/UserEditDrawer";
-import { UserContactBlock } from "@shared/components/UserContactBlock";
-import { relativeTime } from "@shared/lib/format";
+import { UserAvatar } from "@shared/components/UserAvatar";
+import { UserRoleBadge } from "@shared/components/UserRoleBadge";
+import { UserStatusBadge } from "@shared/components/UserStatusBadge";
+import { CopyInlineButton } from "@shared/components/CopyInlineButton";
+import { relativeTime, truncateAddress } from "@shared/lib/format";
 
 export function UserList() {
   const { t, i18n } = useTranslation();
@@ -195,33 +203,99 @@ export function UserList() {
                         <TableRow
                           key={user.id}
                           className={cn("cursor-pointer", user.deleted_at && "bg-error/5")}
+                          onClick={() => navigate(`/users/${user.id}`)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && !e.defaultPrevented) {
+                              navigate(`/users/${user.id}`);
+                            }
+                          }}
                         >
                           <TableCell>
-                            <UserContactBlock
-                              labelType="full"
-                              user={user}
-                              fallbackId={user.id}
-                              copyPrefix="user"
-                              blockLinks
-                              layout="grid"
-                            >
-                              <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-500">
-                                <Calendar className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
-                                <span>
-                                  {user.deleted_at
-                                    ? t("user.list.trashed", {
-                                        time: relativeTime(user.deleted_at, i18n.language),
-                                      })
-                                    : user.updated_at !== user.created_at
-                                      ? t("user.list.updated", {
-                                          time: relativeTime(user.updated_at, i18n.language),
+                            <div className="flex items-start gap-3">
+                              <UserAvatar user={user} size="sm" className="mt-0.5 shrink-0" />
+                              <div className="min-w-0 flex-1">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <Link
+                                    to={`/users/${user.id}`}
+                                    onClick={(e) => e.stopPropagation()}
+                                    className={cn(
+                                      "line-clamp-1 text-sm font-bold text-navy hover:underline focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none",
+                                      user.deleted_at && "text-gray-400 line-through",
+                                    )}
+                                  >
+                                    {user.name ?? user.email}
+                                  </Link>
+                                  <UserRoleBadge role={user.role} />
+                                  <UserStatusBadge deletedAt={user.deleted_at} />
+                                </div>
+                                <div className="mt-1 grid grid-cols-1 gap-x-4 gap-y-0.5 text-xs text-gray-500 lg:grid-cols-3">
+                                  <div className="flex items-center gap-1">
+                                    <Hash className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden="true" />
+                                    <span className="truncate">{user.number ?? "—"}</span>
+                                    {user.number && (
+                                      <CopyInlineButton
+                                        value={user.number}
+                                        ariaLabel={t("user.copy.number")}
+                                        className="shrink-0"
+                                      />
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <Mail className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden="true" />
+                                    <span className="truncate">{user.email}</span>
+                                    <CopyInlineButton
+                                      value={user.email}
+                                      ariaLabel={t("user.copy.email")}
+                                      className="shrink-0"
+                                    />
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <Phone className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden="true" />
+                                    <span className="truncate">{user.phone_number ?? "—"}</span>
+                                    {user.phone_number && (
+                                      <CopyInlineButton
+                                        value={user.phone_number}
+                                        ariaLabel={t("user.copy.phone")}
+                                        className="shrink-0"
+                                      />
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-1 font-mono">
+                                    <Wallet className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden="true" />
+                                    <span className="truncate">
+                                      {user.wallet_address ? truncateAddress(user.wallet_address) : "—"}
+                                    </span>
+                                    {user.wallet_address && (
+                                      <CopyInlineButton
+                                        value={user.wallet_address}
+                                        ariaLabel={t("user.copy.wallet")}
+                                        className="shrink-0"
+                                      />
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <VenusAndMars className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden="true" />
+                                    <span>{user.gender ? t(`user.field.gender.${user.gender}`) : "—"}</span>
+                                  </div>
+                                </div>
+                                <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-500">
+                                  <Calendar className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
+                                  <span>
+                                    {user.deleted_at
+                                      ? t("user.list.trashed", {
+                                          time: relativeTime(user.deleted_at, i18n.language),
                                         })
-                                      : t("user.list.created", {
-                                          time: relativeTime(user.created_at, i18n.language),
-                                        })}
-                                </span>
+                                      : user.updated_at !== user.created_at
+                                        ? t("user.list.updated", {
+                                            time: relativeTime(user.updated_at, i18n.language),
+                                          })
+                                        : t("user.list.created", {
+                                            time: relativeTime(user.created_at, i18n.language),
+                                          })}
+                                  </span>
+                                </div>
                               </div>
-                            </UserContactBlock>
+                            </div>
                           </TableCell>
                           <TableCell className="text-right">
                             <DropdownMenu>
@@ -230,18 +304,20 @@ export function UserList() {
                                   variant="ghost"
                                   size="icon"
                                   aria-label={t("user.actions.menu")}
+                                  onClick={(e) => e.stopPropagation()}
                                 >
                                   <MoreVertical className="h-4 w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => navigate(`/users/${user.id}`)}>
+                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/users/${user.id}`); }}>
                                   <Eye className="mr-2 h-4 w-4" />
                                   {t("common.view")}
                                 </DropdownMenuItem>
                                 {currentUser && canEditUser(currentUser, user) && (
                                   <DropdownMenuItem
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                      e.stopPropagation();
                                       if (user.deleted_at) {
                                         void (async () => {
                                           const ok = await confirm({
@@ -265,7 +341,8 @@ export function UserList() {
                                 )}
                                 {currentUser && canTransferTo(currentUser, user) && (
                                   <DropdownMenuItem
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                      e.stopPropagation();
                                       void (async () => {
                                         const ok = await confirm({
                                           title: t("user.transfer.confirm.title", {
@@ -291,7 +368,8 @@ export function UserList() {
                                   !user.deleted_at && (
                                     <DropdownMenuItem
                                       destructive
-                                      onClick={() => {
+                                      onClick={(e) => {
+                                        e.stopPropagation();
                                         void (async () => {
                                           const ok = await confirm({
                                             title: t("user.delete.confirm.title", {
@@ -312,7 +390,8 @@ export function UserList() {
                                   )}
                                 {canManageUsers && user.deleted_at && (
                                   <DropdownMenuItem
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                      e.stopPropagation();
                                       void (async () => {
                                         const ok = await confirm({
                                           title: t("user.restore.confirm.title", {

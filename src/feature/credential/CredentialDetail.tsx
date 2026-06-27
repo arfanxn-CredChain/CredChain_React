@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 import { AlertCircle, ChevronDown, RotateCw } from "lucide-react";
 import { useCredential } from "./api/useCredential";
 import { useReExtractCredentials } from "./api/useReExtractCredentials";
+import { useStore } from "@app/store";
+import { Role, canAccessAny } from "@shared/auth/role";
 import { PageHeader } from "@shared/components/PageHeader";
 import { BackLink } from "@shared/components/BackLink";
 import { EmptyState } from "@shared/components/EmptyState";
@@ -14,7 +16,7 @@ import { UserContactBlock } from "@shared/components/UserContactBlock";
 import { Card } from "@ui/card";
 import { Button } from "@ui/button";
 import { Skeleton } from "@ui/skeleton";
-import { CredentialStatusBadge } from "./components/CredentialStatusBadge";
+import { CredentialStatusBadge } from "@shared/components/CredentialStatusBadge";
 import { CredentialViewFilePreview } from "./components/CredentialViewFilePreview";
 import { formatDateTime, truncateAddress } from "@shared/lib/format";
 import { cn } from "@shared/lib/cn";
@@ -22,6 +24,8 @@ import { cn } from "@shared/lib/cn";
 export function CredentialDetail() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
+  const currentUser = useStore((s) => s.user);
+  const canManage = canAccessAny(currentUser?.role, [Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]);
   const { data: cred, isLoading, isError } = useCredential(id ?? "", [
     "holder",
     "issuer",
@@ -187,7 +191,7 @@ export function CredentialDetail() {
             )}
 
             {/* Re-Extract */}
-            {extractFailed && (
+            {canManage && extractFailed && (
               <div className="mt-6 flex justify-end border-t border-gray-100 pt-6">
                 <Button
                   variant="outline"
@@ -210,6 +214,7 @@ export function CredentialDetail() {
                 copyPrefix="holder"
                 labelType="full"
                 layout="grid"
+                blockLinks={!canManage}
               />
             </div>
             <div className="py-5">
@@ -219,6 +224,7 @@ export function CredentialDetail() {
                 copyPrefix="issuer"
                 labelType="full"
                 layout="grid"
+                blockLinks={!canManage}
               />
             </div>
             {revoked && cred.revoker && (
@@ -230,6 +236,7 @@ export function CredentialDetail() {
                   labelType="full"
                   layout="grid"
                   tone="error"
+                  blockLinks={!canManage}
                 />
               </div>
             )}

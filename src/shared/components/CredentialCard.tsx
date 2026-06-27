@@ -17,6 +17,7 @@ interface CredentialCardProps {
   selectionMode?: "revoke" | "reextract" | null;
   onSelect?: () => void;
   selectDisabled?: boolean;
+  blockLinks?: boolean;
 }
 
 const INTERACTIVE_SELECTORS = "a,button,[role='button'],input,textarea,select";
@@ -27,6 +28,7 @@ export function CredentialCard({
   selectionMode,
   onSelect,
   selectDisabled,
+  blockLinks,
 }: CredentialCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -136,7 +138,7 @@ export function CredentialCard({
             user={credential.holder}
             fallbackId={credential.holder_user_id}
             copyPrefix="holder"
-            blockLinks={!!selectionMode}
+            blockLinks={blockLinks || !!selectionMode}
           />
 
           <UserContactBlock
@@ -144,7 +146,7 @@ export function CredentialCard({
             user={credential.issuer}
             fallbackId={credential.issuer_user_id}
             copyPrefix="issuer"
-            blockLinks={!!selectionMode}
+            blockLinks={blockLinks || !!selectionMode}
           />
 
           {revoked && credential.revoker && (
@@ -154,7 +156,7 @@ export function CredentialCard({
               fallbackId={credential.revoker_user_id ?? ""}
               copyPrefix="revoker"
               tone="error"
-              blockLinks={!!selectionMode}
+              blockLinks={blockLinks || !!selectionMode}
             />
           )}
         </div>

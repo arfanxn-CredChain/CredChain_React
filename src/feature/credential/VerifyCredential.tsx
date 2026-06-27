@@ -311,7 +311,7 @@ export function VerifyCredential() {
                   {isIssuerOrAbove && result.credential!.token_id && (
                     <div className="mb-3 flex items-center gap-3 border-t border-gray-100 pt-3 text-xs">
                       <span className="font-bold tracking-wider uppercase text-gray-400">
-                        Token ID
+                        {t("cred.verify.tokenId")}
                       </span>
                       <span className="font-mono text-navy">
                         # {result.credential!.token_id}

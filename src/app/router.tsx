@@ -86,8 +86,15 @@ export const router = createBrowserRouter([
             ...lazyRoute(() => import("@feature/overview/Overview"), "Overview"),
           },
           {
-            path: "/credentials/self",
-            ...lazyRoute(() => import("@feature/credential/MyCredentials"), "MyCredentials"),
+            path: "/credentials",
+            ...lazyRoute(() => import("@feature/credential/CredentialList"), "CredentialList"),
+          },
+          {
+            path: "/credentials/:id",
+            ...lazyRoute(
+              () => import("@feature/credential/CredentialDetail"),
+              "CredentialDetail",
+            ),
           },
           {
             path: "/account/profile",
@@ -108,21 +115,10 @@ export const router = createBrowserRouter([
                 ...lazyRoute(() => import("@feature/user/UserDetail"), "UserDetail"),
               },
               {
-                path: "/credentials",
-                ...lazyRoute(() => import("@feature/credential/CredentialList"), "CredentialList"),
-              },
-              {
                 path: "/credentials/issue",
                 ...lazyRoute(
                   () => import("@feature/credential/CredentialIssue"),
                   "CredentialIssue",
-                ),
-              },
-              {
-                path: "/credentials/:id",
-                ...lazyRoute(
-                  () => import("@feature/credential/CredentialDetail"),
-                  "CredentialDetail",
                 ),
               },
             ],

@@ -83,7 +83,7 @@ describe("useNavSearch", () => {
     const hrefs = result.current.map((i) => i.href);
     expect(hrefs).not.toContain("/users");
     expect(hrefs).not.toContain("/settings");
-    expect(hrefs).toContain("/credentials/self");
+    expect(hrefs).toContain("/credentials");
     expect(hrefs).toContain("/help");
   });
 
@@ -101,9 +101,9 @@ describe("useNavSearch", () => {
       user: { role: Role.HOLDER } as never,
       isAuthenticated: true,
     });
-    const { result } = renderHook(() => useNavSearch("my creden"));
+    const { result } = renderHook(() => useNavSearch("cred"));
     const hrefs = result.current.map((i) => i.href);
-    expect(hrefs).toContain("/credentials/self");
+    expect(hrefs).toContain("/credentials");
   });
 
   it("matches English label regardless of active locale", () => {

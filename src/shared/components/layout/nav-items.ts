@@ -24,15 +24,7 @@ export const NAV_ITEMS: NavSearchItem[] = [
     href: "/credentials",
     i18nKey: "nav.credentials",
     icon: FileBadge,
-    minRole: Role.ISSUER,
-    inSidebar: true,
-  },
-  {
-    href: "/credentials/self",
-    i18nKey: "nav.myCredentials",
-    icon: FileBadge,
     minRole: Role.HOLDER,
-    exactRole: Role.HOLDER,
     inSidebar: true,
   },
   {

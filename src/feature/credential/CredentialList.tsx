@@ -22,10 +22,10 @@ import { Skeleton } from "@ui/skeleton";
 import { useConfirm } from "@ui/confirm-dialog";
 import { LoadMoreBar } from "@shared/components/LoadMoreBar";
 
-import { CredentialCard } from "./components/CredentialCard";
-import { CredentialStatusFilterMenu } from "./components/CredentialStatusFilterMenu";
-import type { CredentialStatusFilter } from "./components/CredentialStatusFilterMenu";
-import { CredentialSortMenu } from "./components/CredentialSortMenu";
+import { CredentialCard } from "@shared/components/CredentialCard";
+import { CredentialStatusFilterMenu } from "@shared/components/CredentialStatusFilterMenu";
+import type { CredentialStatusFilter } from "@shared/components/CredentialStatusFilterMenu";
+import { CredentialSortMenu } from "@shared/components/CredentialSortMenu";
 
 const MAX_SELECTION = 100;
 
@@ -70,6 +70,7 @@ export function CredentialList() {
 
   const currentUser = useStore((s) => s.user);
   const canManage = canAccessAny(currentUser?.role, [Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]);
+  const isHolder = currentUser?.role === Role.HOLDER;
 
   const filterArray: string[] = (() => {
     switch (credStatus) {
@@ -83,7 +84,7 @@ export function CredentialList() {
 
   const { items: credentials, total, isLoading, isError, isFetchingNextPage, hasMore, loadMore, reset } =
     useLoadMore<CredentialDTO>(
-      ["credentials", { search: debouncedSearch || undefined, sort: credSort, filters: filterArray }],
+      [isHolder ? "my-credentials" : "credentials", { search: debouncedSearch || undefined, sort: credSort, filters: filterArray }],
       async (page, limit) => {
         const q: Record<string, unknown> = {};
         q.page = page;
@@ -92,7 +93,8 @@ export function CredentialList() {
         q.sorts = [credSort];
         if (filterArray.length > 0) q.filters = filterArray;
         q.includes = ["holder", "issuer", "revoker"];
-        const response = await api.get("/credentials", { params: q });
+        const endpoint = isHolder ? "/users/self/credentials" : "/credentials";
+        const response = await api.get(endpoint, { params: q });
         return response.data;
       },
     );
@@ -162,16 +164,7 @@ export function CredentialList() {
   };
 
   const renderActions = () => {
-    if (!canManage) {
-      return (
-        <Button asChild variant="gold">
-          <Link to="/credentials/issue">
-            <FileBadge className="h-4 w-4" />
-            {t("cred.list.issueCta")}
-          </Link>
-        </Button>
-      );
-    }
+    if (!canManage) return null;
 
     if (bulkMode === "revoke") {
       return (
@@ -334,10 +327,11 @@ export function CredentialList() {
                   <CredentialCard
                     key={cred.id}
                     credential={cred}
-                    selectionMode={bulkMode}
-                    isSelected={selectedIds.has(cred.id)}
-                    onSelect={() => toggleSelection(cred.id)}
-                    selectDisabled={bulkMode ? (!isSelectable || (selectionFull && !selectedIds.has(cred.id))) : undefined}
+                    selectionMode={canManage ? bulkMode : undefined}
+                    isSelected={canManage ? selectedIds.has(cred.id) : undefined}
+                    onSelect={canManage ? () => toggleSelection(cred.id) : undefined}
+                    selectDisabled={canManage && bulkMode ? (!isSelectable || (selectionFull && !selectedIds.has(cred.id))) : undefined}
+                    blockLinks={!canManage}
                   />
                 );
               })}
