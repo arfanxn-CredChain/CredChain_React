@@ -130,7 +130,7 @@ export function VerifyCredential() {
   const showSimilarity = result?.similarity_score != null;
 
   return (
-    <div className="mx-auto flex min-h-[calc(100dvh-64px-48px)] max-w-4xl flex-col justify-center space-y-6 px-4 py-8">
+    <div className="mx-auto max-w-4xl space-y-6 px-4 py-8">
       {/* Page Header — no logo */}
       <div className="space-y-4 text-center">
         <h2 className="font-display text-3xl font-extrabold tracking-tight text-balance text-navy sm:text-4xl md:text-5xl">
