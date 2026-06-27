@@ -130,7 +130,7 @@ export function VerifyCredential() {
   const showSimilarity = result?.similarity_score != null;
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6 px-4 py-8">
+    <div className="mx-auto min-w-0 max-w-4xl overflow-hidden space-y-6 px-4 py-8">
       {/* Page Header — no logo */}
       <div className="space-y-4 text-center">
         <h2 className="font-display text-3xl font-extrabold tracking-tight text-balance text-navy sm:text-4xl md:text-5xl">
@@ -142,7 +142,7 @@ export function VerifyCredential() {
       </div>
 
       {/* Upload Card */}
-      <Card className="mx-auto max-w-[560px] overflow-hidden">
+      <Card className="mx-auto min-w-0 max-w-[560px] overflow-hidden">
         <div className="p-5 md:p-6">
           <CredentialFileInput
             file={file}
@@ -190,7 +190,7 @@ export function VerifyCredential() {
       {/* Result Card */}
       {result && state === "done" && (
         <div role="status" aria-live="polite">
-          <Card className="mx-auto max-w-[560px] overflow-hidden">
+      <Card className="mx-auto min-w-0 max-w-[560px] overflow-hidden">
             {/* Verdict Banner */}
             <div
               className={cn(
