@@ -1,15 +1,62 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { TestProviders } from "@/test/TestProviders";
 import { i18n } from "@shared/i18n/config";
 import { useStore } from "@app/store";
 import { VerifyCredential } from "./VerifyCredential";
 
+const mockMutateAsync = vi.fn();
+
 vi.mock("./api/useVerifyCredential", () => ({
   useVerifyCredential: () => ({
-    mutateAsync: vi.fn(),
+    mutateAsync: mockMutateAsync,
     isPending: false,
   }),
+}));
+
+vi.mock("./components/CredentialFileInput", () => ({
+  CredentialFileInput: ({
+    file,
+    onChange,
+    onExpand,
+    error,
+  }: {
+    file: File | null;
+    onChange: (f: File | null) => void;
+    onExpand: () => void;
+    error?: string;
+  }) => (
+    <div data-testid="credential-file-input">
+      {file ? (
+        <div>
+          <span data-testid="file-name">{file.name}</span>
+          <button onClick={onExpand} aria-label="Preview">
+            Preview
+          </button>
+          <button onClick={() => onChange(null)} aria-label="Remove">
+            Remove
+          </button>
+        </div>
+      ) : (
+        <div>
+          <span>Drag &amp; drop</span>
+          <button
+            onClick={() =>
+              onChange(new File(["test"], "test.pdf", { type: "application/pdf" }))
+            }
+          >
+            Select file
+          </button>
+        </div>
+      )}
+      {error && <p role="alert">{error}</p>}
+    </div>
+  ),
+}));
+
+vi.mock("./components/CredentialFileModal", () => ({
+  CredentialFileModal: () => null,
 }));
 
 function renderVerify(initialEntries?: string[]) {
@@ -29,23 +76,100 @@ describe("VerifyCredential", () => {
     useStore.setState({ user: null, isAuthenticated: false });
   });
 
-  it("renders upload form initially", () => {
-    renderVerify();
-    expect(screen.getByText("Credential Verification")).toBeInTheDocument();
-    expect(screen.getByText("Verify Source Document")).toBeInTheDocument();
-  });
-
-  it("renders file upload input with correct accept attributes", () => {
-    renderVerify();
-    const input = screen.getByLabelText("Upload file for verification");
-    expect(input).toHaveAttribute("accept", ".pdf,.jpg,.jpeg,.png,.webp,.tiff");
-  });
-
   it("renders the page heading and description", () => {
     renderVerify();
     expect(screen.getByText("Credential Verification")).toBeInTheDocument();
     expect(
       screen.getByText(/Cryptographically verify the authenticity/),
     ).toBeInTheDocument();
+  });
+
+  it("renders drag-drop zone in empty state", () => {
+    renderVerify();
+    expect(screen.getByText(/Drag & drop/)).toBeInTheDocument();
+    expect(screen.getByText("Select file")).toBeInTheDocument();
+  });
+
+  it("renders verify button disabled when no file", () => {
+    renderVerify();
+    const btn = screen.getByRole("button", { name: /Verify Document/i });
+    expect(btn).toBeDisabled();
+  });
+
+  it("enables verify button after file is selected", async () => {
+    const user = userEvent.setup();
+    renderVerify();
+    await user.click(screen.getByText("Select file"));
+    const btn = screen.getByRole("button", { name: /Verify Document/i });
+    expect(btn).toBeEnabled();
+  });
+
+  it("shows file name in preview after selection", async () => {
+    const user = userEvent.setup();
+    renderVerify();
+    await user.click(screen.getByText("Select file"));
+    expect(screen.getByTestId("file-name")).toHaveTextContent("test.pdf");
+  });
+
+  it("calls mutateAsync and shows result on verify click", async () => {
+    const user = userEvent.setup();
+    mockMutateAsync.mockResolvedValueOnce({
+      verdict_code: 100,
+      similarity_score: 1.0,
+      similarity_percent: "100%",
+      description: "Credential Verified",
+      credential: {
+        id: "cred-123",
+        name: "Test Credential",
+        holder_user_id: "user-1",
+        issuer_user_id: "user-2",
+        holder: null,
+        issuer: null,
+        revoked_at: null,
+        token_id: 1,
+        issued_at: "2026-01-01",
+      },
+    });
+
+    renderVerify();
+    await user.click(screen.getByText("Select file"));
+    await user.click(screen.getByRole("button", { name: /Verify Document/i }));
+
+    expect(mockMutateAsync).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("Credential Verified")).toBeInTheDocument();
+  });
+
+  it("shows error on verification failure", async () => {
+    const user = userEvent.setup();
+    mockMutateAsync.mockRejectedValueOnce(new Error("Network error"));
+
+    renderVerify();
+    await user.click(screen.getByText("Select file"));
+    await user.click(screen.getByRole("button", { name: /Verify Document/i }));
+
+    expect(screen.getByRole("alert")).toBeInTheDocument();
+  });
+
+  it("disables verify button during verification", async () => {
+    const user = userEvent.setup();
+    let resolveVerify!: (value: unknown) => void;
+    mockMutateAsync.mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveVerify = resolve;
+      }),
+    );
+
+    renderVerify();
+    await user.click(screen.getByText("Select file"));
+    await user.click(screen.getByRole("button", { name: /Verify Document/i }));
+
+    expect(screen.getByRole("button", { name: /Processing/i })).toBeDisabled();
+    resolveVerify({
+      verdict_code: 100,
+      similarity_score: 1.0,
+      similarity_percent: "100%",
+      description: "OK",
+      credential: null,
+    });
   });
 });
