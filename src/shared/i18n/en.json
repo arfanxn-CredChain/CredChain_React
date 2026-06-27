@@ -421,6 +421,8 @@
   "cred.verify.noMatchReason2": "Or the document has been significantly altered",
   "cred.verify.noMatchReason3": "Contact the issuing organization for verification",
   "cred.verify.verifyAnother": "Verify Another Document",
+  "cred.verify.dragDrop": "Drag & drop a document here, or click to browse",
+  "cred.verify.verifyNow": "Verify Document",
   "nav.overview": "Overview",
   "nav.users": "Users",
   "nav.credentials": "Credentials",

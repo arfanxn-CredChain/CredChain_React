@@ -421,6 +421,8 @@
   "cred.verify.noMatchReason2": "Atau dokumen telah diubah secara signifikan",
   "cred.verify.noMatchReason3": "Hubungi organisasi penerbit untuk verifikasi",
   "cred.verify.verifyAnother": "Verifikasi Dokumen Lain",
+  "cred.verify.dragDrop": "Seret & lepas dokumen di sini, atau klik untuk memilih",
+  "cred.verify.verifyNow": "Verifikasi Dokumen",
   "nav.overview": "Ringkasan",
   "nav.users": "Pengguna",
   "nav.credentials": "Kredensial",
