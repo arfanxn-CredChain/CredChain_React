@@ -40,7 +40,7 @@ export function CredentialFileInput({
   );
 
   return (
-    <div className="min-w-0 overflow-hidden">
+    <div>
       <input
         ref={inputRef}
         type="file"

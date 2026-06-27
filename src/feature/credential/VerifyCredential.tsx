@@ -130,7 +130,7 @@ export function VerifyCredential() {
   const showSimilarity = result?.similarity_score != null;
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6 px-4 py-8">
+    <div className="mx-auto flex min-h-[calc(100dvh-64px-48px)] max-w-4xl flex-col items-center justify-center space-y-6 px-4 py-8">
       {/* Page Header — no logo */}
       <div className="space-y-4 text-center">
         <h2 className="font-display text-3xl font-extrabold tracking-tight text-balance text-navy sm:text-4xl md:text-5xl">
@@ -142,41 +142,39 @@ export function VerifyCredential() {
       </div>
 
       {/* Upload Card */}
-      <Card className="mx-auto max-w-[560px] overflow-hidden">
-        <div className="p-5 md:p-6">
-          <CredentialFileInput
-            file={file}
-            onChange={handleFileChange}
-            onExpand={() => setPreviewOpen(true)}
-            error={fileError ?? undefined}
-          />
+      <Card className="mx-auto max-w-[560px] overflow-hidden p-6 sm:p-8">
+        <CredentialFileInput
+          file={file}
+          onChange={handleFileChange}
+          onExpand={() => setPreviewOpen(true)}
+          error={fileError ?? undefined}
+        />
 
-          {error && (
-            <p className="mt-4 text-sm text-error" role="alert">
-              {error}
-            </p>
+        {error && (
+          <p className="mt-4 text-sm text-error" role="alert">
+            {error}
+          </p>
+        )}
+
+        <Button
+          variant="primary"
+          size="lg"
+          className="mt-5 w-full"
+          disabled={!file || state === "verifying"}
+          onClick={handleVerify}
+        >
+          {state === "verifying" ? (
+            <>
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" aria-hidden="true" />
+              {t("cred.verify.processing")}
+            </>
+          ) : (
+            <>
+              <Search className="mr-2 h-5 w-5" aria-hidden="true" />
+              {t("cred.verify.verifyNow")}
+            </>
           )}
-
-          <Button
-            variant="primary"
-            size="lg"
-            className="mt-5 w-full"
-            disabled={!file || state === "verifying"}
-            onClick={handleVerify}
-          >
-            {state === "verifying" ? (
-              <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" aria-hidden="true" />
-                {t("cred.verify.processing")}
-              </>
-            ) : (
-              <>
-                <Search className="mr-2 h-5 w-5" aria-hidden="true" />
-                {t("cred.verify.verifyNow")}
-              </>
-            )}
-          </Button>
-        </div>
+        </Button>
 
         {file && (
           <CredentialFileModal
