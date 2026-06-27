@@ -71,3 +71,25 @@ export function defaultCredentialIssueRow(): CredentialIssueRowInput {
     file: null,
   };
 }
+
+export const verifyFileSchema = z.custom<File>().superRefine((f, ctx) => {
+  if (!(f instanceof File)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "zod.credential.fileRequired",
+    });
+    return;
+  }
+  if (f.size > MAX_FILE_BYTES) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "zod.credential.fileTooLarge",
+    });
+  }
+  if (!ALLOWED_MIME_TYPES.has(f.type)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "zod.credential.fileTypeInvalid",
+    });
+  }
+});
