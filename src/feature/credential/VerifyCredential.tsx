@@ -80,6 +80,9 @@ export function VerifyCredential() {
     if (!f) {
       setFile(null);
       setFileError(null);
+      setResult(null);
+      setError(null);
+      setState("idle");
       return;
     }
     const parsed = verifyFileSchema.safeParse(f);
@@ -139,7 +142,7 @@ export function VerifyCredential() {
       </div>
 
       {/* Upload Card */}
-      <Card className="mx-auto max-w-[560px] overflow-hidden">
+      <Card className="w-full max-w-[560px] overflow-hidden">
         <div className="p-5 md:p-6">
           <CredentialFileInput
             file={file}
@@ -187,7 +190,7 @@ export function VerifyCredential() {
       {/* Result Card */}
       {result && state === "done" && (
         <div role="status" aria-live="polite">
-          <Card className="mx-auto max-w-[560px] overflow-hidden">
+          <Card className="w-full max-w-[560px] overflow-hidden">
             {/* Verdict Banner */}
             <div
               className={cn(
