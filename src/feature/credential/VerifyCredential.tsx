@@ -380,11 +380,7 @@ export function VerifyCredential() {
                   <p className="mb-1.5 text-sm font-semibold text-navy">
                     {t("cred.verify.whatThisMeans")}
                   </p>
-                  <ul className="space-y-1 text-xs text-gray-500">
-                    <li>{t("cred.verify.noMatchReason1")}</li>
-                    <li>{t("cred.verify.noMatchReason2")}</li>
-                    <li>{t("cred.verify.noMatchReason3")}</li>
-                  </ul>
+                    <p className="text-xs text-gray-500">{t("cred.verify.noMatchReason1")}</p>
                 </div>
               )}
 
