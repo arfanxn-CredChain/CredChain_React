@@ -80,7 +80,7 @@ describe("VerifyCredential", () => {
     renderVerify();
     expect(screen.getByText("Credential Verification")).toBeInTheDocument();
     expect(
-      screen.getByText(/Cryptographically verify the authenticity/),
+      screen.getByText(/Upload a document to check if it matches the blockchain record/),
     ).toBeInTheDocument();
   });
 
