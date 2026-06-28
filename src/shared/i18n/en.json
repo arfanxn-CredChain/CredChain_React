@@ -349,7 +349,7 @@
   "cred.detail.tokenId": "Token ID",
   "cred.detail.view": "View",
   "cred.issue.title": "Issue Credentials",
-  "cred.issue.description": "Upload documents to issue as on-chain credentials",
+  "cred.issue.description": "Upload documents to issue new credentials.",
   "cred.issue.submit": "Issue Credentials",
   "cred.issue.submitting": "Issuing...",
   "cred.issue.addAnother": "Add another credential",
@@ -398,7 +398,7 @@
   "cred.status.pending_extraction": "Pending",
   "cred.status.extraction_failed": "Extraction Failed",
   "cred.verify.title": "Verify Credential",
-  "cred.verify.description": "Upload a document to verify its authenticity against on-chain credentials",
+  "cred.verify.description": "Upload a document to check if it matches the blockchain record.",
   "cred.verify.uploadAriaLabel": "Upload document to verify",
   "cred.verify.selectFile": "Upload Document",
   "cred.verify.processing": "Processing...",
@@ -416,7 +416,7 @@
   "cred.verify.signInNudgeDesc": "Including holder info, issuer details, and blockchain data",
   "cred.verify.whatThisMeans": "What this means:",
   "cred.verify.noMatchReason1": "This document doesn't match any credential on CredChain. The document may not have been issued through our platform, may have been edited, or may not be recognized by our system. Contact the organization that issued it to verify directly.",
-      "cred.verify.verifyAnother": "Verify Another Document",
+  "cred.verify.verifyAnother": "Verify Another Document",
   "cred.verify.dragDrop": "Drag & drop a document here, or click to browse",
   "cred.verify.verifyNow": "Verify Document",
   "cred.verify.fileHash": "File hash",
@@ -802,7 +802,7 @@
     "revoke": {
       "confirmTitle": "Revoke {{count}} credential?",
       "confirmTitle_plural": "Revoke {{count}} credentials?",
-      "confirmBody": "This action revokes the credential on-chain and cannot be undone. Holders will lose verification.",
+      "confirmBody": "This permanently revokes the credential and cannot be undone. The credential will no longer be verifiable.",
       "confirmAction": "Revoke"
     },
     "reextract": {
