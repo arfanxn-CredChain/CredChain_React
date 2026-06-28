@@ -114,10 +114,10 @@ describe("VerifyCredential", () => {
   it("calls mutateAsync and shows result on verify click", async () => {
     const user = userEvent.setup();
     mockMutateAsync.mockResolvedValueOnce({
-      verdict_code: 100,
-      similarity_score: 1.0,
-      similarity_percent: "100%",
-      description: "Credential Verified",
+      verdict_code: 400404,
+      similarity_score: 0.92,
+      similarity_percent: "92%",
+      description: "This document may have been altered.",
       credential: {
         id: "cred-123",
         name: "Test Credential",
@@ -136,7 +136,7 @@ describe("VerifyCredential", () => {
     await user.click(screen.getByRole("button", { name: /Verify Document/i }));
 
     expect(mockMutateAsync).toHaveBeenCalledTimes(1);
-    expect(screen.getByText("Credential Verified")).toBeInTheDocument();
+    expect(screen.getByText("This document may have been altered.")).toBeInTheDocument();
   });
 
   it("shows error on verification failure", async () => {
@@ -165,10 +165,10 @@ describe("VerifyCredential", () => {
 
     expect(screen.getByRole("button", { name: /Processing/i })).toBeDisabled();
     resolveVerify({
-      verdict_code: 100,
-      similarity_score: 1.0,
-      similarity_percent: "100%",
-      description: "OK",
+      verdict_code: 400408,
+      similarity_score: null,
+      similarity_percent: null,
+      description: "Could not read identity data from this document.",
       credential: null,
     });
   });

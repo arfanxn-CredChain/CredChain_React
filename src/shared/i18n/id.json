@@ -199,6 +199,7 @@
   "landing.cta.overview": "Ke Ringkasan",
   "landing.cta.help": "Bantuan",
   "landing.cta.about": "Tentang",
+  "landing.cta.verify": "Verifikasi",
   "userCreate.title": "Daftarkan Pengguna Baru",
   "userCreate.description": "Tambahkan beberapa pengguna dan tetapkan perannya.",
   "userCreate.addAnother": "Tambah pengguna lain",
@@ -383,6 +384,7 @@
   "cred.list.searchPlaceholder": "Cari berdasarkan nama, ID, token, hash, pemegang, penerbit, dan pembatal",
   "cred.list.searchAriaLabel": "Cari kredensial",
   "cred.list.issueCta": "Terbitkan",
+  "cred.list.verifyCta": "Verifikasi",
   "cred.list.revokeSelectedCount": "Cabut ({{count}})",
   "cred.list.count_one": "{{count}} Kredensial",
   "cred.list.count_other": "{{count}} Kredensial",
@@ -684,7 +686,7 @@
           "body": "Coba istilah pencarian yang berbeda."
         }
       },
-      "issueCta": "Terbitkan Baru",
+      "issueCta": "Terbitkan",
       "revokeSelected": "Cabut Terpilih",
       "revokeSelectedCount": "Cabut Terpilih ({{count}})"
     },

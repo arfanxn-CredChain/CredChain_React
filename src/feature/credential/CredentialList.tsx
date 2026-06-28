@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router-dom";
-import { Ban, FileBadge, RefreshCw, Search } from "lucide-react";
+import { Ban, FileBadge, RefreshCw, Search, ShieldCheck } from "lucide-react";
 import { useRevokeCredentials } from "./api/useRevokeCredentials";
 import { useReExtractCredentials } from "./api/useReExtractCredentials";
 import { useStore } from "@app/store";
@@ -14,7 +14,7 @@ import type { CredentialDTO } from "@shared/types/api";
 
 import { PageHeader } from "@shared/components/PageHeader";
 import { EmptyState } from "@shared/components/EmptyState";
-import { RoleGate } from "@shared/auth/guards";
+
 import { Button } from "@ui/button";
 import { Card } from "@ui/card";
 import { Input } from "@ui/input";
@@ -164,7 +164,18 @@ export function CredentialList() {
   };
 
   const renderActions = () => {
-    if (!canManage) return null;
+    if (!canManage) {
+      return (
+        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+          <Button asChild variant="outline">
+            <Link to="/credentials/verify">
+              <ShieldCheck className="h-4 w-4" />
+              {t("cred.list.verifyCta")}
+            </Link>
+          </Button>
+        </div>
+      );
+    }
 
     if (bulkMode === "revoke") {
       return (
@@ -211,6 +222,12 @@ export function CredentialList() {
         <Button variant="outline" onClick={() => enterMode("reextract")}>
           <RefreshCw className="h-4 w-4" />
           {t("cred.card.reExtractMode")}
+        </Button>
+        <Button asChild variant="outline">
+          <Link to="/credentials/verify">
+            <ShieldCheck className="h-4 w-4" />
+            {t("cred.list.verifyCta")}
+          </Link>
         </Button>
         <Button asChild variant="gold" className="w-full sm:w-auto">
           <Link to="/credentials/issue">
@@ -265,7 +282,7 @@ export function CredentialList() {
       <PageHeader
         title={t("cred.list.title")}
         description={t("cred.list.description")}
-        action={<RoleGate allowed={[Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]}>{renderActions()}</RoleGate>}
+        action={renderActions()}
       />
 
       <Card className="p-0">

@@ -13,7 +13,7 @@ const PUBLIC_PATHS = ["/", "/login", "/help", "/about"];
 
 function isPublicPath(pathname: string): boolean {
   if (PUBLIC_PATHS.includes(pathname)) return true;
-  if (pathname.startsWith("/credentials/verify/")) return true;
+  if (pathname.startsWith("/credentials/verify")) return true;
   return false;
 }
 

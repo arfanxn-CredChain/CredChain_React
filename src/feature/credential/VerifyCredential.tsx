@@ -25,6 +25,8 @@ import { CredentialFileModal } from "./components/CredentialFileModal";
 import { CredentialStatusBadge } from "@shared/components/CredentialStatusBadge";
 import { UserContactBlock } from "@shared/components/UserContactBlock";
 import { CopyInlineButton } from "@shared/components/CopyInlineButton";
+import { BackLink } from "@shared/components/BackLink";
+import { PageHeader } from "@shared/components/PageHeader";
 import { formatDate, truncateId } from "@shared/lib/format";
 import { cn } from "@shared/lib/cn";
 
@@ -118,7 +120,7 @@ export function VerifyCredential() {
   };
 
   const tier = result ? getVerdictTier(result.verdict_code) : "light-gray";
-  const method = result ? getMethodLabel(result.similarity_score) : "hash";
+  const method = result ? getMethodLabel(result.similarity_score, result.verdict_code) : "hash";
   const hasCredential = result?.credential != null;
 
   const isHolderOfCredential =
@@ -130,19 +132,15 @@ export function VerifyCredential() {
   const showSimilarity = result?.similarity_score != null;
 
   return (
-    <div className="mx-auto flex min-h-[calc(100dvh-64px-48px)] max-w-4xl flex-col items-center justify-center space-y-6 px-4 py-8">
-      {/* Page Header — no logo */}
-      <div className="space-y-4 text-center">
-        <h2 className="font-display text-3xl font-extrabold tracking-tight text-balance text-navy sm:text-4xl md:text-5xl">
-          {t("cred.verify.title")}
-        </h2>
-        <p className="mx-auto max-w-xl text-lg text-pretty text-gray-500">
-          {t("cred.verify.description")}
-        </p>
-      </div>
+    <div className="mx-auto max-w-4xl space-y-6">
+      <BackLink />
+      <PageHeader
+        title={t("cred.verify.title")}
+        description={t("cred.verify.description")}
+      />
 
       {/* Upload Card */}
-      <Card className="mx-auto max-w-[560px] overflow-hidden p-6 sm:p-8">
+      <Card className="mx-auto w-full max-w-[560px] overflow-hidden p-6 sm:p-8">
         <CredentialFileInput
           file={file}
           onChange={handleFileChange}
@@ -188,11 +186,11 @@ export function VerifyCredential() {
       {/* Result Card */}
       {result && state === "done" && (
         <div role="status" aria-live="polite">
-          <Card className="mx-auto max-w-[560px] overflow-hidden">
+          <Card className="mx-auto w-full max-w-[560px] overflow-hidden p-6 sm:p-8">
             {/* Verdict Banner */}
             <div
               className={cn(
-                "bg-gradient-to-br p-6 text-center text-white md:p-8",
+                "rounded-xl bg-gradient-to-br p-6 text-center text-white md:p-8",
                 VERDICT_GRADIENT[tier],
               )}
             >
@@ -209,7 +207,7 @@ export function VerifyCredential() {
               </h3>
             </div>
 
-            <div className="p-5 md:p-6">
+            <div>
               {/* Similarity Bar (fuzzy only) */}
               {showSimilarity && (
                 <div className="mb-4">

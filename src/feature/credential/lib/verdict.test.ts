@@ -60,15 +60,35 @@ describe("getVerdictTier", () => {
 });
 
 describe("getMethodLabel", () => {
-  it("returns 'hash' when similarity_score is null", () => {
+  it("returns 'hash' when verdict_code is exact-hash (400401)", () => {
+    expect(getMethodLabel(null, 400401)).toBe("hash");
+  });
+
+  it("returns 'hash' when verdict_code is exact-hash (400402)", () => {
+    expect(getMethodLabel(null, 400402)).toBe("hash");
+  });
+
+  it("returns 'fuzzy' when verdict_code is tampered (400404)", () => {
+    expect(getMethodLabel(0.85, 400404)).toBe("fuzzy");
+  });
+
+  it("returns 'fuzzy' when verdict_code is no_identifiers (400408) even with null score", () => {
+    expect(getMethodLabel(null, 400408)).toBe("fuzzy");
+  });
+
+  it("returns 'fuzzy' when verdict_code is no_match (400409) even with null score", () => {
+    expect(getMethodLabel(null, 400409)).toBe("fuzzy");
+  });
+
+  it("returns 'hash' when similarity_score is null (no verdict_code)", () => {
     expect(getMethodLabel(null)).toBe("hash");
   });
 
-  it("returns 'fuzzy' when similarity_score is defined", () => {
+  it("returns 'fuzzy' when similarity_score is defined (no verdict_code)", () => {
     expect(getMethodLabel(0.85)).toBe("fuzzy");
   });
 
-  it("returns 'hash' when similarity_score is undefined", () => {
+  it("returns 'hash' when similarity_score is undefined (no verdict_code)", () => {
     expect(getMethodLabel(undefined)).toBe("hash");
   });
 });

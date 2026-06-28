@@ -199,6 +199,7 @@
   "landing.cta.overview": "Go to Overview",
   "landing.cta.help": "Help",
   "landing.cta.about": "About",
+  "landing.cta.verify": "Verify",
   "userCreate.title": "Register New Users",
   "userCreate.description": "Add multiple users and assign their roles.",
   "userCreate.addAnother": "Add another user",
@@ -382,6 +383,7 @@
   "cred.list.searchPlaceholder": "Search by name, ID, token, hash, holder, issuer, and revoker",
   "cred.list.searchAriaLabel": "Search credentials",
   "cred.list.issueCta": "Issue",
+  "cred.list.verifyCta": "Verify",
   "cred.list.revokeSelectedCount": "Revoke ({{count}})",
   "cred.list.count_one": "{{count}} Credential",
   "cred.list.count_other": "{{count}} Credentials",
@@ -680,7 +682,7 @@
           "body": "Try a different search term."
         }
       },
-      "issueCta": "Issue New",
+      "issueCta": "Issue",
       "revokeSelected": "Revoke Selected",
       "revokeSelectedCount": "Revoke Selected ({{count}})"
     },

@@ -40,7 +40,12 @@ export function getVerdictTier(verdictCode: number): VerdictTier {
   return VERDICT_TIER_MAP[verdictCode] ?? "light-gray";
 }
 
-export function getMethodLabel(similarityScore: number | null | undefined): "hash" | "fuzzy" {
+export function getMethodLabel(
+  similarityScore: number | null | undefined,
+  verdictCode?: number,
+): "hash" | "fuzzy" {
+  if (verdictCode != null && EXACT_HASH_CODES.has(verdictCode)) return "hash";
+  if (verdictCode != null && !EXACT_HASH_CODES.has(verdictCode)) return "fuzzy";
   return similarityScore != null ? "fuzzy" : "hash";
 }
 

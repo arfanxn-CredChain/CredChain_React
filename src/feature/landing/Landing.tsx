@@ -178,7 +178,7 @@ export function Landing() {
     <SplitLayout brandSlot={desktopBrand} mobileBrandSlot={mobileBrand}>
       <section
         aria-labelledby="landing-title"
-        className="relative flex h-full max-w-[min(36rem,90vw)] flex-col items-start justify-center space-y-[1.5dvh] self-center py-[2dvh] sm:space-y-[2dvh] lg:py-0"
+        className="relative flex h-full w-full flex-col justify-center space-y-[1.5dvh] py-[2dvh] sm:w-auto sm:self-center sm:max-w-[min(36rem,90vw)] sm:space-y-[2dvh] lg:py-0"
       >
         <div className="flex items-center gap-3">
           <div className="h-px w-10 shrink-0 bg-gold" aria-hidden="true" />
@@ -203,26 +203,33 @@ export function Landing() {
           {t("landing.subtitle")}
         </p>
 
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-1">
-          <Button asChild variant="gold" size="lg">
-            <Link to={primaryHref} className="inline-flex items-center gap-2">
+        <div className="flex w-full flex-col gap-x-6 gap-y-3 pt-1 sm:w-auto sm:flex-row sm:items-center">
+          <Button asChild variant="gold" size="lg" className="w-full sm:w-auto">
+            <Link to={primaryHref} className="inline-flex items-center justify-center gap-2">
               {primaryLabel}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </Button>
-          <Link
-            to="/about"
-            className="text-sm font-semibold text-navy decoration-gold/40 decoration-2 underline-offset-4 transition-colors hover:text-gold hover:underline"
-          >
-            {t("landing.cta.about")}
-            <span aria-hidden="true"> →</span>
-          </Link>
-          <Link
-            to="/help"
-            className="text-sm font-medium text-gray-400 transition-colors hover:text-navy"
-          >
-            {t("landing.cta.help")}
-          </Link>
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 sm:justify-start">
+            <Link
+              to="/credentials/verify"
+              className="text-sm font-semibold text-navy decoration-gold/40 decoration-2 underline-offset-4 transition-colors hover:text-gold hover:underline"
+            >
+              {t("landing.cta.verify")}
+            </Link>
+            <Link
+              to="/about"
+              className="text-sm font-semibold text-navy decoration-gold/40 decoration-2 underline-offset-4 transition-colors hover:text-gold hover:underline"
+            >
+              {t("landing.cta.about")}
+            </Link>
+            <Link
+              to="/help"
+              className="text-sm font-semibold text-navy decoration-gold/40 decoration-2 underline-offset-4 transition-colors hover:text-gold hover:underline"
+            >
+              {t("landing.cta.help")}
+            </Link>
+          </div>
         </div>
       </section>
     </SplitLayout>

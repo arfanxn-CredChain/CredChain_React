@@ -61,7 +61,7 @@ export function CredentialFilePreview({
     <div className="flex items-center gap-4 rounded-xl border border-gray-100 bg-gray-50/50 p-3">
       <PreviewThumbnail file={file} isImage={isImage} />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-navy">{file.name}</p>
+        <p className="line-clamp-3 text-sm font-medium text-navy">{file.name}</p>
         <p className="text-xs text-gray-400">
           {formatFileSize(file.size)}
           {" · "}
