@@ -15,7 +15,7 @@ describe("About", () => {
 
   it("renders product description", () => {
     render(<About />, { wrapper: TestProviders });
-    expect(screen.getByText(/decentralized credential/i)).toBeInTheDocument();
+    expect(screen.getByText(/verifiable digital credentials/i)).toBeInTheDocument();
   });
 
   it("renders all four role descriptions", () => {
