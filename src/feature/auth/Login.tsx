@@ -13,15 +13,12 @@ export function Login() {
     <div className="flex flex-col items-center gap-6 text-center">
       <ShieldCheck className="h-24 w-24 text-gold drop-shadow-xl" aria-hidden="true" />
       <div>
-        <h1 className="mb-4 font-display text-4xl font-extrabold tracking-tight text-balance text-surface md:text-5xl">
+        <h1 className="font-display text-4xl font-extrabold tracking-tight text-balance text-surface md:text-5xl">
           <Trans
             i18nKey="auth.welcome.title"
             components={{ brand: <span className="text-gold" /> }}
           />
         </h1>
-        <p className="text-lg leading-relaxed text-pretty text-gray-400">
-          {t("auth.welcome.tagline")}
-        </p>
       </div>
     </div>
   );
@@ -30,7 +27,6 @@ export function Login() {
     <div className="rounded-b-3xl px-6 py-[2dvh] text-center shadow-md">
       <ShieldCheck className="mx-auto mb-3 h-16 w-16 text-gold drop-shadow-md" aria-hidden="true" />
       <h2 className="font-display text-3xl font-extrabold tracking-tight text-gold">CredChain</h2>
-      <p className="mt-2 text-sm text-gray-400">{t("auth.welcome.mobileTagline")}</p>
     </div>
   );
 
