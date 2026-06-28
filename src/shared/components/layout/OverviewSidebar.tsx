@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ShieldCheck, LogOut, X } from "lucide-react";
+import { LogOut, X } from "lucide-react";
 import { cn } from "@shared/lib/cn";
 import { useStore } from "@app/store";
 import { canAccess } from "@shared/auth/role";
@@ -41,7 +41,7 @@ export function OverviewSidebar({ onClose }: OverviewSidebarProps) {
       <div className="flex h-full flex-col bg-navy text-gray-300">
         {/* Logo */}
         <div className="relative flex flex-col items-center justify-center pt-10 pb-8">
-          <ShieldCheck className="mb-2 h-12 w-12 text-gold" aria-hidden="true" />
+          <img src="/logo-icon.svg" alt="" className="mb-2 h-12 w-12" aria-hidden="true" />
           <span className="font-display text-2xl font-bold tracking-tight text-gold">
             CredChain
           </span>

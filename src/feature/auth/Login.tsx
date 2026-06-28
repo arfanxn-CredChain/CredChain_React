@@ -1,6 +1,5 @@
 import { GoogleLogin } from "@react-oauth/google";
-import { ShieldCheck } from "lucide-react";
-import { Trans, useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import { BackLink } from "@shared/components/BackLink";
 import { useGoogleLogin } from "./api/useGoogleLogin";
 import { SplitLayout } from "@shared/components/layout/SplitLayout";
@@ -10,22 +9,18 @@ export function Login() {
   const login = useGoogleLogin();
 
   const desktopBrand = (
-    <div className="flex flex-col items-center gap-6 text-center">
-      <ShieldCheck className="h-24 w-24 text-gold drop-shadow-xl" aria-hidden="true" />
-      <div>
-        <h1 className="font-display text-4xl font-extrabold tracking-tight text-balance text-surface md:text-5xl">
-          <Trans
-            i18nKey="auth.welcome.title"
-            components={{ brand: <span className="text-gold" /> }}
-          />
-        </h1>
+    <div className="flex items-center gap-6">
+      <img src="/logo-icon.svg" alt="" className="h-24 w-24 drop-shadow-xl" aria-hidden="true" />
+      <div className="font-display text-4xl font-extrabold tracking-tight text-balance md:text-5xl">
+        <span className="block text-surface">Welcome to</span>
+        <span className="block text-gold">CredChain</span>
       </div>
     </div>
   );
 
   const mobileBrand = (
     <div className="rounded-b-3xl px-6 py-[2dvh] text-center shadow-md">
-      <ShieldCheck className="mx-auto mb-3 h-16 w-16 text-gold drop-shadow-md" aria-hidden="true" />
+      <img src="/logo-icon.svg" alt="" className="mx-auto mb-3 h-16 w-16 drop-shadow-md" aria-hidden="true" />
       <h2 className="font-display text-3xl font-extrabold tracking-tight text-gold">CredChain</h2>
     </div>
   );

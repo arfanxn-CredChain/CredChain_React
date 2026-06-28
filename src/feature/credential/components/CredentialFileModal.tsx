@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { ZoomOut, ZoomIn, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -9,10 +9,6 @@ import {
   DialogTitle,
 } from "@ui/dialog";
 import { Button } from "@ui/button";
-
-const MIN_ZOOM = 0.25;
-const MAX_ZOOM = 3;
-const ZOOM_STEP = 0.25;
 
 interface CredentialFileModalProps {
   file: File | Blob;
@@ -58,7 +54,6 @@ export function CredentialFileModal({ file, open, onClose, name }: CredentialFil
 
 function ImageViewer({ file }: { file: File | Blob }) {
   const { t } = useTranslation();
-  const [zoom, setZoom] = useState(1);
   const objectUrlRef = useRef<string | null>(null);
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
 
@@ -76,40 +71,17 @@ function ImageViewer({ file }: { file: File | Blob }) {
   }, [file]);
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <div className="flex h-full w-full items-center justify-center overflow-hidden">
-        {objectUrl ? (
-          <img
-            src={objectUrl}
-            alt={file instanceof File ? file.name : ""}
-            className="max-h-full max-w-full object-contain transition-transform duration-200"
-            style={{ transform: `scale(${zoom})` }}
-            draggable={false}
-          />
-        ) : (
-          <span className="text-sm text-gray-400">{t("credential.issue.preview.notAvailable")}</span>
-        )}
-      </div>
-      <div className="flex items-center gap-1">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          aria-label={t("credential.issue.preview.zoomOut")}
-          onClick={() => setZoom((z) => Math.max(MIN_ZOOM, z - ZOOM_STEP))}
-        >
-          <ZoomOut className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          aria-label={t("credential.issue.preview.zoomIn")}
-          onClick={() => setZoom((z) => Math.min(MAX_ZOOM, z + ZOOM_STEP))}
-        >
-          <ZoomIn className="h-4 w-4" />
-        </Button>
-      </div>
+    <div className="flex h-full w-full items-center justify-center overflow-hidden">
+      {objectUrl ? (
+        <img
+          src={objectUrl}
+          alt={file instanceof File ? file.name : ""}
+          className="max-h-[60vh] max-w-full object-contain"
+          draggable={false}
+        />
+      ) : (
+        <span className="text-sm text-gray-400">{t("credential.issue.preview.notAvailable")}</span>
+      )}
     </div>
   );
 }

@@ -373,8 +373,6 @@
   "credential.issue.preview.pageCount": "{{current}} dari {{total}}",
   "credential.issue.preview.previousPage": "Halaman sebelumnya",
   "credential.issue.preview.remove": "Hapus file",
-  "credential.issue.preview.zoomIn": "Perbesar",
-  "credential.issue.preview.zoomOut": "Perkecil",
   "cred.field.name": "Nama",
   "cred.field.namePlaceholder": "Nama kredensial, kosongkan untuk menggunakan nama file",
   "cred.field.file": "Berkas Kredensial",

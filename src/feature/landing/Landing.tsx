@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ArrowRight, ShieldCheck } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useStore } from "@app/store";
 import { Button } from "@ui/button";
 import { cn } from "@shared/lib/cn";
@@ -26,7 +26,7 @@ function AttestationStamp({
   const ring2Opacity = isDark ? "0.25" : "0.2";
   const medallionBg = isDark ? "bg-surface/[0.06]" : "bg-navy/[0.04]";
   const medallionBorder = isDark ? "border-gold/50" : "border-gold/30";
-  const shieldColor = isDark ? "text-gold" : "text-navy";
+
   const hashColor = isDark ? "text-surface/60" : "text-navy/60";
   const stampColor = isDark ? "text-surface/40" : "text-gray-400";
 
@@ -132,7 +132,7 @@ function AttestationStamp({
             medallionBorder,
           )}
         >
-          <ShieldCheck className={cn(shieldSize, shieldColor)} strokeWidth={1.25} />
+          <img src="/logo-icon.svg" alt="" className={cn(shieldSize, "object-contain")} />
         </div>
         {!isMini && (
           <>

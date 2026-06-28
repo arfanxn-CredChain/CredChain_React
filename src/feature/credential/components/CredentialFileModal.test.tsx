@@ -49,16 +49,6 @@ describe("CredentialFileModal", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it("shows zoom controls for images", () => {
-    const file = makeImageFile();
-    render(
-      <CredentialFileModal file={file} open={true} onClose={() => {}} />,
-      { wrapper: TestProviders },
-    );
-    expect(screen.getByRole("button", { name: /zoom in/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /zoom out/i })).toBeInTheDocument();
-  });
-
   it("shows file metadata in footer", () => {
     const file = makeImageFile("photo.png");
     render(
@@ -78,13 +68,4 @@ describe("CredentialFileModal", () => {
     expect(screen.getByText("transcript.pdf")).toBeInTheDocument();
   });
 
-  it("does not show zoom controls for PDF files", () => {
-    const file = makePdfFile();
-    render(
-      <CredentialFileModal file={file} open={true} onClose={() => {}} />,
-      { wrapper: TestProviders },
-    );
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /zoom/i })).not.toBeInTheDocument();
-  });
 });

@@ -94,7 +94,7 @@ export function NavbarOverview({ onMenuClick }: NavbarOverviewProps) {
                 {showDropdown && searchResults.length > 0 && (
                   <div
                     role="menu"
-                    className="absolute top-full right-0 left-0 z-50 mt-1 w-64 rounded-md border bg-popover p-1 text-popover-foreground shadow-md shadow-navy/20"
+                    className="absolute top-full right-0 left-0 z-50 mt-1 w-64 overflow-hidden rounded-xl border border-gray-100 bg-popover p-1 text-popover-foreground shadow-xl shadow-navy/20"
                   >
                     {searchResults.map((item) => (
                       <button
@@ -106,7 +106,7 @@ export function NavbarOverview({ onMenuClick }: NavbarOverviewProps) {
                           navigate(item.href);
                           setSearchQuery("");
                         }}
-                        className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:outline-none"
+                        className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-navy/5 focus:bg-accent focus:outline-none"
                       >
                         <item.icon className="h-4 w-4 text-gray-400" aria-hidden="true" />
                         {t(item.i18nKey)}

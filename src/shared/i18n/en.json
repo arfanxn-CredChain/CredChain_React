@@ -372,8 +372,6 @@
   "credential.issue.preview.pageCount": "{{current}} of {{total}}",
   "credential.issue.preview.previousPage": "Previous page",
   "credential.issue.preview.remove": "Remove file",
-  "credential.issue.preview.zoomIn": "Zoom in",
-  "credential.issue.preview.zoomOut": "Zoom out",
   "cred.field.name": "Name",
   "cred.field.namePlaceholder": "Credential name, or leave empty to use filename",
   "cred.field.file": "Credential File",
