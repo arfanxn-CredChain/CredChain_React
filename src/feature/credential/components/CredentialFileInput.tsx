@@ -1,5 +1,6 @@
-import { useRef, useCallback } from "react";
+import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { FileDropzone } from "@ui/file-dropzone";
 import { CredentialFilePreview } from "./CredentialFilePreview";
 
 interface CredentialFileInputProps {
@@ -16,7 +17,6 @@ export function CredentialFileInput({
   error,
 }: CredentialFileInputProps) {
   const { t } = useTranslation();
-  const inputRef = useRef<HTMLInputElement>(null);
   const noop = useCallback(() => {}, []);
 
   const handleRemove = useCallback(() => {
@@ -30,32 +30,27 @@ export function CredentialFileInput({
     [onChange],
   );
 
-  const handleFileChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const f = e.target.files?.[0] ?? null;
-      if (f) onChange(f);
-      if (inputRef.current) inputRef.current.value = "";
-    },
-    [onChange],
-  );
+  if (!file) {
+    return (
+      <FileDropzone
+        file={null}
+        onChange={onChange}
+        accept=".pdf,.jpg,.jpeg,.png,.webp,.tiff"
+        emptyLabel={t("credential.issue.preview.dragDrop")}
+        hint={t("cred.field.fileHint")}
+        error={error}
+      />
+    );
+  }
 
   return (
     <div>
-      <input
-        ref={inputRef}
-        type="file"
-        accept=".pdf,.jpg,.jpeg,.png,.webp,.tiff"
-        onChange={handleFileChange}
-        className="hidden"
+      <CredentialFilePreview
+        file={file}
+        onExpand={onExpand ?? noop}
+        onRemove={handleRemove}
+        onFileDrop={handleFileDrop}
       />
-      <div onClick={!file ? () => inputRef.current?.click() : undefined}>
-        <CredentialFilePreview
-          file={file}
-          onExpand={onExpand ?? noop}
-          onRemove={handleRemove}
-          onFileDrop={handleFileDrop}
-        />
-      </div>
       {error && (
         <p className="mt-1.5 text-xs text-error" role="alert">
           {t(error)}
