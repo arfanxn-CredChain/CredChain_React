@@ -883,6 +883,7 @@
   "userImport.supportedFormats": "CSV, XLS, or XLSX",
   "userImport.exampleTable.title": "Expected File Format",
   "userImport.exampleTable.note": "Any column beyond the fixed fields becomes a custom field; the column name becomes the key. Leave a cell empty if that user doesn't need that field.",
+  "userImport.rowsToImport": "{{count}} rows to import",
   "userImport.rowsFound": "{{count}} data rows found",
   "userImport.fromRow": "Import from row",
   "userImport.toRow": "Import to row",
