@@ -34,18 +34,20 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed top-1/2 left-1/2 z-50 grid w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2",
+        "fixed top-1/2 left-1/2 z-50 flex w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 flex-col",
         "rounded-2xl border border-gray-100 bg-surface p-6 shadow-2xl sm:p-8",
-        "max-h-[90vh] overflow-y-auto",
+        "max-h-[90vh]",
         "data-state-open:animate-in data-state-closed:animate-out",
         "data-state-closed:fade-out-0 data-state-open:fade-in-0",
         "data-state-closed:zoom-out-95 data-state-open:zoom-in-95",
         className,
       )}
       {...props}
-    >
-      {children}
-      <DialogPrimitive.Close
+      >
+        <div className="scrollbar-hidden min-h-0 flex-1 overflow-y-auto p-1">
+          {children}
+        </div>
+        <DialogPrimitive.Close
         className={cn(
           "absolute top-4 right-4 rounded-xl p-2 text-gray-400",
           "transition-colors hover:bg-gray-100 hover:text-navy",

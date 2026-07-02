@@ -1,6 +1,4 @@
-import { useState, useCallback, useRef } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Upload } from "lucide-react";
 import * as XLSX from "xlsx";
@@ -8,16 +6,9 @@ import { Button } from "@ui/button";
 import { Card } from "@ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@ui/dialog";
 import { FileDropzone } from "@ui/file-dropzone";
-import { FormField } from "@ui/form-field";
 import { Input } from "@ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@ui/table";
-import { UserCreateRow } from "./UserCreateRow";
-import {
-  type UserBatchStoreFormInput,
-  type UserStoreFormInput,
-  userBatchStoreFormSchema,
-  defaultUserStoreFormRow,
-} from "../schemas/user";
+import { type UserStoreFormInput, userStoreFormSchema } from "../schemas/user";
 
 const FIXED_COLUMNS = [
   "fullname",
@@ -58,117 +49,154 @@ interface ParsedRow {
   [key: string]: string | number | boolean | null;
 }
 
+interface ValidationError {
+  row: number;
+  field: string;
+  error: string;
+}
+
 export function UserImportModal({ open, onClose, onImport }: UserImportModalProps) {
   const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | undefined>();
-  const parsedDataRef = useRef<ParsedRow[]>([]);
+  const [parsedData, setParsedData] = useState<ParsedRow[]>([]);
   const [rowCount, setRowCount] = useState(0);
   const [fromRow, setFromRow] = useState(1);
   const [toRow, setToRow] = useState(100);
   const [rangeError, setRangeError] = useState<string | undefined>();
   const [missingColumns, setMissingColumns] = useState<string[]>([]);
   const [metaColumnCount, setMetaColumnCount] = useState(0);
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
+  const [validatedRows, setValidatedRows] = useState<UserStoreFormInput[]>([]);
 
-  const importForm = useForm<UserBatchStoreFormInput>({
-    resolver: zodResolver(userBatchStoreFormSchema),
-    defaultValues: { users: [] },
-    mode: "onBlur",
-  });
-  const { fields: importFields, replace: importReplace } = useFieldArray({
-    control: importForm.control,
-    name: "users",
-  });
+  const validateRange = useCallback(
+    (from: number, to: number, total: number): string | undefined => {
+      if (from < 1 || from > total) return "userImport.invalidRange";
+      if (to < from || to > total) return "userImport.invalidRange";
+      if (to - from + 1 > 100) return "userImport.invalidRange";
+      return undefined;
+    },
+    [],
+  );
 
-  const validateRange = useCallback((from: number, to: number): string | undefined => {
-    if (from < 1 || to < from || to - from + 1 > 100) {
-      return "userImport.invalidRange";
-    }
-    return undefined;
-  }, []);
+  const buildRowsFromParsed = useCallback(
+    (data: ParsedRow[], from: number, to: number) => {
+      const slice = data.slice(from - 1, to);
+      if (slice.length === 0)
+        return { rows: [] as UserStoreFormInput[], missing: [] as string[], metaCount: 0 };
 
-  const buildRowsFromParsed = useCallback((data: ParsedRow[], from: number, to: number) => {
-    const slice = data.slice(from - 1, to);
-    if (slice.length === 0)
-      return { rows: [] as UserStoreFormInput[], missing: [] as string[], metaCount: 0 };
+      const headers = Object.keys(slice[0]);
+      const normalizedHeaders = headers.map((h) => h.trim().toLowerCase());
 
-    const headers = Object.keys(slice[0]);
-    const normalizedHeaders = headers.map((h) => h.trim().toLowerCase());
+      const missing = REQUIRED_COLUMNS.filter((col) => !normalizedHeaders.includes(col));
 
-    const missing = REQUIRED_COLUMNS.filter((col) => !normalizedHeaders.includes(col));
+      const fixedSet = new Set(FIXED_COLUMNS);
+      const metaKeys = headers.filter(
+        (h) => !fixedSet.has(h.trim().toLowerCase() as (typeof FIXED_COLUMNS)[number]),
+      );
+      const metaCount = metaKeys.length;
 
-    const fixedSet = new Set(FIXED_COLUMNS);
-    const metaKeys = headers.filter(
-      (h) => !fixedSet.has(h.trim().toLowerCase() as (typeof FIXED_COLUMNS)[number]),
-    );
-    const metaCount = metaKeys.length;
+      const rows: UserStoreFormInput[] = slice.map((row) => {
+        const mapped: UserStoreFormInput = {
+          name: "",
+          number: undefined,
+          phone_number: undefined,
+          email: "",
+          birth_date: undefined,
+          gender: undefined,
+          meta_entries: [],
+          role: "holder",
+        };
 
-    const rows: UserStoreFormInput[] = slice.map((row) => {
-      const mapped = defaultUserStoreFormRow();
+        for (const header of headers) {
+          const key = header.trim().toLowerCase();
+          const field = COLUMN_TO_FIELD[key];
+          if (!field) continue;
 
-      for (const header of headers) {
-        const key = header.trim().toLowerCase();
-        const field = COLUMN_TO_FIELD[key];
-        if (!field) continue;
+          const raw = row[header];
+          if (raw === null || raw === undefined) continue;
+          const val = String(raw).trim();
+          if (val === "") continue;
 
-        const raw = row[header];
-        if (raw === null || raw === undefined) continue;
-        const val = String(raw).trim();
-        if (val === "") continue;
-
-        if (field === "gender") {
-          const lower = val.toLowerCase();
-          if (lower === "male" || lower === "female" || lower === "other") {
-            mapped.gender = lower;
+          if (field === "gender") {
+            const lower = val.toLowerCase();
+            if (lower === "male" || lower === "female" || lower === "other") {
+              mapped.gender = lower;
+            }
+          } else if (field === "role") {
+            const lower = val.toLowerCase();
+            if (lower === "holder" || lower === "issuer" || lower === "admin") {
+              mapped.role = lower;
+            }
+          } else if (field === "name") {
+            mapped.name = val;
+          } else if (field === "email") {
+            mapped.email = val;
+          } else if (field === "phone_number") {
+            mapped.phone_number = val;
+          } else if (field === "number") {
+            mapped.number = val;
+          } else if (field === "birth_date") {
+            mapped.birth_date = val;
           }
-        } else if (field === "role") {
-          const lower = val.toLowerCase();
-          if (lower === "holder" || lower === "issuer" || lower === "admin") {
-            mapped.role = lower;
-          }
-        } else if (field === "name") {
-          mapped.name = val;
-        } else if (field === "email") {
-          mapped.email = val;
-        } else if (field === "phone_number") {
-          mapped.phone_number = val;
-        } else if (field === "number") {
-          mapped.number = val;
-        } else if (field === "birth_date") {
-          mapped.birth_date = val;
         }
-      }
 
-      mapped.meta_entries = metaKeys
-        .map((mk) => {
-          const raw = row[mk];
-          if (raw === null || raw === undefined) return null;
-          const v = String(raw).trim();
-          if (v === "") return null;
-          return { key: mk.trim(), value: v };
-        })
-        .filter((e): e is { key: string; value: string } => e !== null);
+        mapped.meta_entries = metaKeys
+          .map((mk) => {
+            const raw = row[mk];
+            if (raw === null || raw === undefined) return null;
+            const v = String(raw).trim();
+            if (v === "") return null;
+            return { key: mk.trim(), value: v };
+          })
+          .filter((e): e is { key: string; value: string } => e !== null);
 
-      return mapped;
-    });
+        return mapped;
+      });
 
-    return { rows, missing, metaCount };
-  }, []);
+      return { rows, missing, metaCount };
+    },
+    [],
+  );
+
+  const validateRows = useCallback(
+    (rows: UserStoreFormInput[], from: number): { errors: ValidationError[]; valid: UserStoreFormInput[] } => {
+      const errors: ValidationError[] = [];
+      const valid: UserStoreFormInput[] = [];
+
+      rows.forEach((row, idx) => {
+        const result = userStoreFormSchema.safeParse(row);
+        if (result.success) {
+          valid.push(result.data);
+        } else {
+          for (const issue of result.error.issues) {
+            const field = issue.path.join(".");
+            const message = t(issue.message);
+            errors.push({ row: from + idx, field: field || "(root)", error: message });
+          }
+        }
+      });
+
+      return { errors, valid };
+    },
+    [t],
+  );
 
   const resetState = useCallback(() => {
     setStep(1);
     setFile(null);
     setFileError(undefined);
-    parsedDataRef.current = [];
+    setParsedData([]);
     setRowCount(0);
     setFromRow(1);
     setToRow(100);
     setRangeError(undefined);
     setMissingColumns([]);
     setMetaColumnCount(0);
-    importReplace([]);
-  }, [importReplace]);
+    setValidationErrors([]);
+    setValidatedRows([]);
+  }, []);
 
   const handleClose = useCallback(() => {
     resetState();
@@ -208,7 +236,7 @@ export function UserImportModal({ open, onClose, onImport }: UserImportModalProp
             setFileError(t("userImport.parseError"));
             return;
           }
-          parsedDataRef.current = json;
+          setParsedData(json);
           setRowCount(json.length);
           setFromRow(1);
           setToRow(Math.min(json.length, 100));
@@ -233,7 +261,7 @@ export function UserImportModal({ open, onClose, onImport }: UserImportModalProp
         if (!next) handleClose();
       }}
     >
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-5xl">
         <DialogHeader>
           <DialogTitle>{t("userImport.title")}</DialogTitle>
           <DialogDescription>{t("userImport.description")}</DialogDescription>
@@ -261,15 +289,19 @@ export function UserImportModal({ open, onClose, onImport }: UserImportModalProp
                     <TableRow>
                       {FIXED_COLUMNS.map((col) => (
                         <TableHead key={col} className="whitespace-nowrap">
-                          {t(`userImport.column.${COLUMN_I18N_MAP[col] ?? col}`)}
-                          {REQUIRED_COLUMNS.includes(col) && (
-                            <span className="ml-0.5 text-error">*</span>
-                          )}
+                          <div className="flex flex-col">
+                            <span className="font-semibold">{col}</span>
+                            <span className="text-[10px] font-normal text-gray-400">
+                              {t(`userImport.column.${COLUMN_I18N_MAP[col] ?? col}`)}
+                            </span>
+                          </div>
+                          <span className="text-[10px] font-normal text-gray-400">
+                            {REQUIRED_COLUMNS.includes(col)
+                              ? t("userImport.column.required")
+                              : t("userImport.column.optional")}
+                          </span>
                         </TableHead>
                       ))}
-                      <TableHead className="whitespace-nowrap">
-                        {t("userImport.column.department")}
-                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -280,79 +312,205 @@ export function UserImportModal({ open, onClose, onImport }: UserImportModalProp
                             {row[col] ?? ""}
                           </TableCell>
                         ))}
-                        <TableCell className="text-sm text-gray-600">
-                          {row.department ?? ""}
-                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
               </div>
-              <p className="mt-2 text-xs text-gray-400">{t("userImport.metaHint")}</p>
+              <div className="mt-3 flex flex-col gap-1.5 text-xs text-gray-400">
+                <p>{t("userImport.customColumns.description")}</p>
+                <p>
+                  {t("userImport.customColumns.column")}:{" "}
+                  <code className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[11px] text-gray-500">
+                    department
+                  </code>{" "}
+                  <span className="text-gray-300">→</span>{" "}
+                  <span className="text-gray-500">Engineering</span>
+                  <span className="mx-2 text-gray-300">·</span>
+                  <code className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[11px] text-gray-500">
+                    location
+                  </code>{" "}
+                  <span className="text-gray-300">→</span>{" "}
+                  <span className="text-gray-500">Jakarta</span>
+                </p>
+              </div>
+              {file && (
+                <div className="flex justify-end pt-2">
+                  <Button
+                    variant="primary"
+                    onClick={() => {
+                      setFileError(undefined);
+                      setStep(2);
+                    }}
+                  >
+                    {t("userImport.continue")}
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         )}
 
-        {step === 2 && (
-          <div className="space-y-4">
-            <p className="text-sm text-navy">{t("userImport.rowsFound", { count: rowCount })}</p>
+        {step === 2 &&
+          (() => {
+            const previewCols = (() => {
+              if (parsedData.length === 0) return FIXED_COLUMNS as readonly string[];
+              const first = parsedData[0];
+              const extra = Object.keys(first).filter(
+                (h) => !(FIXED_COLUMNS as readonly string[]).includes(h.trim().toLowerCase()),
+              );
+              return [...FIXED_COLUMNS, ...extra] as readonly string[];
+            })();
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField label={t("userImport.fromRow")} error={rangeError}>
-                <Input
-                  type="number"
-                  min={1}
-                  value={fromRow}
-                  onChange={(e) => {
-                    const val = Number(e.target.value);
-                    setFromRow(val);
-                    setRangeError(validateRange(val, toRow));
-                  }}
-                />
-              </FormField>
+            const showFrom =
+              fromRow >= 1 && fromRow <= rowCount && parsedData.length > 0;
+            const showTo =
+              toRow >= 1 &&
+              toRow <= rowCount &&
+              toRow !== fromRow &&
+              parsedData.length > 0;
 
-              <FormField label={t("userImport.toRow")}>
-                <Input
-                  type="number"
-                  min={1}
-                  value={toRow}
-                  onChange={(e) => {
-                    const val = Number(e.target.value);
-                    setToRow(val);
-                    setRangeError(validateRange(fromRow, val));
-                  }}
-                />
-              </FormField>
-            </div>
+            return (
+              <div className="space-y-4">
+                <p className="text-sm text-navy">
+                  {t("userImport.rowsFound", { count: rowCount })}
+                </p>
 
-            <p className="text-xs text-gray-400">{t("userImport.maxRows")}</p>
+                <div className="flex items-end gap-4">
+                  <div className="max-w-[8rem]">
+                    <label className="mb-1 block text-sm font-medium text-navy">
+                      {t("userImport.fromRow")}
+                    </label>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={rowCount}
+                      value={fromRow}
+                      onChange={(e) => {
+                        const val = Math.max(
+                          1,
+                          Math.min(Number(e.target.value) || 1, rowCount),
+                        );
+                        setFromRow(val);
+                        setRangeError(validateRange(val, toRow, rowCount));
+                      }}
+                    />
+                    {rangeError && (
+                      <p className="mt-1 text-xs text-error">{t(rangeError)}</p>
+                    )}
+                  </div>
 
-            <div className="flex justify-between pt-2">
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  setStep(1);
-                  setRangeError(undefined);
-                }}
-              >
-                {t("userImport.back")}
-              </Button>
-              <Button
-                variant="primary"
-                disabled={!!rangeError}
-                onClick={() => {
-                  const result = buildRowsFromParsed(parsedDataRef.current, fromRow, toRow);
-                  setMissingColumns(result.missing);
-                  setMetaColumnCount(result.metaCount);
-                  importReplace(result.rows);
-                  setStep(3);
-                }}
-              >
-                {t("userImport.continue")}
-              </Button>
-            </div>
-          </div>
-        )}
+                  <div className="max-w-[8rem]">
+                    <label className="mb-1 block text-sm font-medium text-navy">
+                      {t("userImport.toRow")}
+                    </label>
+                    <Input
+                      type="number"
+                      min={fromRow}
+                      max={Math.min(fromRow + 99, rowCount)}
+                      value={toRow}
+                      onChange={(e) => {
+                        const val = Math.max(
+                          fromRow,
+                          Math.min(
+                            Number(e.target.value) || fromRow,
+                            Math.min(fromRow + 99, rowCount),
+                          ),
+                        );
+                        setToRow(val);
+                        setRangeError(validateRange(fromRow, val, rowCount));
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <p className="text-xs text-gray-400">{t("userImport.maxRows")}</p>
+
+                {(showFrom || showTo) && (
+                  <div className="overflow-x-auto rounded-xl border border-gray-100">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          {previewCols.map((col) => (
+                            <TableHead key={col} className="text-[10px]">
+                              {col}
+                            </TableHead>
+                          ))}
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {showFrom && (
+                          <>
+                            <TableRow>
+                              <TableCell
+                                className="text-[10px] font-medium text-gray-400"
+                                colSpan={previewCols.length}
+                              >
+                                {t("userImport.previewRow", { row: fromRow })}
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              {previewCols.map((col) => (
+                                <TableCell key={col} className="text-xs">
+                                  {String(parsedData[fromRow - 1]?.[col] ?? "")}
+                                </TableCell>
+                              ))}
+                            </TableRow>
+                          </>
+                        )}
+                        {showTo && (
+                          <>
+                            <TableRow>
+                              <TableCell
+                                className="text-[10px] font-medium text-gray-400"
+                                colSpan={previewCols.length}
+                              >
+                                {t("userImport.previewRow", { row: toRow })}
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              {previewCols.map((col) => (
+                                <TableCell key={col} className="text-xs">
+                                  {String(parsedData[toRow - 1]?.[col] ?? "")}
+                                </TableCell>
+                              ))}
+                            </TableRow>
+                          </>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+
+                <div className="flex justify-between pt-2">
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setStep(1);
+                      setRangeError(undefined);
+                    }}
+                  >
+                    {t("userImport.back")}
+                  </Button>
+                  <Button
+                    variant="primary"
+                    disabled={!!rangeError}
+                    onClick={() => {
+                      const result = buildRowsFromParsed(parsedData, fromRow, toRow);
+                      setMissingColumns(result.missing);
+                      setMetaColumnCount(result.metaCount);
+                      const { errors, valid } = validateRows(result.rows, fromRow);
+                      setValidationErrors(errors);
+                      setValidatedRows(valid);
+                      setStep(3);
+                    }}
+                  >
+                    {t("userImport.continue")}
+                  </Button>
+                </div>
+              </div>
+            );
+          })()}
 
         {step === 3 && (
           <div className="space-y-4">
@@ -364,43 +522,65 @@ export function UserImportModal({ open, onClose, onImport }: UserImportModalProp
                   })}
                 </p>
               </div>
-            ) : (
+            ) : validationErrors.length > 0 ? (
               <>
-                <p className="text-sm text-navy">
-                  {t("userImport.rowsToImport", { count: importFields.length })}
-                  {metaColumnCount > 0 &&
-                    ` · ${t("userImport.customColumns", { count: metaColumnCount })}`}
-                </p>
-
-                <div className="max-h-[400px] space-y-3 overflow-y-auto pr-1">
-                  {importFields.map((field, idx) => (
-                    <Card key={field.id} className="p-0">
-                      <UserCreateRow
-                        form={importForm}
-                        index={idx}
-                        onRemove={
-                          importFields.length > 1
-                            ? () => {
-                                const kept = importFields
-                                  .map((_, i) => i)
-                                  .filter((i) => i !== idx)
-                                  .map((i) => importForm.getValues(`users.${i}`));
-                                importReplace(kept);
-                              }
-                            : undefined
-                        }
-                      />
-                    </Card>
-                  ))}
+                <div className="rounded-lg border border-error/20 bg-error/5 p-4">
+                  <p className="text-sm font-medium text-error">
+                    {t("userImport.validation.errorsFound", {
+                      count: validationErrors.length,
+                    })}
+                  </p>
+                </div>
+                <div className="max-h-[400px] overflow-y-auto rounded-lg border border-gray-100">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-20">
+                          {t("userImport.validation.rowLabel")}
+                        </TableHead>
+                        <TableHead>{t("userImport.validation.field")}</TableHead>
+                        <TableHead>{t("userImport.validation.error")}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {validationErrors.map((err, idx) => (
+                        <TableRow key={idx}>
+                          <TableCell className="text-xs font-medium">
+                            {err.row}
+                          </TableCell>
+                          <TableCell className="text-xs font-mono">
+                            {err.field}
+                          </TableCell>
+                          <TableCell className="text-xs text-error">
+                            {err.error}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
               </>
+            ) : (
+              <div className="rounded-lg border border-green-200 bg-green-50 p-4">
+                <p className="text-sm font-medium text-green-700">
+                  {t("userImport.validation.success", {
+                    count: validatedRows.length,
+                  })}
+                </p>
+                {metaColumnCount > 0 && (
+                  <p className="mt-1 text-xs text-green-600">
+                    {t("userImport.customColumns", { count: metaColumnCount })}
+                  </p>
+                )}
+              </div>
             )}
 
             <div className="flex justify-between pt-2">
               <Button
                 variant="ghost"
                 onClick={() => {
-                  setMissingColumns([]);
+                  setValidationErrors([]);
+                  setValidatedRows([]);
                   setStep(2);
                 }}
               >
@@ -408,7 +588,7 @@ export function UserImportModal({ open, onClose, onImport }: UserImportModalProp
               </Button>
               <Button
                 variant="primary"
-                disabled={missingColumns.length > 0}
+                disabled={validationErrors.length > 0 || missingColumns.length > 0}
                 onClick={() => setStep(4)}
               >
                 {t("userImport.continue")}
@@ -420,7 +600,9 @@ export function UserImportModal({ open, onClose, onImport }: UserImportModalProp
         {step === 4 && (
           <div className="space-y-4">
             <Card className="space-y-3 p-4">
-              <h3 className="font-sans text-lg font-bold">{t("userImport.confirm.title")}</h3>
+              <h3 className="font-sans text-lg font-bold">
+                {t("userImport.confirm.title")}
+              </h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-500">{t("userImport.confirm.file")}</span>
@@ -428,7 +610,7 @@ export function UserImportModal({ open, onClose, onImport }: UserImportModalProp
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">{t("userImport.confirm.rows")}</span>
-                  <span className="font-medium text-navy">{importFields.length}</span>
+                  <span className="font-medium text-navy">{validatedRows.length}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">{t("userImport.confirm.range")}</span>
@@ -438,7 +620,9 @@ export function UserImportModal({ open, onClose, onImport }: UserImportModalProp
                 </div>
                 {metaColumnCount > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-gray-500">{t("userImport.confirm.metaColumns")}</span>
+                    <span className="text-gray-500">
+                      {t("userImport.confirm.metaColumns")}
+                    </span>
                     <span className="font-medium text-navy">{metaColumnCount}</span>
                   </div>
                 )}
@@ -451,18 +635,12 @@ export function UserImportModal({ open, onClose, onImport }: UserImportModalProp
               </Button>
               <Button
                 variant="primary"
-                onClick={async () => {
-                  const valid = await importForm.trigger();
-                  if (!valid) {
-                    setStep(3);
-                    return;
-                  }
-                  const values = importForm.getValues("users");
-                  onImport(values);
+                onClick={() => {
+                  onImport(validatedRows);
                   handleClose();
                 }}
               >
-                {t("userImport.confirm.import", { count: importFields.length })}
+                {t("userImport.confirm.import", { count: validatedRows.length })}
               </Button>
             </div>
           </div>
@@ -481,7 +659,6 @@ const EXAMPLE_ROWS: readonly Record<string, string>[] = [
     birth_date: "1995-03-15",
     gender: "female",
     role: "holder",
-    department: "Engineering",
   },
   {
     fullname: "Bob Smith",
@@ -491,6 +668,5 @@ const EXAMPLE_ROWS: readonly Record<string, string>[] = [
     birth_date: "1990-07-22",
     gender: "male",
     role: "issuer",
-    department: "Finance",
   },
 ] as const;

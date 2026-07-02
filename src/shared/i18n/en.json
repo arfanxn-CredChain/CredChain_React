@@ -887,6 +887,7 @@
   "userImport.rowsFound": "{{count}} data rows found",
   "userImport.fromRow": "Import from row",
   "userImport.toRow": "Import to row",
+  "userImport.previewRow": "Row {{row}}",
   "userImport.maxRows": "Maximum 100 rows per import",
   "userImport.invalidRange": "End row must be \u2265 start row and range must be \u2264 100",
   "userImport.missingColumns": "Missing required columns: {{columns}}",
@@ -902,7 +903,7 @@
   "userImport.confirm.replace.description": "Importing will replace all current user entries. Continue?",
   "userImport.step1": "Select File",
   "userImport.step2": "Row Range",
-  "userImport.step3": "Review & Edit",
+  "userImport.step3": "Validate",
   "userImport.step4": "Confirm",
   "userImport.back": "Back",
   "userImport.continue": "Continue",
@@ -916,7 +917,14 @@
   "userImport.column.department": "Department",
   "userImport.column.required": "required",
   "userImport.column.optional": "optional",
-  "userImport.metaHint": "Any extra column \u2192 custom field (key = header, value = cell). Empty cell = skip.",
+  "userImport.customColumns.description": "Add any extra columns to your Excel file — they become custom fields. The column header becomes the field name, and cell values become the value.",
+  "userImport.customColumns.column": "Extra Column",
   "userImport.customColumns_one": "{{count}} custom column",
-  "userImport.customColumns_other": "{{count}} custom columns"
+  "userImport.customColumns_other": "{{count}} custom columns",
+  "userImport.validation.title": "Validation Results",
+  "userImport.validation.success": "All {{count}} rows are valid",
+  "userImport.validation.errorsFound": "{{count}} rows have errors",
+  "userImport.validation.rowLabel": "Row",
+  "userImport.validation.field": "Field",
+  "userImport.validation.error": "Error"
 }
