@@ -1,8 +1,11 @@
 import { useState, useCallback, useRef } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { Upload } from "lucide-react";
 import * as XLSX from "xlsx";
 import { Button } from "@ui/button";
+import { Card } from "@ui/card";
 import {
   Dialog,
   DialogContent,
@@ -21,7 +24,13 @@ import {
   TableHeader,
   TableRow,
 } from "@ui/table";
-import type { UserStoreFormInput } from "../schemas/user";
+import { UserCreateRow } from "./UserCreateRow";
+import {
+  type UserBatchStoreFormInput,
+  type UserStoreFormInput,
+  userBatchStoreFormSchema,
+  defaultUserStoreFormRow,
+} from "../schemas/user";
 
 const FIXED_COLUMNS = [
   "fullname",
@@ -67,6 +76,18 @@ export function UserImportModal({ open, onClose, onImport: _onImport }: UserImpo
   const [fromRow, setFromRow] = useState(1);
   const [toRow, setToRow] = useState(100);
   const [rangeError, setRangeError] = useState<string | undefined>();
+  const [missingColumns, setMissingColumns] = useState<string[]>([]);
+  const [metaColumnCount, setMetaColumnCount] = useState(0);
+
+  const importForm = useForm<UserBatchStoreFormInput>({
+    resolver: zodResolver(userBatchStoreFormSchema),
+    defaultValues: { users: [] },
+    mode: "onBlur",
+  });
+  const { fields: importFields, replace: importReplace } = useFieldArray({
+    control: importForm.control,
+    name: "users",
+  });
 
   const validateRange = useCallback((from: number, to: number): string | undefined => {
     if (from < 1 || to < from || to - from + 1 > 100) {
@@ -74,6 +95,79 @@ export function UserImportModal({ open, onClose, onImport: _onImport }: UserImpo
     }
     return undefined;
   }, []);
+
+  const buildRowsFromParsed = useCallback(
+    (data: ParsedRow[], from: number, to: number) => {
+      const slice = data.slice(from - 1, to);
+      if (slice.length === 0)
+        return { rows: [] as UserStoreFormInput[], missing: [] as string[], metaCount: 0 };
+
+      const headers = Object.keys(slice[0]);
+      const normalizedHeaders = headers.map((h) => h.trim().toLowerCase());
+
+      const missing = REQUIRED_COLUMNS.filter(
+        (col) => !normalizedHeaders.includes(col),
+      );
+
+      const fixedSet = new Set(FIXED_COLUMNS);
+      const metaKeys = headers.filter(
+        (h) => !fixedSet.has(h.trim().toLowerCase() as (typeof FIXED_COLUMNS)[number]),
+      );
+      const metaCount = metaKeys.length;
+
+      const rows: UserStoreFormInput[] = slice.map((row) => {
+        const mapped = defaultUserStoreFormRow();
+
+        for (const header of headers) {
+          const key = header.trim().toLowerCase();
+          const field = COLUMN_TO_FIELD[key];
+          if (!field) continue;
+
+          const raw = row[header];
+          if (raw === null || raw === undefined) continue;
+          const val = String(raw).trim();
+          if (val === "") continue;
+
+          if (field === "gender") {
+            const lower = val.toLowerCase();
+            if (lower === "male" || lower === "female" || lower === "other") {
+              mapped.gender = lower;
+            }
+          } else if (field === "role") {
+            const lower = val.toLowerCase();
+            if (lower === "holder" || lower === "issuer" || lower === "admin") {
+              mapped.role = lower;
+            }
+          } else if (field === "name") {
+            mapped.name = val;
+          } else if (field === "email") {
+            mapped.email = val;
+          } else if (field === "phone_number") {
+            mapped.phone_number = val;
+          } else if (field === "number") {
+            mapped.number = val;
+          } else if (field === "birth_date") {
+            mapped.birth_date = val;
+          }
+        }
+
+        mapped.meta_entries = metaKeys
+          .map((mk) => {
+            const raw = row[mk];
+            if (raw === null || raw === undefined) return null;
+            const v = String(raw).trim();
+            if (v === "") return null;
+            return { key: mk.trim(), value: v };
+          })
+          .filter((e): e is { key: string; value: string } => e !== null);
+
+        return mapped;
+      });
+
+      return { rows, missing, metaCount };
+    },
+    [],
+  );
 
   const resetState = useCallback(() => {
     setStep(1);
@@ -84,7 +178,10 @@ export function UserImportModal({ open, onClose, onImport: _onImport }: UserImpo
     setFromRow(1);
     setToRow(100);
     setRangeError(undefined);
-  }, []);
+    setMissingColumns([]);
+    setMetaColumnCount(0);
+    importReplace([]);
+  }, [importReplace]);
 
   const handleClose = useCallback(() => {
     resetState();
@@ -251,7 +348,79 @@ export function UserImportModal({ open, onClose, onImport: _onImport }: UserImpo
               <Button
                 variant="primary"
                 disabled={!!rangeError}
-                onClick={() => setStep(3)}
+                onClick={() => {
+                  const result = buildRowsFromParsed(
+                    parsedDataRef.current,
+                    fromRow,
+                    toRow,
+                  );
+                  setMissingColumns(result.missing);
+                  setMetaColumnCount(result.metaCount);
+                  importReplace(result.rows);
+                  setStep(3);
+                }}
+              >
+                {t("userImport.continue")}
+              </Button>
+            </div>
+           </div>
+        )}
+
+        {step === 3 && (
+          <div className="space-y-4">
+            {missingColumns.length > 0 ? (
+              <div className="rounded-lg border border-error/20 bg-error/5 p-4">
+                <p className="text-sm font-medium text-error">
+                  {t("userImport.missingColumns", {
+                    columns: missingColumns.join(", "),
+                  })}
+                </p>
+              </div>
+            ) : (
+              <>
+                <p className="text-sm text-navy">
+                  {t("userImport.rowsToImport", { count: importFields.length })}
+                  {metaColumnCount > 0 &&
+                    ` · ${metaColumnCount} custom column${metaColumnCount > 1 ? "s" : ""}`}
+                </p>
+
+                <div className="max-h-[400px] space-y-3 overflow-y-auto pr-1">
+                  {importFields.map((field, idx) => (
+                    <Card key={field.id} className="p-0">
+                      <UserCreateRow
+                        form={importForm}
+                        index={idx}
+                        onRemove={
+                          importFields.length > 1
+                            ? () => {
+                                const kept = importFields
+                                  .map((_, i) => i)
+                                  .filter((i) => i !== idx)
+                                  .map((i) => importForm.getValues(`users.${i}`));
+                                importReplace(kept);
+                              }
+                            : undefined
+                        }
+                      />
+                    </Card>
+                  ))}
+                </div>
+              </>
+            )}
+
+            <div className="flex justify-between pt-2">
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setMissingColumns([]);
+                  setStep(2);
+                }}
+              >
+                {t("userImport.back")}
+              </Button>
+              <Button
+                variant="primary"
+                disabled={missingColumns.length > 0}
               >
                 {t("userImport.continue")}
               </Button>
