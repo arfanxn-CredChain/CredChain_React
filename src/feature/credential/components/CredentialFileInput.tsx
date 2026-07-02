@@ -10,12 +10,7 @@ interface CredentialFileInputProps {
   error?: string;
 }
 
-export function CredentialFileInput({
-  file,
-  onChange,
-  onExpand,
-  error,
-}: CredentialFileInputProps) {
+export function CredentialFileInput({ file, onChange, onExpand, error }: CredentialFileInputProps) {
   const { t } = useTranslation();
   const noop = useCallback(() => {}, []);
 

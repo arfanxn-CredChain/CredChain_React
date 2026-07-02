@@ -90,7 +90,12 @@ describe("UserContactBlock", () => {
 
   it("uses fallbackId as name when user is undefined", () => {
     render(
-      <UserContactBlock user={undefined} fallbackId="usr_fallback" copyPrefix="holder" labelType="full" />,
+      <UserContactBlock
+        user={undefined}
+        fallbackId="usr_fallback"
+        copyPrefix="holder"
+        labelType="full"
+      />,
       { wrapper: TestProviders },
     );
 
@@ -122,10 +127,9 @@ describe("UserContactBlock", () => {
 
   it("renders copy buttons with user prefix when copyPrefix is user", () => {
     const user = makeUser({ number: "NUM-1" });
-    render(
-      <UserContactBlock user={user} fallbackId="usr_1" copyPrefix="user" labelType="full" />,
-      { wrapper: TestProviders },
-    );
+    render(<UserContactBlock user={user} fallbackId="usr_1" copyPrefix="user" labelType="full" />, {
+      wrapper: TestProviders,
+    });
 
     expect(screen.getByRole("button", { name: "Copy user number" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Copy user email" })).toBeInTheDocument();
@@ -145,7 +149,13 @@ describe("UserContactBlock", () => {
   it("applies error tone styles when tone is error", () => {
     const user = makeUser({ name: "Charlie", role: Role.HOLDER });
     render(
-      <UserContactBlock user={user} fallbackId="usr_1" copyPrefix="revoker" labelType="compact" tone="error" />,
+      <UserContactBlock
+        user={user}
+        fallbackId="usr_1"
+        copyPrefix="revoker"
+        labelType="compact"
+        tone="error"
+      />,
       { wrapper: TestProviders },
     );
 
@@ -167,7 +177,13 @@ describe("UserContactBlock", () => {
   it("renders name as plain span when blockLinks is true", () => {
     const user = makeUser({ name: "Static" });
     render(
-      <UserContactBlock user={user} fallbackId="usr_1" copyPrefix="holder" labelType="full" blockLinks />,
+      <UserContactBlock
+        user={user}
+        fallbackId="usr_1"
+        copyPrefix="holder"
+        labelType="full"
+        blockLinks
+      />,
       { wrapper: TestProviders },
     );
 

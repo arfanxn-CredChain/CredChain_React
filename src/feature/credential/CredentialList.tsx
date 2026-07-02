@@ -30,15 +30,25 @@ import { CredentialSortMenu } from "@shared/components/CredentialSortMenu";
 const MAX_SELECTION = 100;
 
 const SORT_OPTIONS = [
-  { key: "newest", getSort: (s: CredentialStatusFilter) => (s === "revoked" ? "-revoked_at" : "-issued_at") },
-  { key: "oldest", getSort: (s: CredentialStatusFilter) => (s === "revoked" ? "revoked_at" : "issued_at") },
+  {
+    key: "newest",
+    getSort: (s: CredentialStatusFilter) => (s === "revoked" ? "-revoked_at" : "-issued_at"),
+  },
+  {
+    key: "oldest",
+    getSort: (s: CredentialStatusFilter) => (s === "revoked" ? "revoked_at" : "issued_at"),
+  },
   { key: "nameAZ", getSort: () => "name" },
   { key: "nameZA", getSort: () => "-name" },
 ];
 
 type BulkMode = "revoke" | "reextract" | null;
 
-function adjustSortForStatus(sortString: string, oldStatus: CredentialStatusFilter, newStatus: CredentialStatusFilter): string {
+function adjustSortForStatus(
+  sortString: string,
+  oldStatus: CredentialStatusFilter,
+  newStatus: CredentialStatusFilter,
+): string {
   for (const opt of SORT_OPTIONS) {
     if (opt.getSort(oldStatus) === sortString) {
       return opt.getSort(newStatus);
@@ -53,7 +63,8 @@ export function CredentialList() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkMode, setBulkMode] = useState<BulkMode>(null);
 
-  const credStatus: CredentialStatusFilter = (searchParams.get("status") as CredentialStatusFilter) ?? "active";
+  const credStatus: CredentialStatusFilter =
+    (searchParams.get("status") as CredentialStatusFilter) ?? "active";
   const credSort = searchParams.get("sort") ?? SORT_OPTIONS[0].getSort(credStatus);
 
   const searchParam = searchParams.get("search") ?? "";
@@ -74,30 +85,46 @@ export function CredentialList() {
 
   const filterArray: string[] = (() => {
     switch (credStatus) {
-      case "all": return [];
-      case "active": return ["revoked_at_", "extract_status!=failed"];
-      case "revoked": return ["revoked_at!_", "extract_status!=failed"];
-      case "pending": return ["extract_status=pending"];
-      case "failed": return ["extract_status=failed"];
+      case "all":
+        return [];
+      case "active":
+        return ["revoked_at_", "extract_status!=failed"];
+      case "revoked":
+        return ["revoked_at!_", "extract_status!=failed"];
+      case "pending":
+        return ["extract_status=pending"];
+      case "failed":
+        return ["extract_status=failed"];
     }
   })();
 
-  const { items: credentials, total, isLoading, isError, isFetchingNextPage, hasMore, loadMore, reset } =
-    useLoadMore<CredentialDTO>(
-      [isHolder ? "my-credentials" : "credentials", { search: debouncedSearch || undefined, sort: credSort, filters: filterArray }],
-      async (page, limit) => {
-        const q: Record<string, unknown> = {};
-        q.page = page;
-        q.limit = limit;
-        if (debouncedSearch) q.search = debouncedSearch;
-        q.sorts = [credSort];
-        if (filterArray.length > 0) q.filters = filterArray;
-        q.includes = ["holder", "issuer", "revoker"];
-        const endpoint = isHolder ? "/users/self/credentials" : "/credentials";
-        const response = await api.get(endpoint, { params: q });
-        return response.data;
-      },
-    );
+  const {
+    items: credentials,
+    total,
+    isLoading,
+    isError,
+    isFetchingNextPage,
+    hasMore,
+    loadMore,
+    reset,
+  } = useLoadMore<CredentialDTO>(
+    [
+      isHolder ? "my-credentials" : "credentials",
+      { search: debouncedSearch || undefined, sort: credSort, filters: filterArray },
+    ],
+    async (page, limit) => {
+      const q: Record<string, unknown> = {};
+      q.page = page;
+      q.limit = limit;
+      if (debouncedSearch) q.search = debouncedSearch;
+      q.sorts = [credSort];
+      if (filterArray.length > 0) q.filters = filterArray;
+      q.includes = ["holder", "issuer", "revoker"];
+      const endpoint = isHolder ? "/users/self/credentials" : "/credentials";
+      const response = await api.get(endpoint, { params: q });
+      return response.data;
+    },
+  );
 
   const isEmpty = !isLoading && credentials.length === 0;
   const selectionFull = selectedIds.size >= MAX_SELECTION;
@@ -302,7 +329,11 @@ export function CredentialList() {
             </div>
             <div className="flex flex-wrap items-center gap-2 md:ml-auto md:shrink-0">
               <CredentialStatusFilterMenu value={credStatus} onChange={handleStatusChange} />
-              <CredentialSortMenu value={credSort} onChange={handleSortChange} statusFilter={credStatus} />
+              <CredentialSortMenu
+                value={credSort}
+                onChange={handleSortChange}
+                statusFilter={credStatus}
+              />
             </div>
           </div>
         </div>
@@ -319,9 +350,7 @@ export function CredentialList() {
                   : t("cred.list.empty.none.title")
               }
               description={
-                debouncedSearch
-                  ? t("cred.list.empty.search.body")
-                  : t("cred.list.empty.none.body")
+                debouncedSearch ? t("cred.list.empty.search.body") : t("cred.list.empty.none.body")
               }
               className="rounded-none border-0 bg-transparent shadow-none"
             />
@@ -347,7 +376,11 @@ export function CredentialList() {
                     selectionMode={canManage ? bulkMode : undefined}
                     isSelected={canManage ? selectedIds.has(cred.id) : undefined}
                     onSelect={canManage ? () => toggleSelection(cred.id) : undefined}
-                    selectDisabled={canManage && bulkMode ? (!isSelectable || (selectionFull && !selectedIds.has(cred.id))) : undefined}
+                    selectDisabled={
+                      canManage && bulkMode
+                        ? !isSelectable || (selectionFull && !selectedIds.has(cred.id))
+                        : undefined
+                    }
                     blockLinks={!canManage}
                   />
                 );

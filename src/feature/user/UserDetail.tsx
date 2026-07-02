@@ -27,6 +27,8 @@ import { EmptyState } from "@shared/components/EmptyState";
 import { MonoId } from "@shared/components/MonoId";
 import { CopyInlineButton } from "@shared/components/CopyInlineButton";
 import { LoadMoreBar } from "@shared/components/LoadMoreBar";
+import { MetaDisplay } from "@shared/components/MetaDisplay";
+import { DetailRow } from "@shared/components/DetailRow";
 import { UserAvatar } from "@shared/components/UserAvatar";
 import { UserRoleBadge } from "@shared/components/UserRoleBadge";
 import { UserStatusBadge } from "@shared/components/UserStatusBadge";
@@ -42,8 +44,14 @@ import { formatDate, formatDateTime } from "@shared/lib/format";
 import { cn } from "@shared/lib/cn";
 
 const CRED_SORT_OPTIONS = [
-  { key: "newest", getSort: (s: CredentialStatusFilter) => (s === "revoked" ? "-revoked_at" : "-issued_at") },
-  { key: "oldest", getSort: (s: CredentialStatusFilter) => (s === "revoked" ? "revoked_at" : "issued_at") },
+  {
+    key: "newest",
+    getSort: (s: CredentialStatusFilter) => (s === "revoked" ? "-revoked_at" : "-issued_at"),
+  },
+  {
+    key: "oldest",
+    getSort: (s: CredentialStatusFilter) => (s === "revoked" ? "revoked_at" : "issued_at"),
+  },
   { key: "nameAZ", getSort: () => "name" },
   { key: "nameZA", getSort: () => "-name" },
 ];
@@ -57,10 +65,11 @@ export function UserDetail() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [metaOpen, setMetaOpen] = useState(false);
 
-  const credStatus: CredentialStatusFilter = (searchParams.get("cred_status") as CredentialStatusFilter) ?? "all";
-  const credSort = searchParams.get("cred_sort") ?? CRED_SORT_OPTIONS[0].getSort(credStatus);
+  const credStatus: CredentialStatusFilter =
+    (searchParams.get("credential_status") as CredentialStatusFilter) ?? "all";
+  const credSort = searchParams.get("credential_sort") ?? CRED_SORT_OPTIONS[0].getSort(credStatus);
 
-  const searchParam = searchParams.get("cred_search") ?? "";
+  const searchParam = searchParams.get("credential_search") ?? "";
   const [credSearch, setCredSearch] = useState(searchParam);
   const searchTypedRef = useRef<string | null>(null);
   const debouncedCredSearch = useDebouncedValue(credSearch, 300);
@@ -75,11 +84,16 @@ export function UserDetail() {
   const credFilterArray: string[] = (() => {
     const base = [`holder_user_id=${id}`];
     switch (credStatus) {
-      case "all": return base;
-      case "active": return [...base, "revoked_at_", "extract_status!=failed"];
-      case "revoked": return [...base, "revoked_at!_", "extract_status!=failed"];
-      case "pending": return [...base, "extract_status=pending"];
-      case "failed": return [...base, "extract_status=failed"];
+      case "all":
+        return base;
+      case "active":
+        return [...base, "revoked_at_", "extract_status!=failed"];
+      case "revoked":
+        return [...base, "revoked_at!_", "extract_status!=failed"];
+      case "pending":
+        return [...base, "extract_status=pending"];
+      case "failed":
+        return [...base, "extract_status=failed"];
     }
   })();
 
@@ -91,9 +105,13 @@ export function UserDetail() {
     isFetchingNextPage: credFetchingMore,
     hasMore: credHasMore,
     loadMore: credLoadMore,
-    reset: credReset,
+    reset: credentialReset,
   } = useLoadMore<CredentialDTO>(
-    ["user-credentials", id, { search: debouncedCredSearch || undefined, sort: credSort, filters: credFilterArray }],
+    [
+      "user-credentials",
+      id,
+      { search: debouncedCredSearch || undefined, sort: credSort, filters: credFilterArray },
+    ],
     async (page, limit) => {
       const q: Record<string, unknown> = {
         page,
@@ -113,13 +131,13 @@ export function UserDetail() {
     const newSort = adjustSortForStatus(credSort, credStatus, status);
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
-      if (status === "all") next.delete("cred_status");
-      else next.set("cred_status", status);
-      if (newSort === CRED_SORT_OPTIONS[0].getSort(status)) next.delete("cred_sort");
-      else next.set("cred_sort", newSort);
+      if (status === "all") next.delete("credential_status");
+      else next.set("credential_status", status);
+      if (newSort === CRED_SORT_OPTIONS[0].getSort(status)) next.delete("credential_sort");
+      else next.set("credential_sort", newSort);
       return next;
     });
-    credReset();
+    credentialReset();
   };
 
   const handleCredSortChange = (sortString: string) => {
@@ -127,11 +145,11 @@ export function UserDetail() {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
       const defaultSort = CRED_SORT_OPTIONS[0].getSort(credStatus);
-      if (sortString === defaultSort) next.delete("cred_sort");
-      else next.set("cred_sort", sortString);
+      if (sortString === defaultSort) next.delete("credential_sort");
+      else next.set("credential_sort", sortString);
       return next;
     });
-    credReset();
+    credentialReset();
   };
 
   const handleCredSearchChange = (value: string) => {
@@ -139,11 +157,11 @@ export function UserDetail() {
     searchTypedRef.current = value;
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
-      if (!value) next.delete("cred_search");
-      else next.set("cred_search", value);
+      if (!value) next.delete("credential_search");
+      else next.set("credential_search", value);
       return next;
     });
-    credReset();
+    credentialReset();
   };
 
   if (isError) {
@@ -207,9 +225,13 @@ export function UserDetail() {
 
           {/* Attribute grid */}
           <dl className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            <Field icon={Hash} label={t("user.detail.number")} value={user.number ?? "—"} />
-            <Field icon={Mail} label={t("user.detail.email")} value={user.email} />
-            <Field icon={Phone} label={t("user.detail.phone")} value={user.phone_number ?? "—"} />
+            <DetailRow icon={Hash} label={t("user.detail.number")} value={user.number ?? "—"} />
+            <DetailRow icon={Mail} label={t("user.detail.email")} value={user.email} />
+            <DetailRow
+              icon={Phone}
+              label={t("user.detail.phone")}
+              value={user.phone_number ?? "—"}
+            />
             <div>
               <dt className="mb-1 flex items-center gap-1.5 text-xs font-bold tracking-wider text-gray-400 uppercase">
                 <Wallet className="h-3.5 w-3.5" aria-hidden="true" />
@@ -224,28 +246,28 @@ export function UserDetail() {
                 />
               </dd>
             </div>
-            <Field
+            <DetailRow
               icon={Users}
               label={t("user.field.gender")}
               value={user.gender ? t(`user.field.gender.${user.gender}`) : "—"}
             />
-            <Field
+            <DetailRow
               icon={Calendar}
               label={t("user.detail.birthDate")}
               value={user.birth_date ? formatDate(user.birth_date) : "—"}
             />
-            <Field
+            <DetailRow
               icon={Clock}
               label={t("user.detail.created")}
               value={formatDateTime(user.created_at)}
             />
-            <Field
+            <DetailRow
               icon={CalendarClock}
               label={t("user.detail.updated")}
               value={formatDateTime(user.updated_at)}
             />
             {user.deleted_at && (
-              <Field
+              <DetailRow
                 icon={Trash2}
                 label={t("user.detail.deleted")}
                 value={formatDateTime(user.deleted_at)}
@@ -269,9 +291,7 @@ export function UserDetail() {
               </button>
               {metaOpen && (
                 <div className="mt-4 rounded-xl bg-gray-50 p-4">
-                  <pre className="overflow-x-auto font-mono text-xs text-gray-600">
-                    {JSON.stringify(user.meta, null, 2)}
-                  </pre>
+                  <MetaDisplay meta={user.meta} />
                 </div>
               )}
             </div>
@@ -285,9 +305,7 @@ export function UserDetail() {
           <div className="mb-4 flex items-center justify-between">
             <EyebrowLabel>
               {t("user.detail.credentialSection")}
-              {credTotal > 0 && (
-                <span className="ml-2 text-xs text-gray-400">({credTotal})</span>
-              )}
+              {credTotal > 0 && <span className="ml-2 text-xs text-gray-400">({credTotal})</span>}
             </EyebrowLabel>
           </div>
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
@@ -305,7 +323,11 @@ export function UserDetail() {
             </div>
             <div className="flex flex-wrap items-center gap-2 md:ml-auto md:shrink-0">
               <CredentialStatusFilterMenu value={credStatus} onChange={handleCredStatusChange} />
-              <CredentialSortMenu value={credSort} onChange={handleCredSortChange} statusFilter={credStatus} />
+              <CredentialSortMenu
+                value={credSort}
+                onChange={handleCredSortChange}
+                statusFilter={credStatus}
+              />
             </div>
           </div>
         </div>
@@ -364,28 +386,4 @@ function adjustSortForStatus(
     }
   }
   return sortString;
-}
-
-interface FieldProps {
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  value: string;
-  tone?: "default" | "error";
-}
-
-function Field({ icon: Icon, label, value, tone = "default" }: FieldProps) {
-  return (
-    <div>
-      <dt className={cn(
-        "mb-1 flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase",
-        tone === "error" ? "text-error" : "text-gray-400",
-      )}>
-        <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-        {label}
-      </dt>
-      <dd className={cn("text-sm break-all", tone === "error" ? "text-error" : "text-navy")}>
-        {value}
-      </dd>
-    </div>
-  );
 }

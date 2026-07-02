@@ -1,13 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@ui/dialog";
 import { Button } from "@ui/button";
 
 interface CredentialFileModalProps {
@@ -29,12 +23,21 @@ export function CredentialFileModal({ file, open, onClose, name }: CredentialFil
   const isPdf = file.type === "application/pdf";
 
   return (
-    <Dialog open={open} onOpenChange={(next) => { if (!next) onClose(); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) onClose();
+      }}
+    >
       <DialogContent className="max-w-5xl">
         <DialogHeader>
-          <DialogTitle>{name || (file instanceof File ? file.name : "Credential File")}</DialogTitle>
+          <DialogTitle>
+            {name || (file instanceof File ? file.name : "Credential File")}
+          </DialogTitle>
           <DialogDescription>
-            {formatFileSize(file.size)}{" · "}{file.type || t("credential.issue.preview.notAvailable")}
+            {formatFileSize(file.size)}
+            {" · "}
+            {file.type || t("credential.issue.preview.notAvailable")}
           </DialogDescription>
         </DialogHeader>
 
@@ -45,8 +48,6 @@ export function CredentialFileModal({ file, open, onClose, name }: CredentialFil
             <ImageViewer file={file} key={file.size + (file instanceof File ? file.name : "")} />
           )}
         </div>
-
-
       </DialogContent>
     </Dialog>
   );
@@ -178,7 +179,9 @@ function PdfViewer({ file }: { file: File | Blob }) {
     };
 
     renderPage();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [pageNum, totalPages]);
 
   if (error) {

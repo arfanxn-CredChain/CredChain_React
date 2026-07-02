@@ -32,7 +32,7 @@ export function SplitLayout({ brandSlot, mobileBrandSlot, children }: SplitLayou
 
       {/* Desktop navy left panel */}
       <div className="relative hidden flex-col items-center justify-center overflow-hidden bg-navy lg:flex lg:w-1/2">
-        <DecorBlob tone="gold" position="top-right" size="xl" />
+        <DecorBlob tone="gold" position="top-right" size="md" />
         <DecorBlob tone="blue" position="bottom-left" size="xl" />
         <div className="relative z-10 flex w-full flex-col items-center px-4">{brandSlot}</div>
       </div>
@@ -40,7 +40,7 @@ export function SplitLayout({ brandSlot, mobileBrandSlot, children }: SplitLayou
       {/* Right panel (or below band on mobile) */}
       <div className="relative flex h-dvh w-full flex-col overflow-hidden bg-base lg:w-1/2">
         {/* Mobile-only navy band */}
-        <div className="safe-area-top relative flex h-[33dvh] w-full   shrink-0 flex-col items-center justify-center overflow-hidden bg-navy text-surface lg:hidden">
+        <div className="safe-area-top relative flex h-[33dvh] w-full shrink-0 flex-col items-center justify-center overflow-hidden bg-navy text-surface lg:hidden">
           {/* Inline language switcher — same placement as PublicLayout header */}
           <div className="absolute top-4 right-4 z-20">
             <LanguageSwitcher variant="dark" />

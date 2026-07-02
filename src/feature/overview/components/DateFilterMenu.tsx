@@ -80,9 +80,7 @@ export function DateFilterMenu({ dateFrom, dateTo, onChange }: DateFilterMenuPro
     setOpen(nextOpen);
   };
 
-  const match = PRESETS.find(
-    (p) => p.range[0] === dateFrom && p.range[1] === dateTo,
-  );
+  const match = PRESETS.find((p) => p.range[0] === dateFrom && p.range[1] === dateTo);
   const activeKey: PresetKey = match?.key ?? "custom";
 
   const activeLabel =
@@ -130,9 +128,7 @@ export function DateFilterMenu({ dateFrom, dateTo, onChange }: DateFilterMenuPro
               onClick={() => selectPreset(preset.key)}
               className="flex items-center justify-between"
             >
-              <span className={cn(active && "font-bold text-navy")}>
-                {t(preset.labelKey)}
-              </span>
+              <span className={cn(active && "font-bold text-navy")}>{t(preset.labelKey)}</span>
               {active && <Check className="h-4 w-4 text-gold" aria-hidden="true" />}
             </DropdownMenuItem>
           );
@@ -144,10 +140,7 @@ export function DateFilterMenu({ dateFrom, dateTo, onChange }: DateFilterMenuPro
           </p>
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <label
-                htmlFor={inputIdFrom}
-                className="block text-xs text-gray-500"
-              >
+              <label htmlFor={inputIdFrom} className="block text-xs text-gray-500">
                 {t("overview.dateFilter.from")}
               </label>
               <Input
@@ -159,10 +152,7 @@ export function DateFilterMenu({ dateFrom, dateTo, onChange }: DateFilterMenuPro
               />
             </div>
             <div className="space-y-1">
-              <label
-                htmlFor={inputIdTo}
-                className="block text-xs text-gray-500"
-              >
+              <label htmlFor={inputIdTo} className="block text-xs text-gray-500">
                 {t("overview.dateFilter.to")}
               </label>
               <Input

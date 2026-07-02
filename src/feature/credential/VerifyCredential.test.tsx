@@ -42,9 +42,7 @@ vi.mock("./components/CredentialFileInput", () => ({
         <div>
           <span>Drag &amp; drop</span>
           <button
-            onClick={() =>
-              onChange(new File(["test"], "test.pdf", { type: "application/pdf" }))
-            }
+            onClick={() => onChange(new File(["test"], "test.pdf", { type: "application/pdf" }))}
           >
             Select file
           </button>

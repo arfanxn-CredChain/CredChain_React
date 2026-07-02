@@ -39,10 +39,7 @@ import type {
 
 /* ── helpers ── */
 
-function relativeTime(
-  iso: string,
-  t: ReturnType<typeof useTranslation>["t"],
-): string {
+function relativeTime(iso: string, t: ReturnType<typeof useTranslation>["t"]): string {
   const diff = Date.now() - new Date(iso).getTime();
   const seconds = Math.floor(diff / 1000);
   const minutes = Math.floor(seconds / 60);
@@ -74,21 +71,24 @@ interface StatItemProps {
   note?: string;
   compact?: boolean;
   className?: string;
+  to?: string;
 }
 
-function StatItem({ value, label, accent, note, compact, className }: StatItemProps) {
+function StatItem({ value, label, accent, note, compact, className, to }: StatItemProps) {
   const isAccent = accent === "gold";
-  return (
-    <div
-      className={cn(
-        "flex flex-col items-center justify-center rounded-2xl border",
-        compact ? "h-28 p-4" : "h-40 p-6",
-        isAccent
-          ? "border-gold/20 bg-gold/10 shadow-sm shadow-gold/10"
-          : "border-gray-100 bg-surface shadow-sm",
-        className,
-      )}
-    >
+  const classes = cn(
+    "flex flex-col items-center justify-center rounded-2xl border transition-all",
+    compact ? "h-28 p-4" : "h-40 p-6",
+    isAccent
+      ? "border-gold/20 bg-gold/10 shadow-sm shadow-gold/10"
+      : "border-gray-100 bg-surface shadow-sm",
+    to &&
+      "cursor-pointer hover:ring-2 hover:ring-gold/40 hover:shadow-md focus-visible:ring-2 focus-visible:ring-gold focus-visible:outline-none",
+    className,
+  );
+
+  const content = (
+    <>
       <span
         className={cn(
           "font-display font-extrabold tracking-tight text-navy",
@@ -105,13 +105,21 @@ function StatItem({ value, label, accent, note, compact, className }: StatItemPr
       >
         {label}
         {note && (
-          <span className="ml-1 block font-normal normal-case text-gray-400/70">
-            {note}
-          </span>
+          <span className="ml-1 block font-normal text-gray-400/70 normal-case">{note}</span>
         )}
       </span>
-    </div>
+    </>
   );
+
+  if (to) {
+    return (
+      <Link to={to} className={classes}>
+        {content}
+      </Link>
+    );
+  }
+
+  return <div className={classes}>{content}</div>;
 }
 
 /* ── skeleton stat ── */
@@ -153,22 +161,14 @@ function RecentSection({ title, icon: Icon, tone = "gold", children }: RecentSec
         <div className={cn("rounded-lg p-1.5", toneBlock[tone])}>
           <Icon className="h-4 w-4" aria-hidden="true" />
         </div>
-        <h4 className="flex-1 text-xs font-bold tracking-wider text-gray-400 uppercase">
-          {title}
-        </h4>
+        <h4 className="flex-1 text-xs font-bold tracking-wider text-gray-400 uppercase">{title}</h4>
       </div>
       {children}
     </div>
   );
 }
 
-function RecentSectionFooter({
-  to,
-  label,
-}: {
-  to: string;
-  label: string;
-}) {
+function RecentSectionFooter({ to, label }: { to: string; label: string }) {
   return (
     <div className="mt-3 flex justify-end">
       <Link
@@ -197,7 +197,10 @@ function CredentialRow({
   const isRevoked = variant === "revoked";
   const actor = isRevoked ? cred.revoker : cred.issuer;
   const actorPrefix = isRevoked ? "revoker" : "issuer";
-  const time = isRevoked && cred.revoked_at ? relativeTime(cred.revoked_at, t) : relativeTime(cred.issued_at, t);
+  const time =
+    isRevoked && cred.revoked_at
+      ? relativeTime(cred.revoked_at, t)
+      : relativeTime(cred.issued_at, t);
 
   const handleClick = () => navigate(`/credentials/${cred.id}`);
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -328,9 +331,7 @@ function CredentialCountsCard({
         <div
           className={cn(
             "grid",
-            compact
-              ? "grid-cols-2 gap-4"
-              : "grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-5",
+            compact ? "grid-cols-2 gap-4" : "grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-5",
           )}
         >
           <StatItem
@@ -339,26 +340,31 @@ function CredentialCountsCard({
             accent="gold"
             compact={compact}
             className={compact ? "col-span-2" : undefined}
+            to="/credentials"
           />
           <StatItem
             value={counts.total}
             label={t("overview.counts.total")}
             compact={compact}
+            to="/credentials?status=all"
           />
           <StatItem
             value={counts.revoked}
             label={t("overview.counts.revoked")}
             compact={compact}
+            to="/credentials?status=revoked"
           />
           <StatItem
             value={counts.pending}
             label={t("overview.counts.pending")}
             compact={compact}
+            to="/credentials?status=pending"
           />
           <StatItem
             value={counts.failed}
             label={t("overview.counts.failed")}
             compact={compact}
+            to="/credentials?status=failed"
           />
         </div>
       </div>
@@ -366,13 +372,7 @@ function CredentialCountsCard({
   );
 }
 
-function UserCountsCard({
-  counts,
-  compact,
-}: {
-  counts: OverviewUserCounts;
-  compact?: boolean;
-}) {
+function UserCountsCard({ counts, compact }: { counts: OverviewUserCounts; compact?: boolean }) {
   const { t } = useTranslation();
   const activeStat = (
     <StatItem
@@ -381,21 +381,48 @@ function UserCountsCard({
       accent="gold"
       compact={compact}
       className={compact ? "col-span-2" : undefined}
+      to="/users?status=deleted_at!_"
     />
   );
   const otherStats = (
     <>
-      <StatItem value={counts.total} label={t("overview.counts.total")} compact={compact} />
-      <StatItem value={counts.holder} label={t("overview.counts.holder")} compact={compact} />
-      <StatItem value={counts.issuer} label={t("overview.counts.issuer")} compact={compact} />
-      <StatItem value={counts.admin} label={t("overview.counts.admin")} compact={compact} />
+      <StatItem
+        value={counts.total}
+        label={t("overview.counts.total")}
+        compact={compact}
+        to="/users"
+      />
+      <StatItem
+        value={counts.holder}
+        label={t("overview.counts.holder")}
+        compact={compact}
+        to="/users?role=holder"
+      />
+      <StatItem
+        value={counts.issuer}
+        label={t("overview.counts.issuer")}
+        compact={compact}
+        to="/users?role=issuer"
+      />
+      <StatItem
+        value={counts.admin}
+        label={t("overview.counts.admin")}
+        compact={compact}
+        to="/users?role=admin"
+      />
       <StatItem
         value={counts.super_admin}
         label={t("overview.counts.superAdmin")}
         note={t("overview.superAdminAlwaysOne")}
         compact={compact}
+        to="/users?role=super_admin"
       />
-      <StatItem value={counts.trashed} label={t("overview.counts.trashed")} compact={compact} />
+      <StatItem
+        value={counts.trashed}
+        label={t("overview.counts.trashed")}
+        compact={compact}
+        to="/users?status=deleted_at_"
+      />
     </>
   );
   return (
@@ -408,9 +435,7 @@ function UserCountsCard({
         <div
           className={cn(
             "grid",
-            compact
-              ? "grid-cols-2 gap-4"
-              : "grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4",
+            compact ? "grid-cols-2 gap-4" : "grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4",
           )}
         >
           {compact ? (
@@ -461,12 +486,7 @@ function RecentActivityCard({
               tone="green"
             >
               {activeCredentials.slice(0, 1).map((cred) => (
-                <CredentialRow
-                  key={cred.id}
-                  cred={cred}
-                  variant="active"
-                  t={t}
-                />
+                <CredentialRow key={cred.id} cred={cred} variant="active" t={t} />
               ))}
               <RecentSectionFooter
                 to="/credentials"
@@ -482,12 +502,7 @@ function RecentActivityCard({
               tone="error"
             >
               {revokedCredentials.slice(0, 1).map((cred) => (
-                <CredentialRow
-                  key={cred.id}
-                  cred={cred}
-                  variant="revoked"
-                  t={t}
-                />
+                <CredentialRow key={cred.id} cred={cred} variant="revoked" t={t} />
               ))}
               <RecentSectionFooter
                 to="/credentials?status=revoked"
@@ -497,18 +512,11 @@ function RecentActivityCard({
           )}
 
           {showUsers && storedUsers.length > 0 && (
-            <RecentSection
-              title={t("overview.recents.storedUsers")}
-              icon={User}
-              tone="navy"
-            >
+            <RecentSection title={t("overview.recents.storedUsers")} icon={User} tone="navy">
               {storedUsers.slice(0, 1).map((u) => (
                 <UserRow key={u.id} user={u} t={t} />
               ))}
-              <RecentSectionFooter
-                to="/users"
-                label={t("overview.recents.viewAllUsers")}
-              />
+              <RecentSectionFooter to="/users" label={t("overview.recents.viewAllUsers")} />
             </RecentSection>
           )}
         </div>
@@ -532,10 +540,7 @@ function ChainInfoCard({ details }: { details: OverviewChainDetails }) {
         </EyebrowLabel>
         <dl className="grid grid-cols-1 gap-6">
           <div>
-            <EyebrowLabel
-              as="dt"
-              className="flex items-center gap-1.5"
-            >
+            <EyebrowLabel as="dt" className="flex items-center gap-1.5">
               <Layers className="h-3.5 w-3.5" aria-hidden="true" />
               {t("overview.chainDetails.authorityContract")}
             </EyebrowLabel>
@@ -552,10 +557,7 @@ function ChainInfoCard({ details }: { details: OverviewChainDetails }) {
             </dd>
           </div>
           <div>
-            <EyebrowLabel
-              as="dt"
-              className="flex items-center gap-1.5"
-            >
+            <EyebrowLabel as="dt" className="flex items-center gap-1.5">
               <Layers className="h-3.5 w-3.5" aria-hidden="true" />
               {t("overview.chainDetails.registryContract")}
             </EyebrowLabel>
@@ -572,10 +574,7 @@ function ChainInfoCard({ details }: { details: OverviewChainDetails }) {
             </dd>
           </div>
           <div>
-            <EyebrowLabel
-              as="dt"
-              className="flex items-center gap-1.5"
-            >
+            <EyebrowLabel as="dt" className="flex items-center gap-1.5">
               <Layers className="h-3.5 w-3.5" aria-hidden="true" />
               {t("overview.chainDetails.lastBlock")}
             </EyebrowLabel>
@@ -646,13 +645,7 @@ export function Overview() {
           name: user?.name?.split(" ")[0] ?? t("overview.fallbackName"),
         })}
         description={t("overview.description")}
-        action={
-          <DateFilterMenu
-            dateFrom={dateFrom}
-            dateTo={dateTo}
-            onChange={handleDateChange}
-          />
-        }
+        action={<DateFilterMenu dateFrom={dateFrom} dateTo={dateTo} onChange={handleDateChange} />}
       />
 
       {isError ? (

@@ -38,7 +38,10 @@ export function Settings() {
               <dd className="flex items-center gap-2">
                 <span className="text-sm font-bold break-all text-navy">{user?.email}</span>
                 {user?.email && (
-                  <CopyInlineButton value={user.email} ariaLabel={t("settings.account.copyEmail")} />
+                  <CopyInlineButton
+                    value={user.email}
+                    ariaLabel={t("settings.account.copyEmail")}
+                  />
                 )}
               </dd>
             </div>
@@ -61,7 +64,11 @@ export function Settings() {
               </dt>
               <dd className="flex items-center gap-2">
                 {user?.wallet_address ? (
-                  <MonoId value={user.wallet_address} mode="address" className="text-sm text-navy" />
+                  <MonoId
+                    value={user.wallet_address}
+                    mode="address"
+                    className="text-sm text-navy"
+                  />
                 ) : (
                   <span className="text-sm text-gray-400 italic">{t("common.notSet")}</span>
                 )}

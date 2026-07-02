@@ -101,15 +101,13 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
           />
         </FormField>
 
-        <div className="max-w-[13rem]">
-          <FormField label={t("user.edit.birthDate")} error={errors?.birth_date?.message} optional>
+        <FormField label={t("user.edit.birthDate")} error={errors?.birth_date?.message} optional>
           <Input
             type="date"
             leadingIcon={Calendar}
             {...form.register(`users.${index}.birth_date`)}
           />
         </FormField>
-        </div>
 
         <FormField label={t("user.field.gender")} error={errors?.gender?.message} optional>
           <Select
@@ -164,9 +162,7 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
             </SelectContent>
           </Select>
           {!canPromoteToAdmin && (
-            <p className="mt-1 text-xs text-gray-400">
-              {t("user.edit.role.adminDisabled")}
-            </p>
+            <p className="mt-1 text-xs text-gray-400">{t("user.edit.role.adminDisabled")}</p>
           )}
         </FormField>
       </div>

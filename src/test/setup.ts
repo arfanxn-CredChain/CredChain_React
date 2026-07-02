@@ -9,7 +9,10 @@ if (typeof File !== "undefined" && !File.prototype.arrayBuffer && Blob.prototype
 }
 
 // Polyfill: jsdom doesn't implement URL.createObjectURL / revokeObjectURL.
-if (typeof URL.createObjectURL !== "function" || URL.createObjectURL.toString().includes("not implemented")) {
+if (
+  typeof URL.createObjectURL !== "function" ||
+  URL.createObjectURL.toString().includes("not implemented")
+) {
   URL.createObjectURL = () => "blob:polyfill";
   URL.revokeObjectURL = () => {};
 }

@@ -23,10 +23,7 @@ const OPTIONS: { key: CredentialStatusFilter; labelKey: string }[] = [
   { key: "failed", labelKey: "cred.filter.failed" },
 ];
 
-export function CredentialStatusFilterMenu({
-  value,
-  onChange,
-}: CredentialStatusFilterMenuProps) {
+export function CredentialStatusFilterMenu({ value, onChange }: CredentialStatusFilterMenuProps) {
   const { t } = useTranslation();
 
   const activeOption = OPTIONS.find((opt) => opt.key === value);

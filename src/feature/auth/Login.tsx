@@ -12,15 +12,20 @@ export function Login() {
     <div className="flex items-center gap-6">
       <img src="/logo-icon.svg" alt="" className="h-24 w-24 drop-shadow-xl" aria-hidden="true" />
       <div className="font-display text-4xl font-extrabold tracking-tight text-balance md:text-5xl">
-        <span className="block text-surface">Welcome to</span>
-        <span className="block text-gold">CredChain</span>
+        <span className="block text-surface">{t("auth.welcome.prefix")}</span>
+        <span className="block text-gold">{t("common.brand")}</span>
       </div>
     </div>
   );
 
   const mobileBrand = (
     <div className="rounded-b-3xl px-6 py-[2dvh] text-center shadow-md">
-      <img src="/logo-icon.svg" alt="" className="mx-auto mb-3 h-16 w-16 drop-shadow-md" aria-hidden="true" />
+      <img
+        src="/logo-icon.svg"
+        alt=""
+        className="mx-auto mb-3 h-16 w-16 drop-shadow-md"
+        aria-hidden="true"
+      />
       <h2 className="font-display text-3xl font-extrabold tracking-tight text-gold">CredChain</h2>
     </div>
   );

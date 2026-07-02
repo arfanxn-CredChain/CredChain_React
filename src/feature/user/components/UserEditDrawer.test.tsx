@@ -171,9 +171,7 @@ describe("UserEditDrawer with Admin auth", () => {
     });
 
     // Admin-disabled note should be visible for Admin auth
-    expect(
-      screen.getByText(/only super admin can assign the admin role/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/only super admin can assign the admin role/i)).toBeInTheDocument();
   });
 
   it("shows admin role disabled note when auth is admin", async () => {

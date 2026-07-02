@@ -11,7 +11,12 @@ const mockData: OverviewDTO = {
   user_counts: { total: 5, holder: 3, issuer: 1, admin: 1, super_admin: 0, active: 5, trashed: 0 },
   recents: {
     active_credentials: [
-      { id: "c1", name: "Degree", issuer: { id: "i1", name: "UI", email: "ui@test.com", role: "issuer" }, issued_at: "2026-06-20T10:00:00Z" },
+      {
+        id: "c1",
+        name: "Degree",
+        issuer: { id: "i1", name: "UI", email: "ui@test.com", role: "issuer" },
+        issued_at: "2026-06-20T10:00:00Z",
+      },
     ],
     revoked_credentials: [],
     stored_users: [],
@@ -35,21 +40,26 @@ describe("useOverview", () => {
   });
 
   it("returns error on server failure", async () => {
-    server.use(http.get("*/api/overview", () => HttpResponse.json({ code: 100150, message: "error" }, { status: 500 })));
+    server.use(
+      http.get("*/api/overview", () =>
+        HttpResponse.json({ code: 100150, message: "error" }, { status: 500 }),
+      ),
+    );
     const { result } = renderHook(() => useOverview(), { wrapper: TestProviders });
     await waitFor(() => expect(result.current.isError).toBe(true));
   });
 
   it("passes filters to query params", async () => {
     let capturedParams: URLSearchParams | null = null;
-    server.use(http.get("*/api/overview", ({ request }) => {
-      capturedParams = new URL(request.url).searchParams;
-      return HttpResponse.json({ code: 100100, data: mockData });
-    }));
-    const { result } = renderHook(
-      () => useOverview({ filters: ["date..2026-01-01,2026-06-30"] }),
-      { wrapper: TestProviders },
+    server.use(
+      http.get("*/api/overview", ({ request }) => {
+        capturedParams = new URL(request.url).searchParams;
+        return HttpResponse.json({ code: 100100, data: mockData });
+      }),
     );
+    const { result } = renderHook(() => useOverview({ filters: ["date..2026-01-01,2026-06-30"] }), {
+      wrapper: TestProviders,
+    });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(capturedParams!.getAll("filters")).toEqual(["date..2026-01-01,2026-06-30"]);
   });

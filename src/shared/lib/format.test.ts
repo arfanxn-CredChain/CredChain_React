@@ -1,11 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  truncateAddress,
-  truncateId,
-  truncateHash,
-  formatDate,
-  toKebabCase,
-} from "./format";
+import { truncateAddress, truncateId, truncateHash, formatDate, toKebabCase } from "./format";
 
 describe("format", () => {
   describe("truncateAddress", () => {

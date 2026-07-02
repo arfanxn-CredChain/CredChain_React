@@ -14,10 +14,9 @@ export function useMyCredentials(params?: PaginationParams & { includes?: string
       if (params?.sorts && params.sorts.length) q.sorts = params.sorts;
       if (params?.includes && params.includes.length) q.includes = params.includes;
 
-      const response = await api.get<PaginatedResponse<CredentialDTO>>(
-        "/users/self/credentials",
-        { params: q },
-      );
+      const response = await api.get<PaginatedResponse<CredentialDTO>>("/users/self/credentials", {
+        params: q,
+      });
       return response.data;
     },
   });

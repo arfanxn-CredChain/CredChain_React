@@ -5,7 +5,10 @@ import { Button } from "@ui/button";
 import { Input } from "@ui/input";
 import { Label } from "@ui/label";
 
-function getNestedError(root: Record<string, unknown>, path: string): Record<string, unknown> | undefined {
+function getNestedError(
+  root: Record<string, unknown>,
+  path: string,
+): Record<string, unknown> | undefined {
   const parts = path.split(".");
   let current: unknown = root;
   for (const part of parts) {
@@ -30,10 +33,9 @@ export function MetaEditor<T extends FieldValues>({
     name: name as never,
   });
 
-  const errors = getNestedError(
-    control._formState.errors as Record<string, unknown>,
-    name,
-  ) as { [k: number]: { key?: { message?: string }; value?: { message?: string } } } | undefined;
+  const errors = getNestedError(control._formState.errors as Record<string, unknown>, name) as
+    | { [k: number]: { key?: { message?: string }; value?: { message?: string } } }
+    | undefined;
 
   return (
     <div className="space-y-3">

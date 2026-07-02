@@ -91,10 +91,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "/credentials/:id",
-            ...lazyRoute(
-              () => import("@feature/credential/CredentialDetail"),
-              "CredentialDetail",
-            ),
+            ...lazyRoute(() => import("@feature/credential/CredentialDetail"), "CredentialDetail"),
           },
           {
             path: "/account/profile",

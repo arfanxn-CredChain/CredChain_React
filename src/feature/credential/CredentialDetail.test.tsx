@@ -22,7 +22,9 @@ describe("CredentialDetail", () => {
 
   it("renders the credential name as page title", async () => {
     renderPage();
-    expect(await screen.findByRole("heading", { level: 2, name: "Bachelor's Degree" })).toBeDefined();
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Bachelor's Degree" }),
+    ).toBeDefined();
   });
 
   it("renders the credential ID", async () => {

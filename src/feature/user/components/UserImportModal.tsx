@@ -6,24 +6,11 @@ import { Upload } from "lucide-react";
 import * as XLSX from "xlsx";
 import { Button } from "@ui/button";
 import { Card } from "@ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@ui/dialog";
 import { FileDropzone } from "@ui/file-dropzone";
 import { FormField } from "@ui/form-field";
 import { Input } from "@ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@ui/table";
 import { UserCreateRow } from "./UserCreateRow";
 import {
   type UserBatchStoreFormInput,
@@ -96,78 +83,73 @@ export function UserImportModal({ open, onClose, onImport }: UserImportModalProp
     return undefined;
   }, []);
 
-  const buildRowsFromParsed = useCallback(
-    (data: ParsedRow[], from: number, to: number) => {
-      const slice = data.slice(from - 1, to);
-      if (slice.length === 0)
-        return { rows: [] as UserStoreFormInput[], missing: [] as string[], metaCount: 0 };
+  const buildRowsFromParsed = useCallback((data: ParsedRow[], from: number, to: number) => {
+    const slice = data.slice(from - 1, to);
+    if (slice.length === 0)
+      return { rows: [] as UserStoreFormInput[], missing: [] as string[], metaCount: 0 };
 
-      const headers = Object.keys(slice[0]);
-      const normalizedHeaders = headers.map((h) => h.trim().toLowerCase());
+    const headers = Object.keys(slice[0]);
+    const normalizedHeaders = headers.map((h) => h.trim().toLowerCase());
 
-      const missing = REQUIRED_COLUMNS.filter(
-        (col) => !normalizedHeaders.includes(col),
-      );
+    const missing = REQUIRED_COLUMNS.filter((col) => !normalizedHeaders.includes(col));
 
-      const fixedSet = new Set(FIXED_COLUMNS);
-      const metaKeys = headers.filter(
-        (h) => !fixedSet.has(h.trim().toLowerCase() as (typeof FIXED_COLUMNS)[number]),
-      );
-      const metaCount = metaKeys.length;
+    const fixedSet = new Set(FIXED_COLUMNS);
+    const metaKeys = headers.filter(
+      (h) => !fixedSet.has(h.trim().toLowerCase() as (typeof FIXED_COLUMNS)[number]),
+    );
+    const metaCount = metaKeys.length;
 
-      const rows: UserStoreFormInput[] = slice.map((row) => {
-        const mapped = defaultUserStoreFormRow();
+    const rows: UserStoreFormInput[] = slice.map((row) => {
+      const mapped = defaultUserStoreFormRow();
 
-        for (const header of headers) {
-          const key = header.trim().toLowerCase();
-          const field = COLUMN_TO_FIELD[key];
-          if (!field) continue;
+      for (const header of headers) {
+        const key = header.trim().toLowerCase();
+        const field = COLUMN_TO_FIELD[key];
+        if (!field) continue;
 
-          const raw = row[header];
-          if (raw === null || raw === undefined) continue;
-          const val = String(raw).trim();
-          if (val === "") continue;
+        const raw = row[header];
+        if (raw === null || raw === undefined) continue;
+        const val = String(raw).trim();
+        if (val === "") continue;
 
-          if (field === "gender") {
-            const lower = val.toLowerCase();
-            if (lower === "male" || lower === "female" || lower === "other") {
-              mapped.gender = lower;
-            }
-          } else if (field === "role") {
-            const lower = val.toLowerCase();
-            if (lower === "holder" || lower === "issuer" || lower === "admin") {
-              mapped.role = lower;
-            }
-          } else if (field === "name") {
-            mapped.name = val;
-          } else if (field === "email") {
-            mapped.email = val;
-          } else if (field === "phone_number") {
-            mapped.phone_number = val;
-          } else if (field === "number") {
-            mapped.number = val;
-          } else if (field === "birth_date") {
-            mapped.birth_date = val;
+        if (field === "gender") {
+          const lower = val.toLowerCase();
+          if (lower === "male" || lower === "female" || lower === "other") {
+            mapped.gender = lower;
           }
+        } else if (field === "role") {
+          const lower = val.toLowerCase();
+          if (lower === "holder" || lower === "issuer" || lower === "admin") {
+            mapped.role = lower;
+          }
+        } else if (field === "name") {
+          mapped.name = val;
+        } else if (field === "email") {
+          mapped.email = val;
+        } else if (field === "phone_number") {
+          mapped.phone_number = val;
+        } else if (field === "number") {
+          mapped.number = val;
+        } else if (field === "birth_date") {
+          mapped.birth_date = val;
         }
+      }
 
-        mapped.meta_entries = metaKeys
-          .map((mk) => {
-            const raw = row[mk];
-            if (raw === null || raw === undefined) return null;
-            const v = String(raw).trim();
-            if (v === "") return null;
-            return { key: mk.trim(), value: v };
-          })
-          .filter((e): e is { key: string; value: string } => e !== null);
+      mapped.meta_entries = metaKeys
+        .map((mk) => {
+          const raw = row[mk];
+          if (raw === null || raw === undefined) return null;
+          const v = String(raw).trim();
+          if (v === "") return null;
+          return { key: mk.trim(), value: v };
+        })
+        .filter((e): e is { key: string; value: string } => e !== null);
 
-        return mapped;
-      });
+      return mapped;
+    });
 
-      return { rows, missing, metaCount };
-    },
-    [],
-  );
+    return { rows, missing, metaCount };
+  }, []);
 
   const resetState = useCallback(() => {
     setStep(1);
@@ -240,7 +222,12 @@ export function UserImportModal({ open, onClose, onImport }: UserImportModalProp
   );
 
   return (
-    <Dialog open={open} onOpenChange={(next) => { if (!next) handleClose(); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) handleClose();
+      }}
+    >
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>{t("userImport.title")}</DialogTitle>
@@ -275,7 +262,9 @@ export function UserImportModal({ open, onClose, onImport }: UserImportModalProp
                           )}
                         </TableHead>
                       ))}
-                      <TableHead className="whitespace-nowrap">{t("userImport.column.department")}</TableHead>
+                      <TableHead className="whitespace-nowrap">
+                        {t("userImport.column.department")}
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -301,9 +290,7 @@ export function UserImportModal({ open, onClose, onImport }: UserImportModalProp
 
         {step === 2 && (
           <div className="space-y-4">
-            <p className="text-sm text-navy">
-              {t("userImport.rowsFound", { count: rowCount })}
-            </p>
+            <p className="text-sm text-navy">{t("userImport.rowsFound", { count: rowCount })}</p>
 
             <div className="grid grid-cols-2 gap-4">
               <FormField label={t("userImport.fromRow")} error={rangeError}>
@@ -349,11 +336,7 @@ export function UserImportModal({ open, onClose, onImport }: UserImportModalProp
                 variant="primary"
                 disabled={!!rangeError}
                 onClick={() => {
-                  const result = buildRowsFromParsed(
-                    parsedDataRef.current,
-                    fromRow,
-                    toRow,
-                  );
+                  const result = buildRowsFromParsed(parsedDataRef.current, fromRow, toRow);
                   setMissingColumns(result.missing);
                   setMetaColumnCount(result.metaCount);
                   importReplace(result.rows);
@@ -363,7 +346,7 @@ export function UserImportModal({ open, onClose, onImport }: UserImportModalProp
                 {t("userImport.continue")}
               </Button>
             </div>
-           </div>
+          </div>
         )}
 
         {step === 3 && (
@@ -431,10 +414,8 @@ export function UserImportModal({ open, onClose, onImport }: UserImportModalProp
 
         {step === 4 && (
           <div className="space-y-4">
-            <Card className="p-4 space-y-3">
-              <h3 className="font-sans text-lg font-bold">
-                {t("userImport.confirm.title")}
-              </h3>
+            <Card className="space-y-3 p-4">
+              <h3 className="font-sans text-lg font-bold">{t("userImport.confirm.title")}</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-500">{t("userImport.confirm.file")}</span>
@@ -446,7 +427,9 @@ export function UserImportModal({ open, onClose, onImport }: UserImportModalProp
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">{t("userImport.confirm.range")}</span>
-                  <span className="font-medium text-navy">{fromRow}–{toRow}</span>
+                  <span className="font-medium text-navy">
+                    {fromRow}–{toRow}
+                  </span>
                 </div>
                 {metaColumnCount > 0 && (
                   <div className="flex justify-between">
@@ -458,10 +441,7 @@ export function UserImportModal({ open, onClose, onImport }: UserImportModalProp
             </Card>
 
             <div className="flex justify-between pt-2">
-              <Button
-                variant="ghost"
-                onClick={() => setStep(3)}
-              >
+              <Button variant="ghost" onClick={() => setStep(3)}>
                 {t("userImport.back")}
               </Button>
               <Button

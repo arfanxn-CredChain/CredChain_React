@@ -39,14 +39,9 @@ function makeResponse(
 
 describe("useLoadMore", () => {
   it("loads first page on mount", async () => {
-    const queryFn = vi.fn().mockResolvedValue(
-      makeResponse([{ id: "1", name: "A" }], 1, 1, 1),
-    );
+    const queryFn = vi.fn().mockResolvedValue(makeResponse([{ id: "1", name: "A" }], 1, 1, 1));
 
-    const { result } = renderHook(
-      () => useLoadMore(["test"], queryFn),
-      { wrapper: wrapper() },
-    );
+    const { result } = renderHook(() => useLoadMore(["test"], queryFn), { wrapper: wrapper() });
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.items).toEqual([{ id: "1", name: "A" }]);
@@ -56,18 +51,32 @@ describe("useLoadMore", () => {
   });
 
   it("loadMore fetches next page and appends items", async () => {
-    const queryFn = vi.fn()
+    const queryFn = vi
+      .fn()
       .mockResolvedValueOnce(
-        makeResponse([{ id: "1", name: "A" }, { id: "2", name: "B" }], 1, 2, 4),
+        makeResponse(
+          [
+            { id: "1", name: "A" },
+            { id: "2", name: "B" },
+          ],
+          1,
+          2,
+          4,
+        ),
       )
       .mockResolvedValueOnce(
-        makeResponse([{ id: "3", name: "C" }, { id: "4", name: "D" }], 2, 2, 4),
+        makeResponse(
+          [
+            { id: "3", name: "C" },
+            { id: "4", name: "D" },
+          ],
+          2,
+          2,
+          4,
+        ),
       );
 
-    const { result } = renderHook(
-      () => useLoadMore(["test"], queryFn),
-      { wrapper: wrapper() },
-    );
+    const { result } = renderHook(() => useLoadMore(["test"], queryFn), { wrapper: wrapper() });
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.items).toHaveLength(2);
@@ -84,41 +93,45 @@ describe("useLoadMore", () => {
   });
 
   it("reset clears items and goes back to page 1", async () => {
-    const queryFn = vi.fn()
+    const queryFn = vi
+      .fn()
+      .mockResolvedValueOnce(makeResponse([{ id: "1", name: "A" }], 1, 2, 3))
       .mockResolvedValueOnce(
-        makeResponse([{ id: "1", name: "A" }], 1, 2, 3),
+        makeResponse(
+          [
+            { id: "2", name: "B" },
+            { id: "3", name: "C" },
+          ],
+          2,
+          2,
+          3,
+        ),
       )
-      .mockResolvedValueOnce(
-        makeResponse([{ id: "2", name: "B" }, { id: "3", name: "C" }], 2, 2, 3),
-      )
-      .mockResolvedValueOnce(
-        makeResponse([{ id: "1", name: "A" }], 1, 2, 3),
-      );
+      .mockResolvedValueOnce(makeResponse([{ id: "1", name: "A" }], 1, 2, 3));
 
-    const { result } = renderHook(
-      () => useLoadMore(["test"], queryFn),
-      { wrapper: wrapper() },
-    );
+    const { result } = renderHook(() => useLoadMore(["test"], queryFn), { wrapper: wrapper() });
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
-    await act(async () => { result.current.loadMore(); });
+    await act(async () => {
+      result.current.loadMore();
+    });
     await waitFor(() => expect(result.current.items).toHaveLength(3));
 
-    await act(async () => { result.current.reset(); });
+    await act(async () => {
+      result.current.reset();
+    });
 
     await waitFor(() => expect(result.current.items).toHaveLength(1));
     expect(queryFn).toHaveBeenCalledTimes(3);
   });
 
   it("resets when queryKey changes", async () => {
-    const queryFn = vi.fn().mockResolvedValue(
-      makeResponse([{ id: "1", name: "A" }], 1, 1, 1),
-    );
+    const queryFn = vi.fn().mockResolvedValue(makeResponse([{ id: "1", name: "A" }], 1, 1, 1));
 
-    const { result, rerender } = renderHook(
-      ({ key }) => useLoadMore(key, queryFn),
-      { wrapper: wrapper(), initialProps: { key: ["test", "v1"] } },
-    );
+    const { result, rerender } = renderHook(({ key }) => useLoadMore(key, queryFn), {
+      wrapper: wrapper(),
+      initialProps: { key: ["test", "v1"] },
+    });
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(queryFn).toHaveBeenCalledTimes(1);
@@ -130,14 +143,9 @@ describe("useLoadMore", () => {
   });
 
   it("does not add duplicate items on re-fetch", async () => {
-    const queryFn = vi.fn().mockResolvedValue(
-      makeResponse([{ id: "1", name: "A" }], 1, 1, 1),
-    );
+    const queryFn = vi.fn().mockResolvedValue(makeResponse([{ id: "1", name: "A" }], 1, 1, 1));
 
-    const { result } = renderHook(
-      () => useLoadMore(["test"], queryFn),
-      { wrapper: wrapper() },
-    );
+    const { result } = renderHook(() => useLoadMore(["test"], queryFn), { wrapper: wrapper() });
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.items).toHaveLength(1);

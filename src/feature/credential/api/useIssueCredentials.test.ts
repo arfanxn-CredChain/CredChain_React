@@ -106,9 +106,7 @@ describe("useIssueCredentials", () => {
       wrapper: TestProviders,
     });
 
-    result.current.mutate([
-      { holder_user_id: "usr_01", name: "OK", meta_entries: [], file: null },
-    ]);
+    result.current.mutate([{ holder_user_id: "usr_01", name: "OK", meta_entries: [], file: null }]);
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);

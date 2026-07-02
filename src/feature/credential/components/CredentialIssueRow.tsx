@@ -106,24 +106,21 @@ export function CredentialIssueRow({
         </FormField>
 
         <div className="md:col-span-2">
-        <FormField
-          label={t("cred.field.file")}
-          error={errors?.file?.message}
-        >
-          <CredentialFileInput
-            file={file ?? null}
-            onChange={(f) => {
-              form.setValue(`credentials.${index}.file`, f, { shouldValidate: true });
-              if (!f && !nameManuallyEdited.current) {
-                form.setValue(`credentials.${index}.name`, "", { shouldValidate: true });
-              } else if (f && !nameManuallyEdited.current) {
-                const stem = f.name.replace(/\.[^.]+$/, "");
-                form.setValue(`credentials.${index}.name`, stem, { shouldValidate: true });
-              }
-            }}
-            onExpand={() => setPreviewOpen(true)}
-          />
-        </FormField>
+          <FormField label={t("cred.field.file")} error={errors?.file?.message}>
+            <CredentialFileInput
+              file={file ?? null}
+              onChange={(f) => {
+                form.setValue(`credentials.${index}.file`, f, { shouldValidate: true });
+                if (!f && !nameManuallyEdited.current) {
+                  form.setValue(`credentials.${index}.name`, "", { shouldValidate: true });
+                } else if (f && !nameManuallyEdited.current) {
+                  const stem = f.name.replace(/\.[^.]+$/, "");
+                  form.setValue(`credentials.${index}.name`, stem, { shouldValidate: true });
+                }
+              }}
+              onExpand={() => setPreviewOpen(true)}
+            />
+          </FormField>
         </div>
       </div>
 
@@ -145,11 +142,7 @@ export function CredentialIssueRow({
         )}
       </div>
       {file && (
-        <CredentialFileModal
-          file={file}
-          open={previewOpen}
-          onClose={() => setPreviewOpen(false)}
-        />
+        <CredentialFileModal file={file} open={previewOpen} onClose={() => setPreviewOpen(false)} />
       )}
     </div>
   );

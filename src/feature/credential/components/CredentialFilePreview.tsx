@@ -32,9 +32,21 @@ export function CredentialFilePreview({
   if (!file) {
     return (
       <div
-        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDragOver(true); }}
-        onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsDragOver(true); }}
-        onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDragOver(false); }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsDragOver(true);
+        }}
+        onDragEnter={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsDragOver(true);
+        }}
+        onDragLeave={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsDragOver(false);
+        }}
         onDrop={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -111,12 +123,18 @@ function PdfThumbnail({ file }: { file: File }) {
         ).toString();
 
         const pdf = await pdfjsLib.getDocument(objectUrl).promise;
-        if (cancelled) { pdf.destroy(); return; }
+        if (cancelled) {
+          pdf.destroy();
+          return;
+        }
 
         const page = await pdf.getPage(1);
         const viewport = page.getViewport({ scale: 0.15 });
         const canvas = canvasRef.current;
-        if (!canvas || cancelled) { pdf.destroy(); return; }
+        if (!canvas || cancelled) {
+          pdf.destroy();
+          return;
+        }
 
         const ctx = canvas.getContext("2d")!;
         canvas.height = viewport.height;

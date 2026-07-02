@@ -19,9 +19,7 @@ function SearchDisplay() {
 function renderOverview(initialEntries?: string[]) {
   return render(<Overview />, {
     wrapper: ({ children }) => (
-      <TestProviders initialEntries={initialEntries ?? ["/"]}>
-        {children}
-      </TestProviders>
+      <TestProviders initialEntries={initialEntries ?? ["/"]}>{children}</TestProviders>
     ),
   });
 }
@@ -37,9 +35,7 @@ describe("Overview", () => {
       user: makeUser({ name: "Arfan", role: Role.ISSUER }),
     });
     renderOverview();
-    await waitFor(() =>
-      expect(screen.getByText("Welcome, Arfan")).toBeDefined(),
-    );
+    await waitFor(() => expect(screen.getByText("Welcome, Arfan")).toBeDefined());
   });
 
   it("renders credential counts section", async () => {
@@ -64,9 +60,7 @@ describe("Overview", () => {
   it("hides user counts for Holder", async () => {
     useStore.setState({ user: makeUser({ role: Role.HOLDER }) });
     renderOverview();
-    await waitFor(() =>
-      expect(screen.getByText("Credentials")).toBeDefined(),
-    );
+    await waitFor(() => expect(screen.getByText("Credentials")).toBeDefined());
     expect(screen.queryByText("Users")).toBeNull();
   });
 
@@ -81,9 +75,7 @@ describe("Overview", () => {
   it("hides chain details for Holder", async () => {
     useStore.setState({ user: makeUser({ role: Role.HOLDER }) });
     renderOverview();
-    await waitFor(() =>
-      expect(screen.getByText("Credentials")).toBeDefined(),
-    );
+    await waitFor(() => expect(screen.getByText("Credentials")).toBeDefined());
     expect(screen.queryByText("Chain Info")).toBeNull();
   });
 
@@ -124,7 +116,15 @@ describe("Overview", () => {
           code: 100100,
           data: {
             credential_counts: { total: 1, active: 1, revoked: 0, pending: 0, failed: 0 },
-            user_counts: { total: 0, holder: 0, issuer: 0, admin: 0, super_admin: 0, active: 0, trashed: 0 },
+            user_counts: {
+              total: 0,
+              holder: 0,
+              issuer: 0,
+              admin: 0,
+              super_admin: 0,
+              active: 0,
+              trashed: 0,
+            },
             recents: {
               active_credentials: [
                 {

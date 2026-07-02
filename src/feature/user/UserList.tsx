@@ -86,20 +86,27 @@ export function UserList() {
   if (params.status === "deleted_at!_") filterArray.push("deleted_at!_");
   else if (params.status === "deleted_at_") filterArray.push("deleted_at_");
 
-  const { items: users, total, isLoading, isError, isFetchingNextPage, hasMore, loadMore } =
-    useLoadMore<UserDTO>(
-      ["users", { search: debouncedSearch || undefined, sorts: sortArray, filters: filterArray }],
-      async (page, limit) => {
-        const q: Record<string, unknown> = {};
-        q.page = page;
-        q.limit = limit;
-        if (debouncedSearch) q.search = debouncedSearch;
-        q.sorts = sortArray;
-        if (filterArray.length > 0) q.filters = filterArray;
-        const response = await api.get("/users", { params: q });
-        return response.data;
-      },
-    );
+  const {
+    items: users,
+    total,
+    isLoading,
+    isError,
+    isFetchingNextPage,
+    hasMore,
+    loadMore,
+  } = useLoadMore<UserDTO>(
+    ["users", { search: debouncedSearch || undefined, sorts: sortArray, filters: filterArray }],
+    async (page, limit) => {
+      const q: Record<string, unknown> = {};
+      q.page = page;
+      q.limit = limit;
+      if (debouncedSearch) q.search = debouncedSearch;
+      q.sorts = sortArray;
+      if (filterArray.length > 0) q.filters = filterArray;
+      const response = await api.get("/users", { params: q });
+      return response.data;
+    },
+  );
 
   const isEmpty = !isLoading && users.length === 0;
 
@@ -230,7 +237,10 @@ export function UserList() {
                                 </div>
                                 <div className="mt-1 grid grid-cols-1 gap-x-4 gap-y-0.5 text-xs text-gray-500 lg:grid-cols-3">
                                   <div className="flex items-center gap-1">
-                                    <Hash className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden="true" />
+                                    <Hash
+                                      className="h-3.5 w-3.5 shrink-0 text-gray-400"
+                                      aria-hidden="true"
+                                    />
                                     <span className="truncate">{user.number ?? "—"}</span>
                                     {user.number && (
                                       <CopyInlineButton
@@ -241,7 +251,10 @@ export function UserList() {
                                     )}
                                   </div>
                                   <div className="flex items-center gap-1">
-                                    <Mail className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden="true" />
+                                    <Mail
+                                      className="h-3.5 w-3.5 shrink-0 text-gray-400"
+                                      aria-hidden="true"
+                                    />
                                     <span className="truncate">{user.email}</span>
                                     <CopyInlineButton
                                       value={user.email}
@@ -250,7 +263,10 @@ export function UserList() {
                                     />
                                   </div>
                                   <div className="flex items-center gap-1">
-                                    <Phone className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden="true" />
+                                    <Phone
+                                      className="h-3.5 w-3.5 shrink-0 text-gray-400"
+                                      aria-hidden="true"
+                                    />
                                     <span className="truncate">{user.phone_number ?? "—"}</span>
                                     {user.phone_number && (
                                       <CopyInlineButton
@@ -261,9 +277,14 @@ export function UserList() {
                                     )}
                                   </div>
                                   <div className="flex items-center gap-1 font-mono">
-                                    <Wallet className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden="true" />
+                                    <Wallet
+                                      className="h-3.5 w-3.5 shrink-0 text-gray-400"
+                                      aria-hidden="true"
+                                    />
                                     <span className="truncate">
-                                      {user.wallet_address ? truncateAddress(user.wallet_address) : "—"}
+                                      {user.wallet_address
+                                        ? truncateAddress(user.wallet_address)
+                                        : "—"}
                                     </span>
                                     {user.wallet_address && (
                                       <CopyInlineButton
@@ -274,12 +295,20 @@ export function UserList() {
                                     )}
                                   </div>
                                   <div className="flex items-center gap-1">
-                                    <VenusAndMars className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden="true" />
-                                    <span>{user.gender ? t(`user.field.gender.${user.gender}`) : "—"}</span>
+                                    <VenusAndMars
+                                      className="h-3.5 w-3.5 shrink-0 text-gray-400"
+                                      aria-hidden="true"
+                                    />
+                                    <span>
+                                      {user.gender ? t(`user.field.gender.${user.gender}`) : "—"}
+                                    </span>
                                   </div>
                                 </div>
                                 <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-500">
-                                  <Calendar className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
+                                  <Calendar
+                                    className="h-3.5 w-3.5 text-gray-400"
+                                    aria-hidden="true"
+                                  />
                                   <span>
                                     {user.deleted_at
                                       ? t("user.list.trashed", {
@@ -310,7 +339,12 @@ export function UserList() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/users/${user.id}`); }}>
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(`/users/${user.id}`);
+                                  }}
+                                >
                                   <Eye className="mr-2 h-4 w-4" />
                                   {t("common.view")}
                                 </DropdownMenuItem>

@@ -6,18 +6,34 @@ import type { UserDTO } from "@shared/types/api";
 
 const MOCK_USERS: UserDTO[] = [
   {
-    id: "u1", name: "John Doe", email: "john@example.com",
-    phone_number: "+628123456789", number: "22091234",
+    id: "u1",
+    name: "John Doe",
+    email: "john@example.com",
+    phone_number: "+628123456789",
+    number: "22091234",
     wallet_address: "0xAb1234567890abcdef1234567890abcdef123456",
-    role: "holder" as const, meta: null, gender: null,
-    birth_date: null, created_at: "", updated_at: "", deleted_at: null,
+    role: "holder" as const,
+    meta: null,
+    gender: null,
+    birth_date: null,
+    created_at: "",
+    updated_at: "",
+    deleted_at: null,
   },
   {
-    id: "u2", name: "Jane Smith", email: "jane@example.com",
-    phone_number: "+628987654321", number: "22095678",
+    id: "u2",
+    name: "Jane Smith",
+    email: "jane@example.com",
+    phone_number: "+628987654321",
+    number: "22095678",
     wallet_address: "0xF34abcdef1234567890abcdef1234567890abcde",
-    role: "holder" as const, meta: null, gender: null,
-    birth_date: null, created_at: "", updated_at: "", deleted_at: null,
+    role: "holder" as const,
+    meta: null,
+    gender: null,
+    birth_date: null,
+    created_at: "",
+    updated_at: "",
+    deleted_at: null,
   },
 ];
 
@@ -31,7 +47,7 @@ describe("HolderSearchDropdown", () => {
         onSearch={onSearch}
         searchPlaceholder="Search holders..."
         noResultsText="No results"
-      />
+      />,
     );
     const trigger = screen.getByRole("combobox");
     await userEvent.click(trigger);
@@ -47,15 +63,18 @@ describe("HolderSearchDropdown", () => {
         onSearch={onSearch}
         searchPlaceholder="Search..."
         noResultsText="No results"
-      />
+      />,
     );
     const trigger = screen.getByRole("combobox");
     await userEvent.click(trigger);
     const input = screen.getByPlaceholderText("Search...");
     await userEvent.type(input, "john");
-    await waitFor(() => {
-      expect(onSearch).toHaveBeenCalledWith("john");
-    }, { timeout: 500 });
+    await waitFor(
+      () => {
+        expect(onSearch).toHaveBeenCalledWith("john");
+      },
+      { timeout: 500 },
+    );
   });
 
   it("displays search results with name and number", async () => {
@@ -67,7 +86,7 @@ describe("HolderSearchDropdown", () => {
         onSearch={onSearch}
         searchPlaceholder="Search..."
         noResultsText="No results"
-      />
+      />,
     );
     const trigger = screen.getByRole("combobox");
     await userEvent.click(trigger);
@@ -88,7 +107,7 @@ describe("HolderSearchDropdown", () => {
         onSearch={onSearch}
         searchPlaceholder="Search..."
         noResultsText="Nothing found"
-      />
+      />,
     );
     const trigger = screen.getByRole("combobox");
     await userEvent.click(trigger);
@@ -109,7 +128,7 @@ describe("HolderSearchDropdown", () => {
         onSearch={onSearch}
         searchPlaceholder="Search..."
         noResultsText="No results"
-      />
+      />,
     );
     const trigger = screen.getByRole("combobox");
     await userEvent.click(trigger);

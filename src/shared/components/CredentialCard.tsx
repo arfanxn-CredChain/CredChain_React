@@ -121,7 +121,9 @@ export function CredentialCard({
         </div>
 
         <div className="mb-4">
-          <h3 className="line-clamp-2 font-sans text-base font-bold text-navy">{credential.name}</h3>
+          <h3 className="line-clamp-2 font-sans font-bold text-base text-navy">
+            {credential.name}
+          </h3>
           <div className="mt-0.5 flex items-center gap-1">
             <MonoId value={credential.id} mode="id" />
             <CopyInlineButton
@@ -181,5 +183,3 @@ export function CredentialCard({
     </Card>
   );
 }
-
-

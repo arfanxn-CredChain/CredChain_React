@@ -1,9 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  getVerdictTier,
-  getMethodLabel,
-  isExactHashMatch,
-} from "./verdict";
+import { getVerdictTier, getMethodLabel, isExactHashMatch } from "./verdict";
 
 describe("getVerdictTier", () => {
   it("returns green for authentic (400401)", () => {

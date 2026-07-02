@@ -16,6 +16,7 @@ import { useVerifyCredential } from "./api/useVerifyCredential";
 import { getVerdictTier, getMethodLabel } from "./lib/verdict";
 import { verifyFileSchema } from "./schemas/credential";
 import type { CredentialVerifyDTO } from "@shared/types/api";
+import { isApiError } from "@shared/api/envelope";
 import { useStore } from "@app/store";
 import { canAccess, Role } from "@shared/auth/role";
 import { Card } from "@ui/card";
@@ -103,10 +104,16 @@ export function VerifyCredential() {
     setResult(null);
     try {
       const resp = await verify.mutateAsync(file);
-      setResult(resp);
+      setResult({
+        verdict_code: resp.verdict_code,
+        similarity_score: resp.similarity_score ?? null,
+        similarity_percent: resp.similarity_percent ?? null,
+        description: resp.description,
+        credential: resp.credential ?? null,
+      });
       setState("done");
-    } catch {
-      setError(t("cred.verify.failed"));
+    } catch (e) {
+      setError(isApiError(e) ? t(e.messageKey) : t("cred.verify.failed"));
       setState("idle");
     }
   };
@@ -126,21 +133,18 @@ export function VerifyCredential() {
   const isHolderOfCredential =
     isAuthenticated && hasCredential && user?.id === result.credential!.holder_user_id;
   const isIssuerOrAbove = isAuthenticated && canAccess(user?.role, Role.ISSUER);
-  const canViewCredential = isIssuerOrAbove || isHolderOfCredential;
+  const canViewCredential = hasCredential && (isIssuerOrAbove || isHolderOfCredential);
 
   const VerdictIcon = VERDICT_ICON[tier];
   const showSimilarity = result?.similarity_score != null;
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="mx-auto w-full max-w-4xl space-y-6">
       <BackLink />
-      <PageHeader
-        title={t("cred.verify.title")}
-        description={t("cred.verify.description")}
-      />
+      <PageHeader title={t("cred.verify.title")} description={t("cred.verify.description")} />
 
       {/* Upload Card */}
-      <Card className="mx-auto w-full max-w-[560px] overflow-hidden p-6 sm:p-8">
+      <Card className="overflow-hidden p-6 sm:p-8">
         <CredentialFileInput
           file={file}
           onChange={handleFileChange}
@@ -186,11 +190,11 @@ export function VerifyCredential() {
       {/* Result Card */}
       {result && state === "done" && (
         <div role="status" aria-live="polite">
-          <Card className="mx-auto w-full max-w-[560px] overflow-hidden p-6 sm:p-8">
+          <Card className="overflow-hidden p-6 sm:p-8">
             {/* Verdict Banner */}
             <div
               className={cn(
-                "rounded-xl bg-gradient-to-br p-6 text-center text-white md:p-8",
+                "mb-5 rounded-xl bg-gradient-to-br p-6 text-center text-white md:p-8",
                 VERDICT_GRADIENT[tier],
               )}
             >
@@ -203,7 +207,7 @@ export function VerifyCredential() {
                 <VerdictIcon className="h-8 w-8" aria-hidden="true" />
               </div>
               <h3 className="font-display text-2xl font-extrabold tracking-tight">
-                {result.description}
+                {result.description ?? t("cred.verify.failed")}
               </h3>
             </div>
 
@@ -212,18 +216,12 @@ export function VerifyCredential() {
               {showSimilarity && (
                 <div className="mb-4">
                   <div className="mb-1.5 flex items-center justify-between text-sm">
-                    <span className="text-gray-500">
-                      {t("cred.verify.similarityLabel")}
-                    </span>
+                    <span className="text-gray-500">{t("cred.verify.similarityLabel")}</span>
                     <span
                       className="font-bold"
                       style={{
                         color:
-                          tier === "red"
-                            ? "#EF4444"
-                            : tier === "amber"
-                              ? "#D97706"
-                              : "#6B7280",
+                          tier === "red" ? "#EF4444" : tier === "amber" ? "#D97706" : "#6B7280",
                       }}
                     >
                       {result.similarity_percent}
@@ -249,17 +247,13 @@ export function VerifyCredential() {
               <div
                 className={cn(
                   "mb-5 flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm",
-                  method === "hash"
-                    ? "bg-green-50 text-green-700"
-                    : "bg-blue-50 text-blue-700",
+                  method === "hash" ? "bg-green-50 text-green-700" : "bg-blue-50 text-blue-700",
                 )}
               >
                 <span
                   className={cn(
                     "rounded px-2 py-0.5 text-xs font-bold",
-                    method === "hash"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-blue-100 text-blue-700",
+                    method === "hash" ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700",
                   )}
                 >
                   {method === "hash" ? "HASH" : "AI"}
@@ -272,15 +266,11 @@ export function VerifyCredential() {
                 <div className="border-t border-gray-100 pt-5">
                   {/* Status Badge */}
                   <div className="mb-3 flex flex-wrap items-center gap-2">
-                    <CredentialStatusBadge
-                      revoked={result.credential!.revoked_at !== null}
-                    />
+                    <CredentialStatusBadge revoked={result.credential!.revoked_at !== null} />
                   </div>
 
                   {/* Name */}
-                  <h4 className="text-base font-bold text-navy">
-                    {result.credential!.name}
-                  </h4>
+                  <h4 className="font-bold text-base text-navy">{result.credential!.name}</h4>
 
                   {/* Credential ULID — shield icon */}
                   <div className="mt-2 flex items-center gap-2 text-xs">
@@ -298,7 +288,18 @@ export function VerifyCredential() {
                   {/* ID Token — credit card icon (issuer+ only) */}
                   {isIssuerOrAbove && result.credential!.token_id && (
                     <div className="mt-1.5 flex items-center gap-2 text-xs">
-                      <svg className="h-4 w-4 shrink-0 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M2 10h20"/></svg>
+                      <svg
+                        className="h-4 w-4 shrink-0 text-gray-400"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <rect x="2" y="6" width="20" height="12" rx="2" />
+                        <path d="M2 10h20" />
+                      </svg>
                       <span className="shrink-0 truncate font-mono text-gray-500">
                         {truncateId(result.credential!.token_id)}
                       </span>
@@ -385,9 +386,7 @@ export function VerifyCredential() {
               {/* Sign-in Nudge (unauthed + credential found) */}
               {!isAuthenticated && hasCredential && (
                 <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-center">
-                  <p className="text-sm font-bold text-amber-800">
-                    {t("cred.verify.signInNudge")}
-                  </p>
+                  <p className="text-sm font-bold text-amber-800">{t("cred.verify.signInNudge")}</p>
                   <p className="mt-0.5 text-xs text-amber-600">
                     {t("cred.verify.signInNudgeDesc")}
                   </p>

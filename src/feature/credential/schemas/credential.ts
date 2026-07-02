@@ -18,29 +18,27 @@ export const credentialIssueRowSchema = z.object({
     .refine((v) => v !== "new_holder", { message: "zod.credential.holderRequired" }),
   name: z.string().min(1, "zod.credential.nameRequired").max(256, "zod.credential.nameTooLong"),
   meta_entries: metaEntriesSchema.optional(),
-  file: z
-    .custom<File | null>()
-    .superRefine((f, ctx) => {
-      if (!(f instanceof File)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "zod.credential.fileRequired",
-        });
-        return;
-      }
-      if (f.size > MAX_FILE_BYTES) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "zod.credential.fileTooLarge",
-        });
-      }
-      if (!ALLOWED_MIME_TYPES.has(f.type)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "zod.credential.fileTypeInvalid",
-        });
-      }
-    }),
+  file: z.custom<File | null>().superRefine((f, ctx) => {
+    if (!(f instanceof File)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "zod.credential.fileRequired",
+      });
+      return;
+    }
+    if (f.size > MAX_FILE_BYTES) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "zod.credential.fileTooLarge",
+      });
+    }
+    if (!ALLOWED_MIME_TYPES.has(f.type)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "zod.credential.fileTypeInvalid",
+      });
+    }
+  }),
 });
 
 export type CredentialIssueRowInput = z.infer<typeof credentialIssueRowSchema>;

@@ -19,7 +19,9 @@ export function TestProviders({ children, initialEntries = ["/"], routePath }: T
   });
 
   // Data router (createMemoryRouter) is required so hooks like useBlocker work.
-  const router = createMemoryRouter([{ path: routePath ?? "*", element: <>{children}</> }], { initialEntries });
+  const router = createMemoryRouter([{ path: routePath ?? "*", element: <>{children}</> }], {
+    initialEntries,
+  });
 
   return (
     <QueryClientProvider client={queryClient}>

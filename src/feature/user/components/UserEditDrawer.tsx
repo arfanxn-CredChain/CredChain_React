@@ -68,7 +68,10 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
         birth_date: user.birth_date ? user.birth_date.slice(0, 10) : undefined,
         gender: user.gender ?? undefined,
         email: user.email,
-        role: user.role === Role.SUPER_ADMIN ? undefined : (user.role as "admin" | "issuer" | "holder" | undefined),
+        role:
+          user.role === Role.SUPER_ADMIN
+            ? undefined
+            : (user.role as "admin" | "issuer" | "holder" | undefined),
         meta_entries: entries,
       });
     }

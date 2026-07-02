@@ -119,10 +119,9 @@ describe("CredentialCard", () => {
     const credential = makeCredential();
     const onSelect = vi.fn();
 
-    render(
-      <CredentialCard credential={credential} selectionMode="revoke" onSelect={onSelect} />,
-      { wrapper: TestProviders },
-    );
+    render(<CredentialCard credential={credential} selectionMode="revoke" onSelect={onSelect} />, {
+      wrapper: TestProviders,
+    });
 
     await user.click(screen.getByRole("button", { name: /select credential/i }));
     expect(onSelect).toHaveBeenCalled();
@@ -211,10 +210,9 @@ describe("CredentialCard", () => {
     const credential = makeCredential();
     const onSelect = vi.fn();
 
-    render(
-      <CredentialCard credential={credential} selectionMode="revoke" onSelect={onSelect} />,
-      { wrapper: TestProviders },
-    );
+    render(<CredentialCard credential={credential} selectionMode="revoke" onSelect={onSelect} />, {
+      wrapper: TestProviders,
+    });
 
     await user.click(screen.getByText("Test Credential"));
     expect(onSelect).toHaveBeenCalled();
@@ -250,10 +248,9 @@ describe("CredentialCard", () => {
 
   it("shows not-allowed cursor when selectDisabled is true", () => {
     const credential = makeCredential();
-    render(
-      <CredentialCard credential={credential} selectionMode="revoke" selectDisabled />,
-      { wrapper: TestProviders },
-    );
+    render(<CredentialCard credential={credential} selectionMode="revoke" selectDisabled />, {
+      wrapper: TestProviders,
+    });
 
     const card = screen.getByRole("link", { name: /active/i });
     expect(card.className).toContain("cursor-not-allowed");
@@ -261,10 +258,9 @@ describe("CredentialCard", () => {
 
   it("disables checkbox when selectDisabled is true", () => {
     const credential = makeCredential();
-    render(
-      <CredentialCard credential={credential} selectionMode="revoke" selectDisabled />,
-      { wrapper: TestProviders },
-    );
+    render(<CredentialCard credential={credential} selectionMode="revoke" selectDisabled />, {
+      wrapper: TestProviders,
+    });
 
     expect(screen.getByRole("button", { name: /select credential/i })).toBeDisabled();
   });
@@ -275,7 +271,12 @@ describe("CredentialCard", () => {
     const onSelect = vi.fn();
 
     render(
-      <CredentialCard credential={credential} selectionMode="revoke" onSelect={onSelect} selectDisabled />,
+      <CredentialCard
+        credential={credential}
+        selectionMode="revoke"
+        onSelect={onSelect}
+        selectDisabled
+      />,
       { wrapper: TestProviders },
     );
 

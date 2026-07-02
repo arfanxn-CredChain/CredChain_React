@@ -30,9 +30,7 @@ export function SortMenu({ value, onChange }: SortMenuProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm">
-          {activeOption
-            ? `${t("user.sort.label")}: ${activeOption.label}`
-            : t("user.sort.label")}
+          {activeOption ? `${t("user.sort.label")}: ${activeOption.label}` : t("user.sort.label")}
           <ChevronDown className="ml-1 h-3 w-3 text-gray-400" aria-hidden="true" />
         </Button>
       </DropdownMenuTrigger>

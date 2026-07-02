@@ -39,10 +39,7 @@ describe("useRestoreUsers", () => {
   it("toasts error message on failure", async () => {
     server.use(
       http.put("*/api/users/batch/restore", () =>
-        HttpResponse.json(
-          { code: 300943, message: "Cannot restore super admin" },
-          { status: 403 },
-        ),
+        HttpResponse.json({ code: 300943, message: "Cannot restore super admin" }, { status: 403 }),
       ),
     );
 

@@ -10,6 +10,7 @@ import { PageHeader } from "@shared/components/PageHeader";
 import { BackLink } from "@shared/components/BackLink";
 import { EmptyState } from "@shared/components/EmptyState";
 import { DetailRow } from "@shared/components/DetailRow";
+import { MetaDisplay } from "@shared/components/MetaDisplay";
 import { MonoId } from "@shared/components/MonoId";
 import { CopyInlineButton } from "@shared/components/CopyInlineButton";
 import { UserContactBlock } from "@shared/components/UserContactBlock";
@@ -26,11 +27,11 @@ export function CredentialDetail() {
   const { id } = useParams<{ id: string }>();
   const currentUser = useStore((s) => s.user);
   const canManage = canAccessAny(currentUser?.role, [Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]);
-  const { data: cred, isLoading, isError } = useCredential(id ?? "", [
-    "holder",
-    "issuer",
-    "revoker",
-  ]);
+  const {
+    data: cred,
+    isLoading,
+    isError,
+  } = useCredential(id ?? "", ["holder", "issuer", "revoker"]);
   const reExtract = useReExtractCredentials();
   const [metaOpen, setMetaOpen] = useState(false);
 
@@ -105,8 +106,8 @@ export function CredentialDetail() {
             </div>
 
             {/* Name + ID */}
-            <h3 className="font-sans text-base font-bold text-navy">{cred.name}</h3>
-            <div className="mb-6 mt-0.5 flex items-center gap-1">
+            <h3 className="font-sans font-bold text-base text-navy">{cred.name}</h3>
+            <div className="mt-0.5 mb-6 flex items-center gap-1">
               <MonoId value={cred.id} mode="id" />
               <CopyInlineButton
                 value={cred.id}
@@ -156,7 +157,9 @@ export function CredentialDetail() {
               {cred.revoked_at && (
                 <DetailRow
                   label={t("cred.detail.revokedDate")}
-                  value={<span className="text-sm text-error">{formatDateTime(cred.revoked_at)}</span>}
+                  value={
+                    <span className="text-sm text-error">{formatDateTime(cred.revoked_at)}</span>
+                  }
                   tone="error"
                 />
               )}
@@ -176,15 +179,8 @@ export function CredentialDetail() {
                   />
                 </button>
                 {metaOpen && (
-                  <div className="mt-4 flex flex-col gap-2 rounded-xl bg-gray-50 p-4">
-                    {Object.entries(cred.meta!).map(([key, value]) => (
-                      <div key={key} className="flex items-baseline gap-2">
-                        <span className="shrink-0 font-mono text-xs font-semibold text-navy">{key}</span>
-                        <span className="min-w-0 break-all text-xs text-gray-600">
-                          {typeof value === "object" ? JSON.stringify(value) : String(value)}
-                        </span>
-                      </div>
-                    ))}
+                  <div className="mt-4 rounded-xl bg-gray-50 p-4">
+                    <MetaDisplay meta={cred.meta} />
                   </div>
                 )}
               </div>

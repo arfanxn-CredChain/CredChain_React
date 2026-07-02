@@ -147,12 +147,18 @@ function PdfBlobThumbnail({ blob }: { blob: Blob }) {
         ).toString();
 
         const pdf = await pdfjsLib.getDocument(objectUrl).promise;
-        if (cancelled) { pdf.destroy(); return; }
+        if (cancelled) {
+          pdf.destroy();
+          return;
+        }
 
         const page = await pdf.getPage(1);
         const viewport = page.getViewport({ scale: 0.15 });
         const canvas = canvasRef.current;
-        if (!canvas || cancelled) { pdf.destroy(); return; }
+        if (!canvas || cancelled) {
+          pdf.destroy();
+          return;
+        }
 
         const ctx = canvas.getContext("2d")!;
         canvas.height = viewport.height;
@@ -181,20 +187,10 @@ function PdfBlobThumbnail({ blob }: { blob: Blob }) {
     );
   }
 
-  return (
-    <canvas ref={canvasRef} className="h-full w-full object-cover" />
-  );
+  return <canvas ref={canvasRef} className="h-full w-full object-cover" />;
 }
 
-function BlobThumbnail({
-  blob,
-  isPdf,
-  isImage,
-}: {
-  blob: Blob;
-  isPdf: boolean;
-  isImage: boolean;
-}) {
+function BlobThumbnail({ blob, isPdf, isImage }: { blob: Blob; isPdf: boolean; isImage: boolean }) {
   const objectUrlRef = useRef<string | null>(null);
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
   const [error, setError] = useState(false);

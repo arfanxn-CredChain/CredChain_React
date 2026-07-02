@@ -178,7 +178,7 @@ export function Landing() {
     <SplitLayout brandSlot={desktopBrand} mobileBrandSlot={mobileBrand}>
       <section
         aria-labelledby="landing-title"
-        className="relative flex h-full w-full flex-col justify-center space-y-[1.5dvh] py-[2dvh] sm:w-auto sm:self-center sm:max-w-[min(36rem,90vw)] sm:space-y-[2dvh] lg:py-0"
+        className="relative flex h-full w-full flex-col justify-center space-y-[1.5dvh] py-[2dvh] sm:w-auto sm:max-w-[min(36rem,90vw)] sm:space-y-[2dvh] sm:self-center lg:py-0"
       >
         <div className="flex items-center gap-3">
           <div className="h-px w-10 shrink-0 bg-gold" aria-hidden="true" />

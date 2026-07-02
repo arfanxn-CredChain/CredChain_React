@@ -3,7 +3,10 @@ import { metaEntrySchema, metaEntriesSchema, splitMeta, mergeMeta, metaEqual } f
 
 describe("metaEntrySchema", () => {
   it("accepts valid entry", () => {
-    expect(metaEntrySchema.parse({ key: "dept", value: "Eng" })).toEqual({ key: "dept", value: "Eng" });
+    expect(metaEntrySchema.parse({ key: "dept", value: "Eng" })).toEqual({
+      key: "dept",
+      value: "Eng",
+    });
   });
 
   it("rejects empty key", () => {

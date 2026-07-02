@@ -85,21 +85,25 @@ export function HolderSearchDropdown({
           "bg-gray-50 text-sm",
           error
             ? "border-error"
-            : "border-gray-200 focus:border-transparent focus:ring-2 focus:ring-gold focus:bg-white",
+            : "border-gray-200 focus:border-transparent focus:bg-white focus:ring-2 focus:ring-gold",
         )}
       >
         {selectedUser ? (
-          <div className="flex items-center gap-2 min-w-0 flex-1">
+          <div className="flex min-w-0 flex-1 items-center gap-2">
             <UserAvatar user={selectedUser} size="sm" className="shrink-0" />
-            <span className="truncate font-medium text-navy text-sm">
-              {selectedUser.name}{selectedUser.number ? ` · ${selectedUser.number}` : ""}
+            <span className="truncate text-sm font-medium text-navy">
+              {selectedUser.name}
+              {selectedUser.number ? ` · ${selectedUser.number}` : ""}
             </span>
           </div>
         ) : (
-          <span className="text-gray-400 flex-1">{searchPlaceholder}</span>
+          <span className="flex-1 text-gray-400">{searchPlaceholder}</span>
         )}
         <svg
-          className={cn("ml-2 h-4 w-4 shrink-0 text-gray-400 transition-transform", open && "rotate-180")}
+          className={cn(
+            "ml-2 h-4 w-4 shrink-0 text-gray-400 transition-transform",
+            open && "rotate-180",
+          )}
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="none"
@@ -113,7 +117,7 @@ export function HolderSearchDropdown({
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-1 w-full rounded-xl border border-gray-100 bg-surface shadow-xl shadow-navy/20 overflow-hidden">
+        <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-xl border border-gray-100 bg-surface shadow-xl shadow-navy/20">
           <div className="flex items-center border-b border-gray-50 px-3 py-2">
             <Search className="mr-2 h-4 w-4 shrink-0 text-gray-400" />
             <input
@@ -139,7 +143,7 @@ export function HolderSearchDropdown({
                   type="button"
                   className={cn(
                     "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left",
-                    "hover:bg-navy/5 transition-colors",
+                    "transition-colors hover:bg-navy/5",
                     value === user.id && "bg-navy/5 font-bold",
                   )}
                   onClick={() => {
@@ -150,7 +154,7 @@ export function HolderSearchDropdown({
                 >
                   <UserAvatar user={user} size="md" className="shrink-0" />
                   <div className="min-w-0">
-                    <div className="text-sm font-medium text-navy truncate">
+                    <div className="truncate text-sm font-medium text-navy">
                       {user.name ?? user.email}
                     </div>
                     <div className="text-xs text-gray-500">{user.number}</div>
