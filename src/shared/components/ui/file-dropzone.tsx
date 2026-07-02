@@ -68,6 +68,15 @@ export function FileDropzone({
 
       {!file ? (
         <div
+          tabIndex={0}
+          role="button"
+          aria-label={emptyLabel}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              inputRef.current?.click();
+            }
+          }}
           onDragOver={(e) => {
             e.preventDefault();
             e.stopPropagation();
