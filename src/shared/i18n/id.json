@@ -916,5 +916,7 @@
   "userImport.column.department": "Departemen",
   "userImport.column.required": "wajib",
   "userImport.column.optional": "opsional",
-  "userImport.metaHint": "Kolom tambahan \u2192 field kustom (kunci = header, nilai = sel). Sel kosong = lewati."
+  "userImport.metaHint": "Kolom tambahan \u2192 field kustom (kunci = header, nilai = sel). Sel kosong = lewati.",
+  "userImport.customColumns_one": "{{count}} kolom kustom",
+  "userImport.customColumns_other": "{{count}} kolom kustom"
 }

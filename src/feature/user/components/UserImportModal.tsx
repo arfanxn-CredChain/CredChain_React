@@ -381,7 +381,7 @@ export function UserImportModal({ open, onClose, onImport: _onImport }: UserImpo
                 <p className="text-sm text-navy">
                   {t("userImport.rowsToImport", { count: importFields.length })}
                   {metaColumnCount > 0 &&
-                    ` · ${metaColumnCount} custom column${metaColumnCount > 1 ? "s" : ""}`}
+                    ` · ${t("userImport.customColumns", { count: metaColumnCount })}`}
                 </p>
 
                 <div className="max-h-[400px] space-y-3 overflow-y-auto pr-1">
