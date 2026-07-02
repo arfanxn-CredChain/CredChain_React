@@ -41,6 +41,11 @@ export const COLUMN_TO_FIELD: Record<string, string> = {
   role: "role",
 };
 
+const COLUMN_I18N_MAP: Record<string, string> = {
+  number_id: "numberId",
+  birth_date: "birthDate",
+};
+
 const ALLOWED_EXTENSIONS = [".csv", ".xls", ".xlsx"];
 
 interface UserImportModalProps {
@@ -256,7 +261,7 @@ export function UserImportModal({ open, onClose, onImport }: UserImportModalProp
                     <TableRow>
                       {FIXED_COLUMNS.map((col) => (
                         <TableHead key={col} className="whitespace-nowrap">
-                          {t(`userImport.column.${col}`)}
+                          {t(`userImport.column.${COLUMN_I18N_MAP[col] ?? col}`)}
                           {REQUIRED_COLUMNS.includes(col) && (
                             <span className="ml-0.5 text-error">*</span>
                           )}
