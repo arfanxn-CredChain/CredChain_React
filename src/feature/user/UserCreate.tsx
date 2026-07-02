@@ -60,7 +60,10 @@ export function UserCreate() {
         u.email.trim() !== "" ||
         (u.phone_number?.trim() ?? "") !== "" ||
         (u.number?.trim() ?? "") !== "" ||
-        (u.birth_date?.trim() ?? "") !== "",
+        (u.birth_date?.trim() ?? "") !== "" ||
+        (u.gender?.trim() ?? "") !== "" ||
+        (u.role?.trim() ?? "") !== "" ||
+        (u.meta_entries?.some((m) => m.key.trim() !== "" || m.value.trim() !== "") ?? false),
     );
   }, [form]);
 
