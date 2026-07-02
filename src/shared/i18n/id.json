@@ -884,6 +884,7 @@
   "userImport.supportedFormats": "CSV, XLS, atau XLSX",
   "userImport.exampleTable.title": "Format File yang Diharapkan",
   "userImport.exampleTable.note": "Kolom tambahan di luar field tetap menjadi kolom kustom; nama kolom menjadi kunci. Biarkan sel kosong jika pengguna tidak memerlukan field tersebut.",
+  "userImport.rowsFound": "{{count}} baris data ditemukan",
   "userImport.fromRow": "Impor dari baris",
   "userImport.toRow": "Impor sampai baris",
   "userImport.maxRows": "Maksimal 100 baris per impor",
