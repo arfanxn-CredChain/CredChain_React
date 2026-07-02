@@ -912,6 +912,7 @@
   "userImport.column.birthDate": "Birth Date",
   "userImport.column.gender": "Gender",
   "userImport.column.role": "Role",
+  "userImport.column.department": "Department",
   "userImport.column.required": "required",
   "userImport.column.optional": "optional",
   "userImport.metaHint": "Any extra column \u2192 custom field (key = header, value = cell). Empty cell = skip."

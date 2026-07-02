@@ -178,7 +178,7 @@ export function UserImportModal({ open, onClose, onImport: _onImport }: UserImpo
                           )}
                         </TableHead>
                       ))}
-                      <TableHead className="whitespace-nowrap">department</TableHead>
+                      <TableHead className="whitespace-nowrap">{t("userImport.column.department")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>

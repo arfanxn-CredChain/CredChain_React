@@ -913,6 +913,7 @@
   "userImport.column.birthDate": "Tanggal Lahir",
   "userImport.column.gender": "Jenis Kelamin",
   "userImport.column.role": "Peran",
+  "userImport.column.department": "Departemen",
   "userImport.column.required": "wajib",
   "userImport.column.optional": "opsional",
   "userImport.metaHint": "Kolom tambahan \u2192 field kustom (kunci = header, nilai = sel). Sel kosong = lewati."
