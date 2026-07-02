@@ -52,7 +52,7 @@ describe("FileDropzone", () => {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
     renderDropzone({ file, onChange });
-    fireEvent.click(screen.getByRole("button", { name: "Remove file" }));
+    fireEvent.click(screen.getByRole("button", { name: "Hapus file" }));
     expect(onChange).toHaveBeenCalledWith(null);
   });
 

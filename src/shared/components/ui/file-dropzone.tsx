@@ -119,7 +119,7 @@ export function FileDropzone({
             variant="ghost"
             size="icon"
             className="h-8 w-8 shrink-0 text-gray-400 hover:bg-error/10 hover:text-error"
-            aria-label="Remove file"
+            aria-label={t("fileDropzone.removeAriaLabel")}
             onClick={handleRemove}
           >
             <X className="h-4 w-4" />

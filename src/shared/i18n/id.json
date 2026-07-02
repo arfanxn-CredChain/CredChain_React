@@ -877,6 +877,7 @@
 
   "fileDropzone.dragDrop": "Seret & lepas atau klik untuk memilih",
   "fileDropzone.notAvailable": "N/A",
+  "fileDropzone.removeAriaLabel": "Hapus file",
 
   "userImport.title": "Impor Pengguna dari File",
   "userImport.description": "Unggah file CSV, XLS, atau XLSX untuk impor pengguna secara massal.",

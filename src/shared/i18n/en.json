@@ -876,6 +876,7 @@
 
   "fileDropzone.dragDrop": "Drag & drop or click to browse",
   "fileDropzone.notAvailable": "N/A",
+  "fileDropzone.removeAriaLabel": "Remove file",
 
   "userImport.title": "Import Users from File",
   "userImport.description": "Upload a CSV, XLS, or XLSX file to bulk import users.",
