@@ -66,7 +66,7 @@ interface ParsedRow {
   [key: string]: string | number | boolean | null;
 }
 
-export function UserImportModal({ open, onClose, onImport: _onImport }: UserImportModalProps) {
+export function UserImportModal({ open, onClose, onImport }: UserImportModalProps) {
   const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [file, setFile] = useState<File | null>(null);
@@ -421,8 +421,63 @@ export function UserImportModal({ open, onClose, onImport: _onImport }: UserImpo
               <Button
                 variant="primary"
                 disabled={missingColumns.length > 0}
+                onClick={() => setStep(4)}
               >
                 {t("userImport.continue")}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {step === 4 && (
+          <div className="space-y-4">
+            <Card className="p-4 space-y-3">
+              <h3 className="font-sans text-lg font-bold">
+                {t("userImport.confirm.title")}
+              </h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">{t("userImport.confirm.file")}</span>
+                  <span className="font-medium text-navy">{file?.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">{t("userImport.confirm.rows")}</span>
+                  <span className="font-medium text-navy">{importFields.length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">{t("userImport.confirm.range")}</span>
+                  <span className="font-medium text-navy">{fromRow}–{toRow}</span>
+                </div>
+                {metaColumnCount > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">{t("userImport.confirm.metaColumns")}</span>
+                    <span className="font-medium text-navy">{metaColumnCount}</span>
+                  </div>
+                )}
+              </div>
+            </Card>
+
+            <div className="flex justify-between pt-2">
+              <Button
+                variant="ghost"
+                onClick={() => setStep(3)}
+              >
+                {t("userImport.back")}
+              </Button>
+              <Button
+                variant="primary"
+                onClick={async () => {
+                  const valid = await importForm.trigger();
+                  if (!valid) {
+                    setStep(3);
+                    return;
+                  }
+                  const values = importForm.getValues("users");
+                  onImport(values);
+                  handleClose();
+                }}
+              >
+                {t("userImport.confirm.import", { count: importFields.length })}
               </Button>
             </div>
           </div>
