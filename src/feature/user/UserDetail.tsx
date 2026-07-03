@@ -365,7 +365,7 @@ export function UserDetail() {
             hasMore={credHasMore}
             isLoading={credFetchingMore}
             onLoadMore={credLoadMore}
-            countLabel={t("cred.list.count", { count: credTotal })}
+            countLabel={t("cred.list.count", { count: credentials.length, total: credTotal })}
           />
         )}
       </Card>

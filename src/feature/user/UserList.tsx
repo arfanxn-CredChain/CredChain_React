@@ -458,7 +458,7 @@ export function UserList() {
                 hasMore={hasMore}
                 isLoading={isFetchingNextPage}
                 onLoadMore={loadMore}
-                countLabel={t("user.list.footerCount", { count: total })}
+                countLabel={t("user.list.footerCount", { count: users.length, total })}
               />
             )}
           </>
