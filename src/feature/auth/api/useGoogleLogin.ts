@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { api } from "@shared/api/client";
 import { useStore } from "@app/store";
 import { notify } from "@shared/lib/notify";
+import { isApiError } from "@shared/api/envelope";
 import type { AuthResponseDTO } from "@shared/types/api";
 
 interface GoogleLoginPayload {
@@ -26,8 +27,12 @@ export function useGoogleLogin() {
       notify.success("auth.login.success");
       navigate("/overview");
     },
-    onError: () => {
-      notify.error("auth.login.failed");
+    onError: (error) => {
+      if (isApiError(error)) {
+        notify.error(error.messageKey);
+      } else {
+        notify.error("auth.login.failed");
+      }
     },
   });
 }
