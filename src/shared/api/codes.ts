@@ -16,12 +16,20 @@ export const CODE_TO_MESSAGE_KEY: Record<number, string> = {
   100100: "overview.success",
   100150: "overview.internal_error",
 
+  // Meta (10 + 02)
+  100200: "system.meta.success",
+  100250: "system.meta.internal_error",
+
   // Auth (20)
   200200: "auth.login.success",
   200140: "auth.unauthorized",
   200141: "auth.token.invalid",
   200142: "auth.forbidden",
   200241: "auth.login.failed",
+  200143: "system.rate_limited",
+  200242: "auth.login.failed",
+  200243: "auth.login.account_deleted",
+  200250: "auth.login.failed",
   200300: "auth.refresh.success",
   200340: "auth.refresh.invalid_token",
   200341: "auth.token.expired",
