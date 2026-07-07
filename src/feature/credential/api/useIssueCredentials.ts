@@ -33,16 +33,16 @@ export function useIssueCredentials<T extends FieldValues>(form?: UseFormReturn<
     mutationFn: async (rows: CredentialIssueRowInput[]) => {
       const formData = new FormData();
       rows.forEach((row, i) => {
-        formData.append(`items[${i}][holder_user_id]`, row.holder_user_id);
-        formData.append(`items[${i}][name]`, row.name);
+        formData.append(`credentials[${i}][holder_user_id]`, row.holder_user_id);
+        formData.append(`credentials[${i}][name]`, row.name);
         if (row.meta_entries && row.meta_entries.length > 0) {
           const metaObj = mergeMeta(row.meta_entries, {});
           if (metaObj) {
-            formData.append(`items[${i}][meta]`, JSON.stringify(metaObj));
+            formData.append(`credentials[${i}][meta]`, JSON.stringify(metaObj));
           }
         }
         if (row.file) {
-          formData.append(`items[${i}][file]`, row.file);
+          formData.append(`credentials[${i}][file]`, row.file);
         }
       });
       await api.post("/credentials/batch/issue", formData, {

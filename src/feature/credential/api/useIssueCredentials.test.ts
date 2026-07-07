@@ -46,7 +46,7 @@ describe("useIssueCredentials", () => {
             code: 100040,
             message: "system.validation",
             errors: {
-              "items[0].name": ["credential.nameRequired"],
+              "credentials[0].name": ["credential.nameRequired"],
             },
           },
           { status: 422 },
@@ -65,7 +65,7 @@ describe("useIssueCredentials", () => {
 
     await waitFor(() => {
       expect(form.setError).toHaveBeenCalledWith(
-        "items[0].name",
+        "credentials[0].name",
         expect.objectContaining({ type: "server", message: "credential.nameRequired" }),
       );
     });
