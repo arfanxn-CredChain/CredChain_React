@@ -656,14 +656,25 @@
       "title": "User not found",
       "body": "This user does not exist or has been removed."
     },
-    "credentialSection": "Credentials",
+    "credentialSectionIssued": "Issued Credentials",
+    "credentialSectionHeld": "Held Credentials",
     "credentials": {
       "empty": {
         "title": "No credentials",
         "body": "This user has no credentials yet."
       },
+      "emptyHeld": {
+        "title": "No held credentials",
+        "body": "This user does not hold any credentials."
+      },
+      "emptyIssued": {
+        "title": "No issued credentials",
+        "body": "This user has not issued any credentials yet."
+      },
       "searchPlaceholder": "Search credentials...",
-      "error": "Failed to load credentials."
+      "error": "Failed to load credentials.",
+      "errorHeld": "Failed to load held credentials.",
+      "errorIssued": "Failed to load issued credentials."
     }
   },
   "user.status": {
@@ -888,7 +899,7 @@
   "userImport.title": "Import Users from File",
   "userImport.description": "Upload a CSV, XLS, or XLSX file to bulk import users.",
   "userImport.supportedFormats": "CSV, XLS, or XLSX",
-  "userImport.exampleTable.title": "Expected File Format",
+  "userImport.exampleTable.title": "Download Template",
   "userImport.exampleTable.note": "Any column beyond the fixed fields becomes a custom field; the column name becomes the key. Leave a cell empty if that user doesn't need that field.",
   "userImport.rowsToImport": "{{count}} rows to import",
   "userImport.rowsFound": "{{count}} data rows found",
@@ -924,8 +935,8 @@
   "userImport.column.department": "Department",
   "userImport.column.required": "required",
   "userImport.column.optional": "optional",
-  "userImport.customColumns.description": "Add any extra columns to your Excel file — they become custom fields. The column header becomes the field name, and cell values become the value.",
-  "userImport.customColumns.column": "Extra Column",
+  "userImport.customColumns.description": "Need extra fields? Add any columns you like, such as department or location. They'll be saved as custom fields.",
+  "userImport.customColumns.example": "Example",
   "userImport.customColumns_one": "{{count}} custom column",
   "userImport.customColumns_other": "{{count}} custom columns",
   "userImport.validation.title": "Validation Results",

@@ -657,14 +657,25 @@
       "title": "Pengguna tidak ditemukan",
       "body": "Pengguna ini tidak ada atau telah dihapus."
     },
-    "credentialSection": "Kredensial",
+    "credentialSectionIssued": "Kredensial Diterbitkan",
+    "credentialSectionHeld": "Kredensial Dimiliki",
     "credentials": {
       "empty": {
         "title": "Belum ada kredensial",
         "body": "Pengguna ini belum memiliki kredensial."
       },
+      "emptyHeld": {
+        "title": "Belum ada kredensial dimiliki",
+        "body": "Pengguna ini tidak memiliki kredensial."
+      },
+      "emptyIssued": {
+        "title": "Belum ada kredensial diterbitkan",
+        "body": "Pengguna ini belum menerbitkan kredensial."
+      },
       "searchPlaceholder": "Cari kredensial...",
-      "error": "Gagal memuat kredensial."
+      "error": "Gagal memuat kredensial.",
+      "errorHeld": "Gagal memuat kredensial dimiliki.",
+      "errorIssued": "Gagal memuat kredensial diterbitkan."
     }
   },
   "user.status": {
@@ -889,7 +900,7 @@
   "userImport.title": "Impor Pengguna dari File",
   "userImport.description": "Unggah file CSV, XLS, atau XLSX untuk impor pengguna secara massal.",
   "userImport.supportedFormats": "CSV, XLS, atau XLSX",
-  "userImport.exampleTable.title": "Format File yang Diharapkan",
+  "userImport.exampleTable.title": "Unduh Template",
   "userImport.exampleTable.note": "Kolom tambahan di luar field tetap menjadi kolom kustom; nama kolom menjadi kunci. Biarkan sel kosong jika pengguna tidak memerlukan field tersebut.",
   "userImport.rowsToImport": "{{count}} baris untuk diimpor",
   "userImport.rowsFound": "{{count}} baris data ditemukan",
@@ -925,8 +936,8 @@
   "userImport.column.department": "Departemen",
   "userImport.column.required": "wajib",
   "userImport.column.optional": "opsional",
-  "userImport.customColumns.description": "Tambahkan kolom apa pun ke file Excel Anda — kolom tersebut menjadi field kustom. Header kolom menjadi nama field, dan nilai sel menjadi nilainya.",
-  "userImport.customColumns.column": "Kolom Tambahan",
+  "userImport.customColumns.description": "Butuh kolom tambahan? Tambahkan kolom apa saja, seperti department atau location. Kolom tersebut akan disimpan sebagai field kustom.",
+  "userImport.customColumns.example": "Contoh",
   "userImport.customColumns_one": "{{count}} kolom kustom",
   "userImport.customColumns_other": "{{count}} kolom kustom",
   "userImport.validation.title": "Hasil Validasi",

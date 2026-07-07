@@ -381,7 +381,7 @@ function UserCountsCard({ counts, compact }: { counts: OverviewUserCounts; compa
       accent="gold"
       compact={compact}
       className={compact ? "col-span-2" : undefined}
-      to="/users?status=deleted_at!_"
+      to="/users?status=deleted_at_"
     />
   );
   const otherStats = (
@@ -421,7 +421,7 @@ function UserCountsCard({ counts, compact }: { counts: OverviewUserCounts; compa
         value={counts.trashed}
         label={t("overview.counts.trashed")}
         compact={compact}
-        to="/users?status=deleted_at_"
+      to="/users?status=deleted_at!_"
       />
     </>
   );

@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { Upload } from "lucide-react";
+import { Download, Upload } from "lucide-react";
 import * as XLSX from "xlsx";
 import { Button } from "@ui/button";
 import { Card } from "@ui/card";
@@ -32,11 +32,6 @@ export const COLUMN_TO_FIELD: Record<string, string> = {
   role: "role",
 };
 
-const COLUMN_I18N_MAP: Record<string, string> = {
-  number_id: "numberId",
-  birth_date: "birthDate",
-};
-
 const ALLOWED_EXTENSIONS = [".csv", ".xls", ".xlsx"];
 
 interface UserImportModalProps {
@@ -53,6 +48,38 @@ interface ValidationError {
   row: number;
   field: string;
   error: string;
+}
+
+function downloadTemplate() {
+  const headers = [...FIXED_COLUMNS];
+  const headerRow = headers.map((h) => ({ t: "s", v: h } satisfies XLSX.CellObject));
+
+  const exampleRows: XLSX.CellObject[][] = [
+    [
+      { t: "s", v: "Alice Johnson" },
+      { t: "s", v: "alice@example.com" },
+      { t: "s", v: "+6281234567890" },
+      { t: "s", v: "EMP-001" },
+      { t: "s", v: "1995-03-15" },
+      { t: "s", v: "female" },
+      { t: "s", v: "holder" },
+    ],
+    [
+      { t: "s", v: "Bob Smith" },
+      { t: "s", v: "bob@example.com" },
+      { t: "s", v: "+6289876543210" },
+      { t: "s", v: "EMP-002" },
+      { t: "s", v: "1990-07-22" },
+      { t: "s", v: "male" },
+      { t: "s", v: "issuer" },
+    ],
+  ];
+
+  const aoa: XLSX.CellObject[][] = [headerRow, ...exampleRows];
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Users");
+  XLSX.writeFile(wb, "credchain-users-template.xlsx", { bookType: "xlsx" });
 }
 
 export function UserImportModal({ open, onClose, onImport }: UserImportModalProps) {
@@ -279,75 +306,37 @@ export function UserImportModal({ open, onClose, onImport }: UserImportModalProp
               error={fileError}
             />
 
-            <div>
-              <p className="mb-2 text-sm font-medium text-navy">
-                {t("userImport.exampleTable.title")}
-              </p>
-              <div className="overflow-x-auto rounded-xl border border-gray-100">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      {FIXED_COLUMNS.map((col) => (
-                        <TableHead key={col} className="whitespace-nowrap">
-                          <div className="flex flex-col">
-                            <span className="font-semibold">{col}</span>
-                            <span className="text-[10px] font-normal text-gray-400">
-                              {t(`userImport.column.${COLUMN_I18N_MAP[col] ?? col}`)}
-                            </span>
-                          </div>
-                          <span className="text-[10px] font-normal text-gray-400">
-                            {REQUIRED_COLUMNS.includes(col)
-                              ? t("userImport.column.required")
-                              : t("userImport.column.optional")}
-                          </span>
-                        </TableHead>
-                      ))}
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {EXAMPLE_ROWS.map((row, idx) => (
-                      <TableRow key={idx}>
-                        {FIXED_COLUMNS.map((col) => (
-                          <TableCell key={col} className="text-sm text-gray-600">
-                            {row[col] ?? ""}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-              <div className="mt-3 flex flex-col gap-1.5 text-xs text-gray-400">
-                <p>{t("userImport.customColumns.description")}</p>
-                <p>
-                  {t("userImport.customColumns.column")}:{" "}
-                  <code className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[11px] text-gray-500">
-                    department
-                  </code>{" "}
-                  <span className="text-gray-300">→</span>{" "}
-                  <span className="text-gray-500">Engineering</span>
-                  <span className="mx-2 text-gray-300">·</span>
-                  <code className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[11px] text-gray-500">
-                    location
-                  </code>{" "}
-                  <span className="text-gray-300">→</span>{" "}
-                  <span className="text-gray-500">Jakarta</span>
-                </p>
-              </div>
-              {file && (
-                <div className="flex justify-end pt-2">
-                  <Button
-                    variant="primary"
-                    onClick={() => {
-                      setFileError(undefined);
-                      setStep(2);
-                    }}
+            <div className="rounded-xl border border-gray-100 bg-gray-50/50 p-3">
+              <div className="md:flex md:items-start md:gap-4">
+                <div className="md:shrink-0">
+                  <button
+                    type="button"
+                    onClick={downloadTemplate}
+                    className="flex items-center gap-2 rounded-lg border border-navy/20 bg-white px-4 py-2.5 text-sm font-medium text-navy transition-colors hover:bg-gray-50"
                   >
-                    {t("userImport.continue")}
-                  </Button>
+                    <Download className="h-4 w-4" />
+                    {t("userImport.exampleTable.title")}
+                  </button>
+
                 </div>
-              )}
+                <div className="mt-3 text-xs text-gray-500 md:mt-0">
+                  <p>{t("userImport.customColumns.description")}</p>
+                </div>
+              </div>
             </div>
+            {file && (
+              <div className="flex justify-end pt-2">
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    setFileError(undefined);
+                    setStep(2);
+                  }}
+                >
+                  {t("userImport.continue")}
+                </Button>
+              </div>
+            )}
           </div>
         )}
 
@@ -649,24 +638,3 @@ export function UserImportModal({ open, onClose, onImport }: UserImportModalProp
     </Dialog>
   );
 }
-
-const EXAMPLE_ROWS: readonly Record<string, string>[] = [
-  {
-    fullname: "Alice Johnson",
-    email: "alice@example.com",
-    phone: "+6281234567890",
-    number_id: "EMP-001",
-    birth_date: "1995-03-15",
-    gender: "female",
-    role: "holder",
-  },
-  {
-    fullname: "Bob Smith",
-    email: "bob@example.com",
-    phone: "+6289876543210",
-    number_id: "EMP-002",
-    birth_date: "1990-07-22",
-    gender: "male",
-    role: "issuer",
-  },
-] as const;

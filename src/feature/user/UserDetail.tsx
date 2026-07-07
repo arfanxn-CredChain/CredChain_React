@@ -40,6 +40,7 @@ import { CredentialCard } from "@shared/components/CredentialCard";
 import { CredentialStatusFilterMenu } from "@shared/components/CredentialStatusFilterMenu";
 import type { CredentialStatusFilter } from "@shared/components/CredentialStatusFilterMenu";
 import { CredentialSortMenu } from "@shared/components/CredentialSortMenu";
+import { Role, ROLE_LEVEL } from "@shared/auth/role";
 import { formatDate, formatDateTime } from "@shared/lib/format";
 import { cn } from "@shared/lib/cn";
 
@@ -69,6 +70,8 @@ export function UserDetail() {
     (searchParams.get("credential_status") as CredentialStatusFilter) ?? "all";
   const credSort = searchParams.get("credential_sort") ?? CRED_SORT_OPTIONS[0].getSort(credStatus);
 
+  const isIssuerOrAbove = user ? ROLE_LEVEL[user.role] >= ROLE_LEVEL[Role.ISSUER] : false;
+
   const searchParam = searchParams.get("credential_search") ?? "";
   const [credSearch, setCredSearch] = useState(searchParam);
   const searchTypedRef = useRef<string | null>(null);
@@ -82,7 +85,8 @@ export function UserDetail() {
   }, [searchParam]);
 
   const credFilterArray: string[] = (() => {
-    const base = [`holder_user_id=${id}`];
+    const roleField = isIssuerOrAbove ? "issuer_user_id" : "holder_user_id";
+    const base = [`${roleField}=${id}`];
     switch (credStatus) {
       case "all":
         return base;
@@ -304,7 +308,7 @@ export function UserDetail() {
         <div className="border-b border-gray-50 p-4 sm:p-6">
           <div className="mb-4 flex items-center justify-between">
             <EyebrowLabel>
-              {t("user.detail.credentialSection")}
+              {t(isIssuerOrAbove ? "user.detail.credentialSectionIssued" : "user.detail.credentialSectionHeld")}
               {credTotal > 0 && <span className="ml-2 text-xs text-gray-400">({credTotal})</span>}
             </EyebrowLabel>
           </div>
@@ -335,7 +339,7 @@ export function UserDetail() {
         <div className="bg-gray-50/30 p-4 sm:p-6">
           {credIsError ? (
             <div className="p-12 text-center text-sm text-error">
-              {t("user.detail.credentials.error")}
+              {t(isIssuerOrAbove ? "user.detail.credentials.errorIssued" : "user.detail.credentials.errorHeld")}
             </div>
           ) : credLoading ? (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -346,8 +350,8 @@ export function UserDetail() {
           ) : credentials.length === 0 ? (
             <EmptyState
               icon={FileBadge}
-              title={t("user.detail.credentials.empty.title")}
-              description={t("user.detail.credentials.empty.body")}
+              title={t(isIssuerOrAbove ? "user.detail.credentials.emptyIssued.title" : "user.detail.credentials.emptyHeld.title")}
+              description={t(isIssuerOrAbove ? "user.detail.credentials.emptyIssued.body" : "user.detail.credentials.emptyHeld.body")}
               className="rounded-none border-0 bg-transparent shadow-none"
             />
           ) : (
