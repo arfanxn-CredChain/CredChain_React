@@ -129,10 +129,6 @@ export const router = createBrowserRouter([
                 path: "/users/create",
                 ...lazyRoute(() => import("@feature/user/UserCreate"), "UserCreate"),
               },
-              {
-                path: "/settings",
-                ...lazyRoute(() => import("@feature/overview/Settings"), "Settings"),
-              },
             ],
           },
         ],
