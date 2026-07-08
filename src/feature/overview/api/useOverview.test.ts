@@ -21,7 +21,7 @@ const mockData: OverviewDTO = {
     revoked_credentials: [],
     stored_users: [],
   },
-  chain_details: { authority_contract: "0x9A", registry_contract: "0x8B", last_block: 100 },
+  chain_details: { authority_contract: "0x9A", registry_contract: "0x8B", last_block: 100, relayer_address: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", relayer_balance: "10499.98" },
 };
 
 const server = setupServer(

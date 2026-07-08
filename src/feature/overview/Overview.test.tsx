@@ -72,6 +72,19 @@ describe("Overview", () => {
     });
   });
 
+  it("renders relayer wallet and balance for Issuer+", async () => {
+    useStore.setState({ user: makeUser({ role: Role.ISSUER }) });
+    renderOverview();
+    await waitFor(() => {
+      expect(screen.getAllByText("Relayer Wallet").length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText("Relayer Balance").length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText("10499.98").length).toBeGreaterThanOrEqual(1);
+      expect(
+        screen.getAllByTitle("0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266").length,
+      ).toBeGreaterThanOrEqual(1);
+    });
+  });
+
   it("hides chain details for Holder", async () => {
     useStore.setState({ user: makeUser({ role: Role.HOLDER }) });
     renderOverview();

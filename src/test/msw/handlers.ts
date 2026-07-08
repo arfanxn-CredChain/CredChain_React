@@ -475,6 +475,8 @@ export const handlers = [
           authority_contract: "0x9A5f",
           registry_contract: "0x8B3c",
           last_block: 12345678,
+          relayer_address: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+          relayer_balance: "10499.98",
         },
       },
     });
