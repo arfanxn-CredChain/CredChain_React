@@ -1,3 +1,11 @@
+/**
+ * @deprecated Removed from routes and navigation as of 2026-07-08.
+ * This page provided account details, language switcher, and security info.
+ * Some of those features (language switcher, user info) are now available
+ * in the NavbarOverview profile dropdown. The file is retained for
+ * reference — do not wire it back into routes without explicit approval.
+ */
+
 import { Globe, ShieldCheck, Wallet } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useStore } from "@app/store";
