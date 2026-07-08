@@ -8,6 +8,7 @@ import {
   Layers,
   Calendar,
   ArrowRight,
+  Wallet,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
@@ -582,6 +583,33 @@ function ChainInfoCard({ details }: { details: OverviewChainDetails }) {
               {details.last_block === 0
                 ? t("overview.chainDetails.unavailable")
                 : details.last_block.toLocaleString()}
+            </dd>
+          </div>
+          <div>
+            <EyebrowLabel as="dt" className="flex items-center gap-1.5">
+              <Wallet className="h-3.5 w-3.5" aria-hidden="true" />
+              {t("overview.chainDetails.relayerWallet")}
+            </EyebrowLabel>
+            <dd className="flex items-center gap-2">
+              <MonoId
+                value={details.relayer_address}
+                mode="address"
+                className="text-sm text-navy"
+              />
+              <CopyInlineButton
+                value={details.relayer_address}
+                ariaLabel={t("overview.chainDetails.copyRelayer")}
+              />
+            </dd>
+          </div>
+          <div>
+            <EyebrowLabel as="dt" className="flex items-center gap-1.5">
+              <Wallet className="h-3.5 w-3.5" aria-hidden="true" />
+              {t("overview.chainDetails.relayerBalance")}
+            </EyebrowLabel>
+            <dd className="font-display text-2xl font-bold tracking-tight text-navy">
+              {details.relayer_balance}{" "}
+              <span className="font-sans text-sm text-gray-500">ETH</span>
             </dd>
           </div>
         </dl>
