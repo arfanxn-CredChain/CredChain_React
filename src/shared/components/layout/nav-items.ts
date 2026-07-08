@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { LayoutDashboard, Users, FileBadge, Settings, User, HelpCircle, Info } from "lucide-react";
+import { LayoutDashboard, Users, FileBadge, User, HelpCircle, Info } from "lucide-react";
 import { Role } from "@shared/auth/role";
 
 export interface NavSearchItem {
@@ -25,13 +25,6 @@ export const NAV_ITEMS: NavSearchItem[] = [
     i18nKey: "nav.credentials",
     icon: FileBadge,
     minRole: Role.HOLDER,
-    inSidebar: true,
-  },
-  {
-    href: "/settings",
-    i18nKey: "nav.settings",
-    icon: Settings,
-    minRole: Role.ADMIN,
     inSidebar: true,
   },
   { href: "/account/profile", i18nKey: "nav.profile", icon: User, inSidebar: false },

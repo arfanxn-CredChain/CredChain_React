@@ -49,7 +49,6 @@ describe("useNavSearch", () => {
     const hrefs = result.current.map((i) => i.href);
     expect(hrefs).toContain("/overview");
     expect(hrefs).toContain("/users");
-    expect(hrefs).toContain("/settings");
     expect(hrefs).toContain("/help");
     expect(hrefs).toContain("/about");
   });
