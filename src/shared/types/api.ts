@@ -116,6 +116,8 @@ export interface OverviewChainDetails {
   authority_contract: string;
   registry_contract: string;
   last_block: number;
+  relayer_address: string;
+  relayer_balance: string;
 }
 
 export interface OverviewRecentCredential {
