@@ -9,7 +9,6 @@ const EN: Record<string, string> = {
   "nav.users": "Users",
   "nav.credentials": "Credentials",
   "nav.myCredentials": "My Credentials",
-  "nav.settings": "Settings",
   "nav.profile": "Profile",
   "nav.help": "Help",
   "nav.about": "About",
@@ -20,7 +19,6 @@ const ID: Record<string, string> = {
   "nav.users": "Pengguna",
   "nav.credentials": "Kredensial",
   "nav.myCredentials": "Kredensial Saya",
-  "nav.settings": "Pengaturan",
   "nav.profile": "Profil",
   "nav.help": "Bantuan",
   "nav.about": "Tentang",
@@ -81,7 +79,6 @@ describe("useNavSearch", () => {
     const { result } = renderHook(() => useNavSearch(""));
     const hrefs = result.current.map((i) => i.href);
     expect(hrefs).not.toContain("/users");
-    expect(hrefs).not.toContain("/settings");
     expect(hrefs).toContain("/credentials");
     expect(hrefs).toContain("/help");
   });
