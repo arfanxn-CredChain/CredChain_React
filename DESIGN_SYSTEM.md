@@ -182,12 +182,12 @@ CredChain_React/
                              # badge, button, card, confirm-dialog, dialog,
                              # dropdown-menu, form-field, input, label, select, skeleton, table, toaster
         layout/
-          AdaptiveLayout.tsx # renders DashboardLayout if authed, PublicLayout otherwise
-          DashboardLayout.tsx
+          AdaptiveLayout.tsx # renders OverviewLayout if authed, PublicLayout otherwise
+          OverviewLayout.tsx
           PublicLayout.tsx
           SplitLayout.tsx    # 50/50 navy+light; used by Landing + Login
-          DashboardSidebar.tsx
-          NavbarDashboard.tsx
+          OverviewSidebar.tsx
+          NavbarOverview.tsx
           NavbarPublic.tsx
           nav-items.ts       # NAV_ITEMS with minRole + exactRole + inSidebar flags
          BackLink.tsx
@@ -365,12 +365,12 @@ body {
 | Card border                            | `border-gray-100`                                                                              |
 | Input border                           | `border-gray-200`                                                                              |
 | Focus ring                             | `ring-gold` (via `focus:ring-2 focus:ring-gold`)                                               |
-| DashboardSidebar background            | `bg-navy`                                                                                      |
-| DashboardSidebar text                  | `text-gray-300` (inactive), `text-surface` (active)                                            |
-| Brand mark (shield icon + wordmark)    | `text-gold` — always, on every chrome (DashboardSidebar, PublicLayout, mobile NavbarDashboard) |
-| DashboardLayout desktop top area       | transparent over page background; no static title — each page renders its own `PageHeader`     |
-| NavbarDashboard search input (resting) | `bg-gray-50 text-navy placeholder-gray-400 border-gray-200 rounded-full`                       |
-| NavbarDashboard search input (focus)   | `bg-white ring-2 ring-gold border-transparent`                                                 |
+| OverviewSidebar background            | `bg-navy`                                                                                      |
+| OverviewSidebar text                  | `text-gray-300` (inactive), `text-surface` (active)                                            |
+| Brand mark (shield icon + wordmark)    | `text-gold` — always, on every chrome (OverviewSidebar, PublicLayout, mobile NavbarOverview) |
+| OverviewLayout desktop top area       | transparent over page background; no static title — each page renders its own `PageHeader`     |
+| NavbarOverview search input (resting) | `bg-gray-50 text-navy placeholder-gray-400 border-gray-200 rounded-full`                       |
+| NavbarOverview search input (focus)   | `bg-white ring-2 ring-gold border-transparent`                                                 |
 
 ### 5.2 Role-Color Mapping
 
@@ -504,12 +504,12 @@ export function PageHeader({ title, description, action, onBack }: PageHeaderPro
 Behavior:
 
 - Navigates to the previous in-app URL via `navigate(-1)` when prior history exists (`location.key !== "default"`).
-- Falls back to `/dashboard` when authenticated, `/` when not, when there is no prior history (e.g. deep-linked or fresh tab).
+- Falls back to `/overview` when authenticated, `/` when not, when there is no prior history (e.g. deep-linked or fresh tab).
 - Renders an `ArrowLeft` icon + `t("common.back")` label in `text-gray-500 hover:text-navy` with a gold focus ring.
 
 Placement:
 
-- On `AdaptiveLayout` / `PublicLayout` / `DashboardLayout` pages (Help, About, Profile, Update Email), drop `<BackLink />` as the first child of the page's `space-y-6` wrapper — the page rhythm provides spacing, so no margin prop is needed.
+- On `AdaptiveLayout` / `PublicLayout` / `OverviewLayout` pages (Help, About, Profile, Update Email), drop `<BackLink />` as the first child of the page's `space-y-6` wrapper — the page rhythm provides spacing, so no margin prop is needed.
 - On `SplitLayout` pages (Login), content is vertically centered with no `<main>` padding, so pass an explicit margin: `<BackLink className="mb-6" />`.
 
 ### 6.3 Eyebrow Label Component
@@ -567,7 +567,7 @@ The design system commits to a specific aesthetic position. These principles gua
 
 These are the things that make CredChain visually distinct. Touch them only with intent.
 
-1. **Navy + gold pairing** - Never substitute purple gradients, blue-to-cyan washes, or rainbow accents. The palette is the brand. The brand mark cluster (shield icon + "CredChain" wordmark) always renders in `text-gold` regardless of background — `DashboardSidebar`, `PublicLayout` header (`NavbarPublic`), and mobile `NavbarDashboard` shield all use `text-gold`. Never `text-surface` for the wordmark.
+1. **Navy + gold pairing** - Never substitute purple gradients, blue-to-cyan washes, or rainbow accents. The palette is the brand. The brand mark cluster (shield icon + "CredChain" wordmark) always renders in `text-gold` regardless of background — `OverviewSidebar`, `PublicLayout` header (`NavbarPublic`), and mobile `NavbarOverview` shield all use `text-gold`. Never `text-surface` for the wordmark.
 2. **Tinted colored shadows** - `shadow-md shadow-navy/20`, `shadow-lg shadow-gold/20`, `shadow-error/20` under brand-colored elements. This is the signature material treatment.
 3. **Single decorative blob per hero area** - One soft radial gradient, never multiple competing blobs. Restraint is the move.
 4. **Mono-font identifiers** - Every hash, address, and ID renders in `font-mono`. This is the blockchain visual cue. Never sans-serif a hash.
@@ -1015,10 +1015,10 @@ export function DetailRow({
 
 | Layout            | Used by                   | Pattern                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | ----------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `PublicLayout`    | `/credentials/verify/:id` | Navy header (`min-h-[64px]` flat, no `sm:` breakpoint) with **gold brand mark** + gold underline, white card body, `<CopyrightFooter />` strip (transparent background — see §8.1.1). Container is `min-h-dvh` (NOT `min-h-screen`) so the footer stays anchored to the _visible_ viewport on mobile — `100vh` over-counts on mobile browsers (chrome collapse/expand) and pushes the footer below the fold or under the bottom bar. `<main>` has `mx-auto max-w-7xl` so the public content area (About/Help/VerifyCredential, which are `max-w-4xl`) centers within a 1280px band that aligns with the `NavbarPublic` width. `<main>` padding `px-4 pt-4 pb-12 sm:px-8` mirrors `DashboardLayout` so unauthed Help/About sit identically to their authed counterparts.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `PublicLayout`    | `/credentials/verify/:id` | Navy header (`min-h-[64px]` flat, no `sm:` breakpoint) with **gold brand mark** + gold underline, white card body, `<CopyrightFooter />` strip (transparent background — see §8.1.1). Container is `min-h-dvh` (NOT `min-h-screen`) so the footer stays anchored to the _visible_ viewport on mobile — `100vh` over-counts on mobile browsers (chrome collapse/expand) and pushes the footer below the fold or under the bottom bar. `<main>` has `mx-auto max-w-7xl` so the public content area (About/Help/VerifyCredential, which are `max-w-4xl`) centers within a 1280px band that aligns with the `NavbarPublic` width. `<main>` padding `px-4 pt-4 pb-12 sm:px-8` mirrors `OverviewLayout` so unauthed Help/About sit identically to their authed counterparts.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `SplitLayout`     | `/` (Landing), `/login`   | Fixed 100dvh — no scrollbars. Outer container and right panel both use `h-dvh overflow-hidden`. Mobile: 33/67 vertical split — navy brand band `h-[33dvh]` with `flex items-center justify-center` to center brand content; white content area `flex-1` fills remaining 67dvh. Desktop: 50/50 horizontal split with navy brand panel left + light content right, gold + blue `<DecorBlob>`s. Mobile: navy band on top + content below, no blobs (too cramped). `AttestationStamp` now accepts a `className` prop for responsive sizing; mobile brand band renders it with `max-w-[min(160px,18vh)]` to scale down on short screens instead of hiding. Landing content vertically centered (`flex items-center justify-center`). Login content top-aligned on mobile (`justify-start`) and centered on desktop (`lg:justify-center`). Login `<BackLink>` uses `self-start` to align left within the card. Language switcher floats top-right on desktop (light variant), inside the navy band on mobile (dark variant). No copyright footer (Landing/Login are conversion surfaces). Landing/Login content refactored to viewport-relative units: `py-[2dvh]`, `space-y-[1.5dvh]`, card padding `p-6 sm:p-8`. Forced `min-h-[Xlh]` removed from headings and subtitles so content can shrink to fit short viewports. |
-| `DashboardLayout` | All authenticated routes  | Fixed navy sidebar (`w-72`) with **gold brand mark cluster**, transparent top navbar (`min-h-[64px]` flat, no `sm:` breakpoint) with `mx-auto max-w-7xl` content row so menu/search/avatar align with the widest page content below, scrollable `main` (`flex-1 overflow-y-scroll [scrollbar-gutter:stable]` so route-switches with differing content heights don't reflow the navbar). Container is `min-h-dvh` (NOT `min-h-screen`) with `bg-base` (NOT `bg-gray-100` or hardcoded `bg-[#F4F7F6]`) so the page background matches `PublicLayout`. Sidebar uses `sm:h-dvh` (NOT `sm:h-screen`) to match the container. On every route change, `useScrollToTop()` resets both the window scroller and the `#main` overflow container to the top so the next page never opens mid-scroll inherited from the previous one. Mobile: hand-rolled CSS-transform slide (`-translate-x-full` ↔ `translate-x-0`) with `bg-navy/80` click backdrop. `<main>` padding `px-4 pt-4 pb-12 sm:px-8` (full width — no `max-w-7xl` on the main wrapper; the sidebar takes the fixed `w-72` and the content area fills the remaining space). No copyright footer (authenticated chrome; brand presence is the sidebar).                                                                                                              |
-| `AdaptiveLayout`  | `/help`, `/about`         | Renders `DashboardLayout` if `isAuthenticated`, `PublicLayout` otherwise. Because both layouts use identical `<main>` padding (`px-4 pt-4 pb-12 sm:px-8`) and matching header heights, unauthed and authed Help/About pages render identically — the only delta is the copyright strip, which appears only on the unauthenticated `PublicLayout` branch.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `OverviewLayout` | All authenticated routes  | Fixed navy sidebar (`w-72`) with **gold brand mark cluster**, transparent top navbar (`min-h-[64px]` flat, no `sm:` breakpoint) with `mx-auto max-w-7xl` content row so menu/search/avatar align with the widest page content below, scrollable `main` (`flex-1 overflow-y-scroll [scrollbar-gutter:stable]` so route-switches with differing content heights don't reflow the navbar). Container is `min-h-dvh` (NOT `min-h-screen`) with `bg-base` (NOT `bg-gray-100` or hardcoded `bg-[#F4F7F6]`) so the page background matches `PublicLayout`. Sidebar uses `sm:h-dvh` (NOT `sm:h-screen`) to match the container. On every route change, `useScrollToTop()` resets both the window scroller and the `#main` overflow container to the top so the next page never opens mid-scroll inherited from the previous one. Mobile: hand-rolled CSS-transform slide (`-translate-x-full` ↔ `translate-x-0`) with `bg-navy/80` click backdrop. `<main>` padding `px-4 pt-4 pb-12 sm:px-8` (full width — no `max-w-7xl` on the main wrapper; the sidebar takes the fixed `w-72` and the content area fills the remaining space). No copyright footer (authenticated chrome; brand presence is the sidebar).                                                                                                              |
+| `AdaptiveLayout`  | `/help`, `/about`         | Renders `OverviewLayout` if `isAuthenticated`, `PublicLayout` otherwise. Because both layouts use identical `<main>` padding (`px-4 pt-4 pb-12 sm:px-8`) and matching header heights, unauthed and authed Help/About pages render identically — the only delta is the copyright strip, which appears only on the unauthenticated `PublicLayout` branch.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 
 #### Copyright Footer
 
@@ -1032,7 +1032,7 @@ The `<CopyrightFooter />` shared component (`@shared/components/CopyrightFooter.
 - Has `mt-auto` baked in so it pins to the bottom of any flex-column container with `min-h-dvh` and a `flex-1` main slot.
 - Accepts a `className` prop for layout-level overrides.
 
-**Where it appears:** only on `PublicLayout` and the unauthenticated branch of `AdaptiveLayout` (Help, About). It does NOT appear on `DashboardLayout` (authenticated chrome) or `SplitLayout` (Landing, Login — conversion surfaces).
+**Where it appears:** only on `PublicLayout` and the unauthenticated branch of `AdaptiveLayout` (Help, About). It does NOT appear on `OverviewLayout` (authenticated chrome) or `SplitLayout` (Landing, Login — conversion surfaces).
 
 ### 8.2 Container Widths
 
@@ -1078,7 +1078,7 @@ All containers center via `mx-auto`.
 ### 8.6 Dashboard Sidebar Pattern
 
 ```tsx
-// shared/components/layout/DashboardSidebar.tsx
+// shared/components/layout/OverviewSidebar.tsx
 <aside
   className={cn(
     "fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-navy text-gray-300 shadow-2xl transition-transform duration-300 sm:static sm:flex-shrink-0 sm:translate-x-0",
@@ -1110,18 +1110,18 @@ The icon color follows the active state via the `children` render prop (`isActiv
 
 ### 8.7 Mobile Drawer
 
-**As-built:** the mobile sidebar is hand-rolled in `DashboardLayout.tsx`, not a shadcn `Sheet`. The `<aside>` is fixed-position and slides via CSS transform, toggled by a `dashboardSidebarOpen` local state (the store state is reserved for cross-component coordination, currently unused); a `bg-navy/80` backdrop (`sm:hidden`) closes it on click. `DashboardSidebar` accepts an `onClose` prop that renders a close (`X`) button and dismisses the drawer on nav-item click.
+**As-built:** the mobile sidebar is hand-rolled in `OverviewLayout.tsx`, not a shadcn `Sheet`. The `<aside>` is fixed-position and slides via CSS transform, toggled by a `overviewSidebarOpen` local state (the store state is reserved for cross-component coordination, currently unused); a `bg-navy/80` backdrop (`sm:hidden`) closes it on click. `OverviewSidebar` accepts an `onClose` prop that renders a close (`X`) button and dismisses the drawer on nav-item click.
 
 ```tsx
-// DashboardLayout.tsx (abbreviated)
+// OverviewLayout.tsx (abbreviated)
 <aside
   className={cn(
     "fixed inset-y-0 left-0 z-50 w-72 shadow-2xl transition-transform duration-300",
     "sm:sticky sm:top-0 sm:h-screen sm:flex-shrink-0 sm:translate-x-0",
-    dashboardSidebarOpen ? "translate-x-0" : "-translate-x-full",
+    overviewSidebarOpen ? "translate-x-0" : "-translate-x-full",
   )}
 >
-  <DashboardSidebar onClose={() => setDashboardSidebarOpen(false)} />
+  <OverviewSidebar onClose={() => setOverviewSidebarOpen(false)} />
 </aside>
 ```
 
@@ -1137,7 +1137,7 @@ Mobile-first using Tailwind defaults:
 | ---------- | --------- | ---------------------------------------------------------- |
 | `sm:`      | 640px     | Tables visible, side-by-side rows                          |
 | `md:`      | 768px     | 2-column grids, search bar visibility                      |
-| `lg:`      | 1024px    | Sidebar (DashboardSidebar) visible, split auth, 4-up grids |
+| `lg:`      | 1024px    | Sidebar (OverviewSidebar) visible, split auth, 4-up grids |
 | `xl:`      | 1280px    | (rarely used) ultra-wide refinements                       |
 
 ### 8.9 Responsive Design
@@ -1177,7 +1177,7 @@ Every interactive element on touch devices must be at minimum **44x44px** (Apple
 | Icon button (mobile)  | `p-3` (12px on each side, 24px icon) | 48px square                |
 | Icon button (desktop) | `p-2` (8px on each side, 24px icon)  | 40px square                |
 
-`DashboardSidebar` nav items already meet target with `px-4 py-3`. Form inputs at `py-3` produce 48px - keep that on mobile, never compress to `py-2`.
+`OverviewSidebar` nav items already meet target with `px-4 py-3`. Form inputs at `py-3` produce 48px - keep that on mobile, never compress to `py-2`.
 
 #### Safe-Area Insets
 
@@ -1199,12 +1199,12 @@ Apply to elements that touch the viewport edges on iOS:
 Apply to:
 
 - `PublicLayout` footer
-- `DashboardLayout` mobile top nav (when navy bar reaches edge)
+- `OverviewLayout` mobile top nav (when navy bar reaches edge)
 - Mobile sidebar `Sheet` content
 - Bottom-sheet dialogs (when added)
 - Toast container (sonner provides this, but verify on iOS)
 
-**Cascade gotcha:** `safe-area-top` (and `-bottom`/`-x`) sets `padding-top: env(safe-area-inset-top)` directly. When co-located with Tailwind's `py-*` utilities on the same element, `safe-area-top` overrides the `padding-top` from `py-*` (CSS utilities-layer source order), leaving the element with `padding-top: 0` on devices without a notch. Apply `safe-area-top` to a dedicated zero-height spacer `<div>` _inside_ the element instead of co-locating it with `py-*`. Pattern in use: `NavbarDashboard.tsx`.
+**Cascade gotcha:** `safe-area-top` (and `-bottom`/`-x`) sets `padding-top: env(safe-area-inset-top)` directly. When co-located with Tailwind's `py-*` utilities on the same element, `safe-area-top` overrides the `padding-top` from `py-*` (CSS utilities-layer source order), leaving the element with `padding-top: 0` on devices without a notch. Apply `safe-area-top` to a dedicated zero-height spacer `<div>` _inside_ the element instead of co-locating it with `py-*`. Pattern in use: `NavbarOverview.tsx`.
 
 #### Mobile Keyboard Hints
 
@@ -1268,7 +1268,7 @@ The `md:` to `lg:` range needs explicit decisions:
 
 | Element          | md (tablet portrait)  | lg (tablet landscape / desktop) |
 | ---------------- | --------------------- | ------------------------------- |
-| DashboardSidebar | Mobile drawer (Sheet) | Fixed `w-72`                    |
+| OverviewSidebar | Mobile drawer (Sheet) | Fixed `w-72`                    |
 | Navigation       | Hamburger menu        | Fixed sidebar                   |
 | Stat cards       | 2-up grid             | 4-up grid                       |
 | Credential cards | 2-up                  | 3-up                            |
@@ -1391,10 +1391,10 @@ interface AuthSlice {
 }
 
 interface UiSlice {
-  dashboardSidebarOpen: boolean;
+  overviewSidebarOpen: boolean;
   locale: "en" | "id";
-  setDashboardSidebarOpen: (open: boolean) => void;
-  toggleDashboardSidebar: () => void;
+  setOverviewSidebarOpen: (open: boolean) => void;
+  toggleOverviewSidebar: () => void;
   setLocale: (locale: "en" | "id") => void;
 }
 
@@ -1406,10 +1406,10 @@ export const useStore = create<AuthSlice & UiSlice>()(
       setUser: (user) => set({ user, isAuthenticated: true }),
       clearUser: () => set({ user: null, isAuthenticated: false }),
 
-      dashboardSidebarOpen: false,
+      overviewSidebarOpen: false,
       locale: "id",
-      setDashboardSidebarOpen: (open) => set({ dashboardSidebarOpen: open }),
-      toggleDashboardSidebar: () => set((s) => ({ dashboardSidebarOpen: !s.dashboardSidebarOpen })),
+      setOverviewSidebarOpen: (open) => set({ overviewSidebarOpen: open }),
+      toggleOverviewSidebar: () => set((s) => ({ overviewSidebarOpen: !s.overviewSidebarOpen })),
       setLocale: (locale) => set({ locale }),
     }),
     {
@@ -1686,7 +1686,7 @@ export function useGoogleLogin() {
       // data.access_token / data.refresh_token are NOT used here -
       // backend already set httpOnly cookies. We only persist user.
       setUser(data.user);
-      navigate("/dashboard");
+      navigate("/overview");
     },
   });
 }
@@ -1813,7 +1813,7 @@ export function ProtectedRoute({ allowedRoles }: { allowedRoles?: Role[] }) {
   }
 
   if (allowedRoles && !canAccessAny(user?.role, allowedRoles)) {
-    const fallback = user?.role === Role.HOLDER ? "/credentials/self" : "/dashboard";
+    const fallback = user?.role === Role.HOLDER ? "/overview" : "/overview";
     return <Navigate to={fallback} replace />;
   }
 
@@ -1823,7 +1823,7 @@ export function ProtectedRoute({ allowedRoles }: { allowedRoles?: Role[] }) {
 export function PublicRoute() {
   const { isAuthenticated } = useStore((s) => s);
   const location = useLocation();
-  const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? "/dashboard";
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? "/overview";
   return isAuthenticated ? <Navigate to={from} replace /> : <Outlet />;
 }
 
@@ -1870,9 +1870,9 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute />,
     children: [
       {
-        element: <DashboardLayout />,
+        element: <OverviewLayout />,
         children: [
-          { path: "/dashboard", lazy: () => import("@feature/dashboard/Dashboard") },
+          { path: "/overview", lazy: () => import("@feature/overview/Overview") },
           { path: "/credentials/self", lazy: () => import("@feature/credential/MyCredentials") },
           {
             element: <ProtectedRoute allowedRoles={[Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]} />,
@@ -2105,7 +2105,7 @@ export function MyComponent() {
 
 ### 14.4 Language Switcher
 
-Lives in `NavbarDashboard` and `NavbarPublic`. Persists choice to `useStore.locale`:
+Lives in `NavbarOverview` and `NavbarPublic`. Persists choice to `useStore.locale`:
 
 ```tsx
 export function LanguageSwitcher() {
@@ -2477,7 +2477,7 @@ export default defineConfig({
 ```ts
 // e2e/auth.spec.ts
 test("redirects unauthenticated user to login", async ({ page }) => {
-  await page.goto("/dashboard");
+  await page.goto("/overview");
   await expect(page).toHaveURL("/login");
 });
 ```
@@ -2809,7 +2809,7 @@ Production must add:
 
 ### 20.6 New Layout Pieces
 
-- `LanguageSwitcher` in NavbarDashboard (and NavbarPublic)
+- `LanguageSwitcher` in NavbarOverview (and NavbarPublic)
 - User menu dropdown (replace static avatar with shadcn `DropdownMenu`)
 - Search command palette (shadcn `Command` triggered by Cmd+K) - optional Phase 2
 - Notifications bell (real-time toast feed) - optional Phase 2
@@ -3030,7 +3030,7 @@ Keep `Last updated` at the top current. Reviewers should reject PRs that introdu
 | v1.2    | 2026-05-31 | Dark mode removed from spec to match codebase (light-only).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | v1.3    | 2026-06-09 | As-built reconciliation pass. Design philosophy (§5 tokens, §6 typography, §6.5 visual language, §8.9 responsive) preserved verbatim — those still describe the intended design faithfully. Architectural sections updated to match codebase: §3 tech versions synced and `ethers` row removed; §3 install list replaced with the 12 actual primitives; §4.1 folder structure rewritten as as-built (single `store/index.ts`, `feature/landing/`, `AdaptiveLayout` + `SplitLayout`, no `AuthLayout`/`interceptors.ts`/`useConfirm.ts`); §7.9 `useConfirm` rewritten to match the real `{confirm, dialog}` shape in `@ui/confirm-dialog`; §8.1 layout shells table updated; **§8.7 mobile drawer rewritten** (hand-rolled CSS-transform `<aside>`, never adopted shadcn `Sheet`; `vaul` reserved for content drawers); §9.2 store consolidated to single-file shape with `partialize` + Indonesian default; §10.1/§10.2 axios example updated with `paramsSerializer`, `Accept-Language`, `refreshInFlight` dedup, `X-Retry: 1`, and 429 handling; §11.1 token strategy moved from "backend coordination required" to "implemented" (Go side ships cookies).                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | v1.4    | 2026-06-10 | `SplitLayout` forced to exactly 100dvh with no scrollbars. §8.1 table updated: outer container and right panel use `h-dvh overflow-hidden`; mobile brand band uses `h-[33dvh] flex items-center justify-center`; content area `flex-1` fills remaining 67dvh with `min-h-0 overflow-hidden`. `AttestationStamp` now accepts `className` prop for responsive sizing; mobile brand band renders it with `max-w-[min(160px,18vh)]` instead of hiding. Landing content vertically centered (`flex items-center justify-center`); Login content top-aligned on mobile (`justify-start`) and centered on desktop (`lg:justify-center`). Login `<BackLink>` uses `self-start` for left alignment. Landing/Login content refactored to viewport-relative units (`py-[2dvh]`, `space-y-[1.5dvh]`, card padding `p-6 sm:p-8`). Removed forced `min-h-[Xlh]` from headings/subtitles so content shrinks to fit short viewports. Added `SplitLayout.test.tsx` (5 tests).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| v1.5    | 2026-06-11 | Layout max-width alignment pass. **§8.1 table** updated: `PublicLayout` `<main>` now has `mx-auto max-w-7xl` so the public content area (About/Help/VerifyCredential, which are `max-w-4xl`) centers within a 1280px band that aligns with `NavbarPublic` width. `DashboardLayout` row expanded: container is now `min-h-dvh bg-base` (was `min-h-screen bg-gray-100` with the inner wrapper at hardcoded `bg-[#F4F7F6]`), sidebar uses `sm:h-dvh` (was `sm:h-screen`), `<main>` drops to `flex-1 overflow-y-scroll` with **no** `max-w-7xl` (the sidebar takes the fixed `w-72` and the content area fills the remaining space — adding `max-w-7xl` would double-constrain list pages like UserList). Navbar row now documents `mx-auto max-w-7xl` on the dashboard navbar's flex row (the `<header>` background still spans full width but menu/search/avatar are centered at 1280px and align with the widest page content below). **§8.1.1 CopyrightFooter** updated: footer now carries `mx-auto max-w-7xl` so footer text centers within the same 1280px band as the navbar and `<main>`. **Page-width standardization** per §8.2: `UserDetail` and `UserSelfProfile` (was `max-w-3xl`) + `About` and `VerifyCredential` (was `max-w-3xl`) bumped to `max-w-4xl` so all detail/settings pages share the same reading width. **UserList table** wrapped in `<div className="overflow-x-auto">` so the 4-column table (entity, role, wallet/status, actions) scrolls horizontally on narrow viewports instead of squishing columns past their `truncate max-w-[12rem]/[14rem]` limits. |
+| v1.5    | 2026-06-11 | Layout max-width alignment pass. **§8.1 table** updated: `PublicLayout` `<main>` now has `mx-auto max-w-7xl` so the public content area (About/Help/VerifyCredential, which are `max-w-4xl`) centers within a 1280px band that aligns with `NavbarPublic` width. `OverviewLayout` row expanded: container is now `min-h-dvh bg-base` (was `min-h-screen bg-gray-100` with the inner wrapper at hardcoded `bg-[#F4F7F6]`), sidebar uses `sm:h-dvh` (was `sm:h-screen`), `<main>` drops to `flex-1 overflow-y-scroll` with **no** `max-w-7xl` (the sidebar takes the fixed `w-72` and the content area fills the remaining space — adding `max-w-7xl` would double-constrain list pages like UserList). Navbar row now documents `mx-auto max-w-7xl` on the dashboard navbar's flex row (the `<header>` background still spans full width but menu/search/avatar are centered at 1280px and align with the widest page content below). **§8.1.1 CopyrightFooter** updated: footer now carries `mx-auto max-w-7xl` so footer text centers within the same 1280px band as the navbar and `<main>`. **Page-width standardization** per §8.2: `UserDetail` and `UserSelfProfile` (was `max-w-3xl`) + `About` and `VerifyCredential` (was `max-w-3xl`) bumped to `max-w-4xl` so all detail/settings pages share the same reading width. **UserList table** wrapped in `<div className="overflow-x-auto">` so the 4-column table (entity, role, wallet/status, actions) scrolls horizontally on narrow viewports instead of squishing columns past their `truncate max-w-[12rem]/[14rem]` limits. |
 
 ---
 
