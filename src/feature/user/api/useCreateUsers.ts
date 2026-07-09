@@ -22,6 +22,7 @@ export function useCreateUsers<T extends FieldValues>(form?: UseFormReturn<T>) {
     onError: (error) => {
       if (isApiError(error) && error.fieldErrors && form) {
         setServerErrors(form, error.fieldErrors);
+        notify.error("validation.form_errors");
       } else if (isApiError(error)) {
         notify.error(error.messageKey);
       }

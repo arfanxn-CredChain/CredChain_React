@@ -518,6 +518,7 @@
   "validation_store_email_duplicate_db": "Email ini sudah terdaftar.",
   "validation_issue_holder_not_found": "Pemegang ini tidak ditemukan.",
   "validation_issue_duplicate_file_hash": "Kredensial dengan hash file ini sudah ada.",
+  "validation.form_errors": "Validasi gagal. Harap perbaiki kolom yang ditandai.",
   "error_email_duplicate_in_batch": "Ditemukan email duplikat dalam batch: {{.emails}}",
   "error_email_duplicate_in_database": "Email sudah ada di database: {{.emails}}",
   "error_store_wallet_generation_failed": "Gagal membuat wallet",
