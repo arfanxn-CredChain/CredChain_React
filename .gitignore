@@ -38,6 +38,7 @@ test-results
 # Env files
 .env
 .env.local
+.env.docker
 .env.*.local
 
 # OS

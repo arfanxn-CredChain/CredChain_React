@@ -1,5 +1,7 @@
 services:
   frontend:
+    env_file:
+      - .env.docker
     build:
       context: .
       args:

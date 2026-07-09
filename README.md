@@ -21,7 +21,7 @@ See [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md) for the full reference.
 ## Quick start
 
 ```bash
-cp .env.example .env.local
+cp .env.example .env
 # Fill in VITE_GOOGLE_CLIENT_ID
 
 npm install

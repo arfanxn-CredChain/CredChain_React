@@ -41,7 +41,7 @@ npm run test:e2e              # Playwright tests (auth, public, a11y) — requir
 npm run check-locales         # verify en.json/id.json sync with backend locales/
 ```
 
-**Env setup:** copy `.env.example` to `.env.local` and fill `VITE_GOOGLE_CLIENT_ID`. Tests use `.env.test` (committed, placeholder values).
+**Env setup:** copy `.env.example` to `.env` and fill `VITE_GOOGLE_CLIENT_ID`. Tests use `.env.test` (committed, placeholder values).
 
 **Required env vars** (validated at startup in `src/shared/lib/env.ts`):
 
@@ -60,8 +60,8 @@ A `prepare` script wires `husky`; commits trigger `lint-staged` (Prettier on `*.
 ## Environment Setup
 
 ```bash
-cp .env.example .env.local
-# Fill VITE_GOOGLE_CLIENT_ID in .env.local
+cp .env.example .env
+# Fill VITE_GOOGLE_CLIENT_ID in .env
 npm install
 npm run dev
 ```
