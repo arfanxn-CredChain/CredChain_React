@@ -44,5 +44,9 @@ test-results
 # OS
 Thumbs.db
 
-# Superpowers plans
+# Superpowers artifacts
+.superpowers/
+
+# Superpowers plans & specs
 docs/superpowers/plans/
+docs/superpowers/specs/
