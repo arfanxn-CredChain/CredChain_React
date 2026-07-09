@@ -109,7 +109,7 @@ Backend contract (see ../CredChain_Golang/AGENTS.md):
 
 The demo hand-rolls everything (selects, modals via window.confirm, no popovers). Production needs accessible select dropdowns, dialogs, command palettes, dropdown menus, toasts, tabs - building all of that from scratch is months of work and an accessibility liability. shadcn/ui gives us Radix primitives (WAI-ARIA compliant, keyboard navigation, focus traps) as source files in our repo that we restyle to our tokens. We own the code; we don't depend on a versioned package. This is the 2026 default for Tailwind apps.
 
-**Components installed in `src/shared/components/ui/` (13 primitives):** badge, button, card, confirm-dialog, dialog, dropdown-menu, form-field, input, label, select, skeleton, table, toaster.
+**Components installed in `src/shared/components/ui/` (14 primitives):** badge, button, card, confirm-dialog, dialog, dropdown-menu, form-field, input, label, select, skeleton, table, toaster.
 
 All shadcn components live in `src/shared/components/ui/` and are restyled to use our tokens (`navy`, `gold`, `error`) before any feature code consumes them. The `vaul` `Drawer` primitive is used outside `ui/` by `feature/user/components/UserEditDrawer.tsx` for the admin batch-edit flow; it is the only content drawer in the app and is **not** used for sidebar navigation (the mobile sidebar is hand-rolled — see §8.7).
 
@@ -156,13 +156,21 @@ CredChain_React/
         api/                 # 6 hooks + keys.ts (useCredentials, useCredential,
                              #   useMyCredentials, useIssueCredentials,
                              #   useRevokeCredentials, useVerifyCredential)
-        components/          # CredentialCard, CredentialIssueRow, CredentialStatusBadge
+        components/          # CredentialCard, CredentialIssueRow, CredentialSortMenu,
+                             # CredentialStatusBadge, CredentialStatusFilterMenu,
+                             # HolderSearchDropdown, LoadMoreBar, MetaDisplay,
+                             # MetaEditor, UserContactBlock, UserStatusBadge
         schemas/             # credential (Zod)
         CredentialList.tsx / CredentialDetail.tsx / CredentialIssue.tsx
         MyCredentials.tsx / VerifyCredential.tsx
-      dashboard/
-        Dashboard.tsx
-        Settings.tsx
+      overview/
+        Overview.tsx            # Main overview/dashboard page
+        Settings.tsx            # @deprecated (2026-07-08), not in routes
+        api/
+          useOverview.ts        # TanStack Query hook
+          keys.ts               # Query keys
+        components/
+          DateFilterMenu.tsx    # Date range filter
       landing/
         Landing.tsx          # self-wraps SplitLayout, route: "/"
         index.ts
@@ -407,27 +415,29 @@ The design commits to a **distinctive editorial pairing**: `Fraunces` (optical s
 
 ### 6.0 Font Loading
 
-Load in `index.html` with `font-display: swap` and preconnect for performance:
-
-```html
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link
-  href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800;9..144,900&family=JetBrains+Mono:wght@400;500;600&display=swap"
-  rel="stylesheet"
-/>
-```
-
-Apply via `@theme` tokens (Section 5) so Tailwind `font-sans`, `font-display`, `font-mono` utilities resolve correctly. Body defaults to `font-sans`:
+Fonts are loaded via `@fontsource` npm packages using `@import` in `src/styles/index.css:1-12`:
 
 ```css
-body {
-  @apply bg-base font-sans text-navy antialiased;
-  font-feature-settings: "ss01", "ss02", "cv11"; /* DM Sans stylistic alternates */
-}
+@import "@fontsource/dm-sans/400.css";
+@import "@fontsource/dm-sans/500.css";
+@import "@fontsource/dm-sans/600.css";
+@import "@fontsource/dm-sans/700.css";
+@import "@fontsource/fraunces/500.css";
+@import "@fontsource/fraunces/600.css";
+@import "@fontsource/fraunces/700.css";
+@import "@fontsource/fraunces/800.css";
+@import "@fontsource/fraunces/900.css";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
+@import "@fontsource/jetbrains-mono/600.css";
 ```
 
-Fraunces uses optical sizing (`opsz`) — at large display sizes (28px+) it renders with more contrast and personality; at small sizes it would feel awkward, which is why it is reserved for headings only.
+**Packages:**
+- `@fontsource/dm-sans` (^5.2.8) — body text, 4 weights
+- `@fontsource/fraunces` (^5.2.9) — headings, 5 weights
+- `@fontsource/jetbrains-mono` (^5.2.8) — code/monospace, 3 weights
+
+No Google Fonts CDN is used. Fonts are bundled with the app.
 
 ### 6.1 Type Scale
 
@@ -1368,289 +1378,19 @@ Before shipping any new screen:
 
 ## 9. State Management
 
-### 9.1 Two-Layer Model
-
-| Layer        | Tool           | What lives here                                       |
-| ------------ | -------------- | ----------------------------------------------------- |
-| Server state | TanStack Query | All API data: users, credentials, auth responses      |
-| Client state | Zustand        | Current user session, UI state (sidebar open, locale) |
-
-Never put server data in Zustand. Never put auth session in TanStack Query cache.
-
-### 9.2 Zustand Store
-
-The store is a **single file** (`app/store/index.ts`) combining an auth slice and a UI slice, wrapped in `persist`. Default locale is `"id"`. Only `user`, `isAuthenticated`, and `locale` are persisted (`partialize`) — never tokens, never `sidebarOpen`.
-
-```ts
-// app/store/index.ts (abbreviated)
-interface AuthSlice {
-  user: UserDTO | null;
-  isAuthenticated: boolean;
-  setUser: (user: UserDTO) => void;
-  clearUser: () => void;
-}
-
-interface UiSlice {
-  overviewSidebarOpen: boolean;
-  locale: "en" | "id";
-  setOverviewSidebarOpen: (open: boolean) => void;
-  toggleOverviewSidebar: () => void;
-  setLocale: (locale: "en" | "id") => void;
-}
-
-export const useStore = create<AuthSlice & UiSlice>()(
-  persist(
-    (set) => ({
-      user: null,
-      isAuthenticated: false,
-      setUser: (user) => set({ user, isAuthenticated: true }),
-      clearUser: () => set({ user: null, isAuthenticated: false }),
-
-      overviewSidebarOpen: false,
-      locale: "id",
-      setOverviewSidebarOpen: (open) => set({ overviewSidebarOpen: open }),
-      toggleOverviewSidebar: () => set((s) => ({ overviewSidebarOpen: !s.overviewSidebarOpen })),
-      setLocale: (locale) => set({ locale }),
-    }),
-    {
-      name: "credchain-store",
-      partialize: (s) => ({ user: s.user, isAuthenticated: s.isAuthenticated, locale: s.locale }),
-    },
-  ),
-);
-```
-
-### 9.3 TanStack Query Conventions
-
-```ts
-// shared/api/query-client.ts
-export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 min
-      gcTime: 1000 * 60 * 10, // 10 min
-      retry: (failureCount, error) => {
-        if (isApiError(error) && error.status === 401) return false;
-        if (isApiError(error) && error.status === 403) return false;
-        return failureCount < 2;
-      },
-      refetchOnWindowFocus: true,
-    },
-    mutations: {
-      onError: (error) => {
-        toast.error(resolveErrorMessage(error));
-      },
-    },
-  },
-});
-```
-
-Query key conventions:
-
-```ts
-export const userKeys = {
-  all: () => ["users"] as const,
-  list: (params?: UserListParams) => ["users", "list", params] as const,
-  detail: (id: string) => ["users", "detail", id] as const,
-  self: () => ["users", "self"] as const,
-};
-
-export const credentialKeys = {
-  all: () => ["credentials"] as const,
-  list: (params?: CredentialListParams) => ["credentials", "list", params] as const,
-  detail: (id: string) => ["credentials", "detail", id] as const,
-  mine: () => ["credentials", "mine"] as const,
-};
-```
-
-### 9.4 Mutation Pattern
-
-All mutations follow this shape:
-
-```ts
-// feature/user/api/useDeleteUsers.ts
-export function useDeleteUsers() {
-  return useMutation({
-    mutationFn: (ids: string[]) => api.delete("/users/batch", { data: { ids } }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: userKeys.all() });
-      toast.success(t("user.delete.success"));
-    },
-  });
-}
-```
+See [AGENTS.md §State Management](AGENTS.md) for TanStack Query + Zustand architecture.
 
 ---
 
-## 10. API Integration Layer
+## 10. API Integration
 
-### 10.1 Axios Instance
-
-```ts
-// shared/api/client.ts
-export const api = axios.create({
-  baseURL: env.apiBaseUrl, // VITE_API_BASE_URL ?? "/api"
-  withCredentials: true, // sends httpOnly cookies
-  timeout: 30_000,
-  headers: { "Content-Type": "application/json" },
-  paramsSerializer: { indexes: null }, // repeated params without [] brackets (Gin-friendly)
-});
-```
-
-The client also exposes `configureAuthHandler(fn)` and `configureLocaleResolver(fn)` setters so the auth-failure redirect and the `Accept-Language` value can be wired from `app/` without `shared/` importing from `app/` (keeps the boundary rule intact).
-
-### 10.2 Response Envelope & Interceptors
-
-Every backend response is `{ code, message, data? }`. The request interceptor stamps `Accept-Language`; the response interceptor unwraps the envelope; the error interceptor handles silent refresh, 429, and `ApiError` wrapping:
-
-```ts
-// shared/api/client.ts (abbreviated)
-api.interceptors.request.use((config) => {
-  config.headers["Accept-Language"] = resolveLocale(); // from Zustand locale
-  return config;
-});
-
-let refreshInFlight: Promise<unknown> | null = null;
-
-api.interceptors.response.use(
-  (response) => response.data?.data ?? response.data, // unwrap envelope
-  async (error: AxiosError<ApiErrorResponse>) => {
-    const status = error.response?.status;
-    const config = error.config;
-
-    // 401 → single deduplicated silent refresh, then retry once with X-Retry: 1
-    const isAuthPath = /\/auth\/(refresh|google|logout)/.test(config?.url ?? "");
-    if (status === 401 && !isAuthPath && config?.headers?.["X-Retry"] !== "1") {
-      try {
-        refreshInFlight ??= api.post("/auth/refresh");
-        await refreshInFlight;
-        return api.request({ ...config, headers: { ...config!.headers, "X-Retry": "1" } });
-      } catch {
-        onAuthFailure(); // clears Zustand + navigates to /login
-        return Promise.reject(error);
-      } finally {
-        refreshInFlight = null;
-      }
-    }
-
-    // 429 → rate-limit message keys (with/without Retry-After)
-    if (status === 429) {
-      const retryAfter = error.response?.headers["retry-after"];
-      const key = retryAfter ? "system.rate_limited_with_retry" : "system.rate_limited";
-      return Promise.reject(new ApiError(status, error.response?.data?.code, key, error));
-    }
-
-    const messageKey = codeToMessageKey(error.response?.data?.code);
-    return Promise.reject(new ApiError(status, error.response?.data?.code, messageKey, error));
-  },
-);
-```
-
-### 10.3 ApiError Type
-
-```ts
-// shared/api/envelope.ts
-export interface ApiResponse<T> {
-  code: number;
-  message: string;
-  data?: T;
-}
-
-export class ApiError extends Error {
-  constructor(
-    public status: number | undefined,
-    public code: number | undefined,
-    public messageKey: string,
-    public cause: AxiosError,
-  ) {
-    super(messageKey);
-  }
-}
-
-export function isApiError(e: unknown): e is ApiError {
-  return e instanceof ApiError;
-}
-```
-
-### 10.4 Backend Code -> i18n Key Mapping
-
-Mirror the backend's `CodeToMessageKey` map from `infrastructure/http/responder/mapper.go`:
-
-```ts
-// shared/api/codes.ts
-export const CODE_TO_MESSAGE_KEY: Record<number, string> = {
-  // System
-  100000: "system.success",
-  400000: "system.internal_error",
-  400001: "system.validation",
-  // Auth
-  100100: "auth.login.success",
-  400100: "auth.login.failed",
-  400101: "auth.token.invalid",
-  400102: "auth.token.expired",
-  300100: "auth.forbidden",
-  // User
-  100200: "user.fetch.success",
-  100201: "user.store.success",
-  400200: "user.fetch.not_found",
-  400201: "user.store.email_duplicate",
-  // ... mirror all codes from domain/codes.go
-};
-
-export function codeToMessageKey(code?: number): string {
-  if (!code) return "system.internal_error";
-  return CODE_TO_MESSAGE_KEY[code] ?? "system.internal_error";
-}
-```
-
-Keep this file in sync with `CredChain_Golang/domain/codes.go`. When the backend adds a new code, add it here and in both locale files.
-
-### 10.5 Pagination
-
-Backend returns `{ data: T[], total, page, page_size }`. Use a typed hook:
-
-```ts
-export interface PaginatedResponse<T> {
-  data: T[];
-  total: number;
-  page: number;
-  page_size: number;
-}
-
-export interface PaginationParams {
-  page?: number;
-  page_size?: number;
-  search?: string;
-  sort?: string;
-  order?: "asc" | "desc";
-}
-```
+See [AGENTS.md §API Integration](AGENTS.md) for axios client setup and interceptors.
 
 ---
 
 ## 11. Authentication Flow
 
-### 11.1 Token Storage Strategy
-
-**httpOnly cookies set by backend** — immune to XSS token theft, CSRF mitigated via `SameSite=Strict`. This is **implemented** on both sides as of the current backend (`CredChain_Golang`, see its `AGENTS.md`):
-
-- `/api/auth/google` returns the user envelope and sets two `Set-Cookie` headers:
-  - `access_token` (HttpOnly, Secure, `Path=/api`, `SameSite=Strict`)
-  - `refresh_token` (HttpOnly, Secure, `Path=/api/auth`, `SameSite=Strict`)
-- `/api/auth/refresh` rotates both cookies on success.
-- `/api/auth/logout` clears both cookies.
-- CORS is configured with `Access-Control-Allow-Credentials: true` and an explicit origin (never `*`); the Go router panics at startup if `GIN_CORS_ALLOW_ORIGINS=*` while credentials are enabled.
-
-The frontend never reads or writes tokens. Axios sends them automatically via `withCredentials: true`. The token fields in `/api/auth/google` and `/api/auth/refresh` response bodies (`access_token`, `refresh_token`, `*_expires_in`) are still part of the wire format (`response.Auth` mirrored as `AuthResponseDTO`) but ignored in the cookie strategy.
-
-### 11.2 Google OAuth Flow
-
-```tsx
-// app/providers.tsx
-<GoogleOAuthProvider clientId={env.VITE_GOOGLE_CLIENT_ID}>
-  <App />
-</GoogleOAuthProvider>
-```
+### 11.1 Google OAuth Button Pattern
 
 ```tsx
 // feature/auth/components/GoogleButton.tsx
@@ -1674,351 +1414,57 @@ export function GoogleButton() {
 }
 ```
 
-```ts
-// feature/auth/api/useGoogleLogin.ts
-export function useGoogleLogin() {
-  const setUser = useStore((s) => s.setUser);
-  const navigate = useNavigate();
+### 11.2 Post-Login Navigation
 
-  return useMutation({
-    mutationFn: (payload: { id_token: string }) => api.post<AuthResponse>("/auth/google", payload),
-    onSuccess: (data) => {
-      // data.access_token / data.refresh_token are NOT used here -
-      // backend already set httpOnly cookies. We only persist user.
-      setUser(data.user);
-      navigate("/overview");
-    },
-  });
-}
-```
+After successful login, navigate to `/overview`. The backend sets httpOnly cookies; the frontend only persists the `UserDTO` from the response.
 
-### 11.3 Silent Refresh
+### 11.3 Logout Pattern
 
-Handled in the axios response interceptor (Section 10.2). When any request returns 401, the interceptor calls `/api/auth/refresh` once, then retries the original request. On refresh failure, clears Zustand session and redirects to `/login`.
+`useLogout` calls `POST /api/auth/logout`, then clears Zustand session + Query cache and navigates to `/`.
 
-This means React components never deal with token rotation manually.
+### 11.4 Email Update with Google Reauth
 
-### 11.4 Logout
+`UserSelfEmail` is a 2-step form. Step 1 captures new email. Step 2 prompts Google sign-in for the new address; the resulting ID token is sent to `PUT /users/self/email` along with the email. Backend verifies the token's email matches.
 
-```ts
-export function useLogout() {
-  const clearUser = useStore((s) => s.clearUser);
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-
-  return useMutation({
-    mutationFn: () => api.post("/auth/logout"),
-    onSettled: () => {
-      // Always clear, even on failure
-      clearUser();
-      queryClient.clear();
-      navigate("/login");
-    },
-  });
-}
-```
-
-### 11.5 Hydrating Session on App Load
-
-On app start, hit `/api/users/self` to detect a valid session (cookies present + valid):
-
-```tsx
-// app/providers.tsx
-function SessionHydrator({ children }: { children: React.ReactNode }) {
-  const setUser = useStore((s) => s.setUser);
-  const clearUser = useStore((s) => s.clearUser);
-
-  const { isLoading } = useQuery({
-    queryKey: userKeys.self(),
-    queryFn: () => api.get<UserDTO>("/users/self"),
-    retry: false,
-    onSuccess: (user) => setUser(user),
-    onError: () => clearUser(),
-  });
-
-  if (isLoading) return <FullPageSpinner />;
-  return <>{children}</>;
-}
-```
-
-### 11.6 Email Update with Google Reauth
-
-The backend's `PUT /api/users/self/email` requires a fresh Google ID token:
-
-```tsx
-// feature/user/UserSelfEmail.tsx
-const { google } = useGoogleOneTapLogin({
-  /* ... */
-});
-const updateEmail = useMutation({
-  mutationFn: (payload: { email: string; id_token: string }) =>
-    api.put("/users/self/email", payload),
-});
-
-const handleSubmit = async (newEmail: string) => {
-  // 1. Re-prompt Google for fresh ID token
-  const credential = await requestFreshGoogleToken();
-  // 2. Send to backend with new email
-  await updateEmail.mutateAsync({ email: newEmail, id_token: credential });
-};
-```
+For token management, refresh flow, and backend auth coordination, see [AGENTS.md §Authentication](AGENTS.md).
 
 ---
 
 ## 12. Routing & Authorization
 
-### 12.1 Role Hierarchy (Single Source of Truth)
+### 12.1 Route Guards
 
-Extract from the demo's duplicated logic into a single utility:
+- `ProtectedRoute` — redirects unauthenticated to `/login` (with `state.from`); role-mismatched to `/overview`. Optional `allowedRoles?: Role[]`.
+- `PublicRoute` — redirects authenticated away to `state.from ?? /overview` (login is public-only).
+- `RoleGate` — inline UI gating for show/hide based on role, with optional `fallback`.
 
-```ts
-// shared/auth/role.ts
-export const Role = {
-  SUPER_ADMIN: "super_admin",
-  ADMIN: "admin",
-  ISSUER: "issuer",
-  HOLDER: "holder",
-} as const;
-export type Role = (typeof Role)[keyof typeof Role];
+See the route guard implementations in `@shared/auth/guards.tsx`.
 
-export const ROLE_LEVEL: Record<Role, number> = {
-  [Role.HOLDER]: 1,
-  [Role.ISSUER]: 2,
-  [Role.ADMIN]: 3,
-  [Role.SUPER_ADMIN]: 4,
-};
+### 12.2 Sidebar Nav Items
 
-export function canAccess(userRole: Role | undefined, minRole: Role): boolean {
-  if (!userRole) return false;
-  return ROLE_LEVEL[userRole] >= ROLE_LEVEL[minRole];
-}
+`NAV_ITEMS` in `@shared/components/layout/nav-items.ts` carry `minRole` (Issuer+ for overview/users/credentials, Admin+ for settings) and `exactRole` (HOLDER-only "My Credentials"). The `inSidebar` flag controls whether an item renders in the sidebar vs. only the global search / profile menu.
 
-export function canAccessAny(userRole: Role | undefined, allowed: Role[]): boolean {
-  if (!userRole) return false;
-  const minLevel = Math.min(...allowed.map((r) => ROLE_LEVEL[r]));
-  return ROLE_LEVEL[userRole] >= minLevel;
-}
-```
-
-### 12.2 Route Guards
-
-```tsx
-// shared/auth/guards.tsx
-export function ProtectedRoute({ allowedRoles }: { allowedRoles?: Role[] }) {
-  const { user, isAuthenticated } = useStore((s) => s);
-  const location = useLocation();
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-
-  if (allowedRoles && !canAccessAny(user?.role, allowedRoles)) {
-    const fallback = user?.role === Role.HOLDER ? "/overview" : "/overview";
-    return <Navigate to={fallback} replace />;
-  }
-
-  return <Outlet />;
-}
-
-export function PublicRoute() {
-  const { isAuthenticated } = useStore((s) => s);
-  const location = useLocation();
-  const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? "/overview";
-  return isAuthenticated ? <Navigate to={from} replace /> : <Outlet />;
-}
-
-export function RoleGate({
-  allowed,
-  children,
-  fallback = null,
-}: {
-  allowed: Role[];
-  children: React.ReactNode;
-  fallback?: React.ReactNode;
-}) {
-  const { user } = useStore((s) => s);
-  return canAccessAny(user?.role, allowed) ? <>{children}</> : <>{fallback}</>;
-}
-```
-
-### 12.3 Lazy Routes
-
-```tsx
-// app/router.tsx
-import { createBrowserRouter } from "react-router-dom";
-
-export const router = createBrowserRouter([
-  {
-    element: <PublicLayout />,
-    children: [
-      {
-        path: "/credentials/verify/:credentialId",
-        lazy: () => import("@feature/credential/VerifyCredential"),
-      },
-    ],
-  },
-  {
-    element: <PublicRoute />,
-    children: [
-      {
-        element: <AuthLayout />,
-        children: [{ path: "/login", lazy: () => import("@feature/auth/Login") }],
-      },
-    ],
-  },
-  {
-    element: <ProtectedRoute />,
-    children: [
-      {
-        element: <OverviewLayout />,
-        children: [
-          { path: "/overview", lazy: () => import("@feature/overview/Overview") },
-          { path: "/credentials/self", lazy: () => import("@feature/credential/MyCredentials") },
-          {
-            element: <ProtectedRoute allowedRoles={[Role.ISSUER, Role.ADMIN, Role.SUPER_ADMIN]} />,
-            children: [
-              { path: "/users", lazy: () => import("@feature/user/UserList") },
-              { path: "/users/:id", lazy: () => import("@feature/user/UserDetail") },
-              { path: "/credentials", lazy: () => import("@feature/credential/CredentialList") },
-              {
-                path: "/credentials/issue",
-                lazy: () => import("@feature/credential/CredentialIssue"),
-              },
-              {
-                path: "/credentials/:id",
-                lazy: () => import("@feature/credential/CredentialDetail"),
-              },
-            ],
-          },
-          {
-            element: <ProtectedRoute allowedRoles={[Role.ADMIN, Role.SUPER_ADMIN]} />,
-            children: [
-              { path: "/users/create", lazy: () => import("@feature/user/UserCreate") },
-              { path: "/settings", lazy: () => import("@feature/dashboard/Settings") },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-  { path: "*", element: <NotFound /> },
-]);
-```
-
-### 12.4 In-Component Authorization
-
-Use `RoleGate` for inline UI gating (e.g., showing/hiding action buttons):
-
-```tsx
-<RoleGate allowed={[Role.ADMIN, Role.SUPER_ADMIN]}>
-  <Button variant="destructive" onClick={handleDelete}>
-    Delete
-  </Button>
-</RoleGate>
-```
+For the complete route table with paths, components, guards, and shells, see [AGENTS.md §Route Map](AGENTS.md).
 
 ---
 
 ## 13. Forms & Validation
 
-### 13.1 Schema-First with Zod
+**Stack:** React Hook Form + Zod via `@hookform/resolvers/zod`.
 
-Mirror backend Ozzo rules from `feature/user/user_request.go`:
-
-```ts
-// feature/user/schemas/user.ts
-import { z } from "zod";
-
-const strictE164 = /^\+[1-9]\d{6,14}$/;
-
-export const userStoreSchema = z.object({
-  name: z.string().min(1).max(256),
-  number: z.string().max(256).optional(),
-  phone_number: z.string().regex(strictE164).max(19).optional(),
-  email: z.string().email().max(256),
-  birth_date: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/)
-    .optional(),
-  meta: z.record(z.unknown()).optional(),
-  role: z.enum([Role.HOLDER, Role.ISSUER, Role.ADMIN]),
-});
-
-export type UserStoreInput = z.infer<typeof userStoreSchema>;
-
-export const userBatchStoreSchema = z.object({
-  users: z.array(userStoreSchema).min(1).max(100),
-});
-```
-
-### 13.2 React Hook Form + shadcn Form
+**FormField:** Use `@ui/form-field` which wraps `<Label>` + children + optional error/hint/optional tag:
 
 ```tsx
-// feature/user/UserCreate.tsx
-const form = useForm<UserBatchStoreInput>({
-  resolver: zodResolver(userBatchStoreSchema),
-  defaultValues: { users: [defaultUser()] },
-});
-
-const { fields, append, remove } = useFieldArray({ control: form.control, name: "users" });
-
-const createUsers = useMutation({
-  mutationFn: (data: UserBatchStoreInput) => api.post("/users/batch", data),
-  onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: userKeys.all() });
-    toast.success(t("user.store.success"));
-    navigate("/users");
-  },
-});
-
-return (
-  <Form {...form}>
-    <form onSubmit={form.handleSubmit((data) => createUsers.mutate(data))}>
-      {fields.map((field, idx) => (
-        <UserRow key={field.id} index={idx} onRemove={() => remove(idx)} />
-      ))}
-      <Button type="button" variant="dashed" onClick={() => append(defaultUser())}>
-        Add another entity
-      </Button>
-      <Button type="submit" variant="primary" disabled={createUsers.isPending}>
-        Register Entities
-      </Button>
-    </form>
-  </Form>
-);
+<FormField label={t("user.name")} error={errors.name?.message}>
+  <Input leadingIcon={User} {...register("name")} />
+</FormField>
 ```
 
-### 13.3 Field Component
+For batch forms, use `useFieldArray({ control, name: "users" })`.
 
-shadcn `form.tsx` provides `<FormField>` + `<FormControl>` + `<FormMessage>`. Wrap into a project-specific `<TextField>` for the icon-prefixed input pattern:
+For Zod schema definitions and RHF integration, see [AGENTS.md §Forms & Validation](AGENTS.md).
 
-```tsx
-export function TextField<T extends FieldValues>({
-  control,
-  name,
-  label,
-  leadingIcon,
-  placeholder,
-  type = "text",
-}: {
-  control: Control<T>;
-  name: FieldPath<T>;
-  label: string;
-  leadingIcon?: LucideIcon;
-  placeholder?: string;
-  type?: string;
-}) {
-  return (
-    <FormField
-      control={control}
-      name={name}
-      render={({ field }) => (
-        <FormItem className="space-y-1">
-          <FormLabel className="text-sm font-semibold text-gray-700">{label}</FormLabel>
-          <FormControl>
-            <Input leadingIcon={leadingIcon} placeholder={placeholder} type={type} {...field} />
-          </FormControl>
-          <FormMessage />
+---
         </FormItem>
       )}
     />
@@ -2049,50 +1495,7 @@ const createUsers = useMutation({
 
 ## 14. Internationalization
 
-### 14.1 i18next Setup
-
-```ts
-// shared/i18n/config.ts
-import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
-import en from "./en.json";
-import id from "./id.json";
-
-i18n.use(initReactI18next).init({
-  resources: {
-    en: { translation: en },
-    id: { translation: id },
-  },
-  lng: navigator.language.startsWith("id") ? "id" : "en",
-  fallbackLng: "en",
-  interpolation: { escapeValue: false }, // React already escapes
-});
-```
-
-### 14.2 Locale Files
-
-Must be **exact mirrors** of backend `locales/en.json` and `locales/id.json`. Any mismatch causes missing translation warnings.
-
-Use a script to verify sync (run in CI or precommit):
-
-```bash
-# scripts/check-locales-sync.mjs
-import enFe from "../src/shared/i18n/en.json" assert { type: "json" };
-import enBe from "../../CredChain_Golang/locales/en.json" assert { type: "json" };
-
-const feKeys = new Set(Object.keys(enFe));
-const beKeys = new Set(Object.keys(enBe));
-
-const missing = [...beKeys].filter((k) => !feKeys.has(k));
-const extra   = [...feKeys].filter((k) => !beKeys.has(k));
-
-if (missing.length || extra.length) {
-  console.error("Locale drift detected:", { missing, extra });
-  process.exit(1);
-}
-```
-
-### 14.3 Translation Hook
+### 14.1 Translation Hook
 
 ```tsx
 import { useTranslation } from "react-i18next";
@@ -2103,7 +1506,7 @@ export function MyComponent() {
 }
 ```
 
-### 14.4 Language Switcher
+### 14.2 Language Switcher
 
 Lives in `NavbarOverview` and `NavbarPublic`. Persists choice to `useStore.locale`:
 
@@ -2131,34 +1534,7 @@ export function LanguageSwitcher() {
 }
 ```
 
-### 14.5 Backend Locale Header
-
-Send `Accept-Language` from frontend so backend `I18nMiddleware` matches:
-
-```ts
-api.interceptors.request.use((config) => {
-  const locale = useStore.getState().locale;
-  config.headers["Accept-Language"] = locale;
-  return config;
-});
-```
-
-### 14.6 Indonesian Translation Conventions
-
-Locked decisions for `id.json` — do not revert without a design review:
-
-| Key                         | English              | Indonesian               | Rationale                                                 |
-| --------------------------- | -------------------- | ------------------------ | --------------------------------------------------------- |
-| `nav.overview`              | Overview             | **Dasbor**               | "Ikhtisar" is too archaic for a product dashboard context |
-| `nav.users`                 | Users                | Pengguna                 | Standard Indonesian for users                             |
-| `nav.credentials`           | Credentials          | Kredensial               | Direct loanword, widely understood                        |
-| `nav.settings`              | Settings             | Pengaturan               | Standard Indonesian                                       |
-| `dashboard.welcome`         | Welcome, {{name}}    | Selamat datang, {{name}} | Formal greeting, appropriate for a professional platform  |
-| `user.list.count_one/other` | {{count}} user/users | {{count}} pengguna       | "Entitas" was rejected — too abstract for end users       |
-
-**Default locale is Indonesian (`id`).** The persisted locale is read from localStorage before i18next initializes, so users never see a flash of English on first load.
-
-**Global nav search is bilingual.** `useNavSearch` matches the query against both `en` and `id` labels simultaneously using `i18n.getFixedT("en")` and `i18n.getFixedT("id")`. Typing "dasbor" finds Dashboard on an English-locale session; typing "overview" finds it on an Indonesian-locale session. The search input placeholder stays localized to the active locale.
+For i18n configuration see [AGENTS.md §Internationalization](AGENTS.md).
 
 ---
 
@@ -2322,165 +1698,9 @@ test("login page has no a11y violations", async ({ page }) => {
 
 ---
 
-## 17. Testing Strategy
+## 17. Testing
 
-### 17.1 Test Layers
-
-| Layer       | Tool         | What to test                                          |
-| ----------- | ------------ | ----------------------------------------------------- |
-| Unit        | Vitest       | Pure functions: cn(), role utils, format, Zod schemas |
-| Component   | Vitest + RTL | Rendering, user interactions, form validation         |
-| Integration | Vitest + MSW | Feature flows with mocked API                         |
-| E2E         | Playwright   | Critical paths against real backend (staging)         |
-
-### 17.2 Vitest Config
-
-```ts
-// vitest.config.ts
-import { defineConfig } from "vitest/config";
-import react from "@vitejs/plugin-react";
-
-export default defineConfig({
-  plugins: [react()],
-  test: {
-    environment: "jsdom",
-    globals: true,
-    setupFiles: ["./src/test/setup.ts"],
-    coverage: {
-      provider: "v8",
-      reporter: ["text", "html"],
-      exclude: ["src/shared/components/ui/**", "src/test/**"],
-    },
-  },
-});
-```
-
-```ts
-// src/test/setup.ts
-import "@testing-library/jest-dom";
-import { server } from "./msw/server";
-
-beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
-afterEach(() => server.resetHandlers());
-afterAll(() => server.close());
-```
-
-### 17.3 MSW Handlers
-
-```ts
-// src/test/msw/handlers.ts
-import { http, HttpResponse } from "msw";
-import { mockUsers, mockCredentials } from "../fixtures";
-
-export const handlers = [
-  http.get("/api/users", () =>
-    HttpResponse.json({
-      code: 100200,
-      message: "OK",
-      data: { data: mockUsers, total: mockUsers.length, page: 1, page_size: 10 },
-    }),
-  ),
-  http.get("/api/users/self", () =>
-    HttpResponse.json({ code: 100200, message: "OK", data: mockUsers[0] }),
-  ),
-  http.post("/api/auth/google", () =>
-    HttpResponse.json({ code: 100100, message: "OK", data: { user: mockUsers[0] } }),
-  ),
-  http.post("/api/auth/logout", () => HttpResponse.json({ code: 100000, message: "OK" })),
-];
-```
-
-### 17.4 Component Test Pattern
-
-```tsx
-// feature/user/UserList.test.tsx
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { UserList } from "./UserList";
-import { TestProviders } from "@/test/TestProviders";
-
-function renderUserList() {
-  return render(<UserList />, { wrapper: TestProviders });
-}
-
-test("renders user table with data", async () => {
-  renderUserList();
-  await waitFor(() => {
-    expect(screen.getByText("Platform Admin")).toBeInTheDocument();
-  });
-});
-
-test("filters users by search term", async () => {
-  renderUserList();
-  await waitFor(() => screen.getByPlaceholderText(/search/i));
-  await userEvent.type(screen.getByPlaceholderText(/search/i), "admin");
-  expect(screen.queryByText("Jane Doe")).not.toBeInTheDocument();
-});
-```
-
-```tsx
-// src/test/TestProviders.tsx
-export function TestProviders({ children }: { children: React.ReactNode }) {
-  return (
-    <QueryClientProvider
-      client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
-    >
-      <I18nextProvider i18n={testI18n}>{children}</I18nextProvider>
-    </QueryClientProvider>
-  );
-}
-```
-
-### 17.5 Zod Schema Tests
-
-```ts
-// feature/user/schemas/user.test.ts
-import { userStoreSchema } from "./user";
-
-test("rejects invalid phone", () => {
-  const result = userStoreSchema.safeParse({
-    email: "a@b.com",
-    role: "holder",
-    phone_number: "08123",
-  });
-  expect(result.success).toBe(false);
-  expect(result.error?.issues[0].path).toContain("phone_number");
-});
-
-test("accepts valid E164 phone", () => {
-  const result = userStoreSchema.safeParse({
-    email: "a@b.com",
-    role: "holder",
-    phone_number: "+6281234567890",
-  });
-  expect(result.success).toBe(true);
-});
-```
-
-### 17.6 Playwright E2E
-
-```ts
-// playwright.config.ts
-export default defineConfig({
-  testDir: "./e2e",
-  use: {
-    baseURL: process.env.E2E_BASE_URL ?? "http://localhost:5173",
-    trace: "on-first-retry",
-  },
-  projects: [
-    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
-    { name: "mobile", use: { ...devices["Pixel 5"] } },
-  ],
-});
-```
-
-```ts
-// e2e/auth.spec.ts
-test("redirects unauthenticated user to login", async ({ page }) => {
-  await page.goto("/overview");
-  await expect(page).toHaveURL("/login");
-});
-```
+See [AGENTS.md §Testing Strategy](AGENTS.md) for Vitest/RTL/MSW/Playwright configuration.
 
 ---
 
@@ -2575,135 +1795,7 @@ Monitor via `npx vite-bundle-visualizer` or `rollup-plugin-visualizer`.
 
 ## 19. Coding Conventions
 
-### 19.1 Naming
-
-| Kind             | Convention                         | Example                      |
-| ---------------- | ---------------------------------- | ---------------------------- |
-| Component file   | `PascalCase.tsx`                   | `UserList.tsx`               |
-| Hook file        | `camelCase.ts` starting with `use` | `useGoogleLogin.ts`          |
-| Util file        | `kebab-case.ts`                    | `format-date.ts`             |
-| Type file        | `kebab-case.ts`                    | `api-types.ts`               |
-| Component        | PascalCase named export            | `export function UserList()` |
-| Hook             | `useX` named export                | `export function useUsers()` |
-| Type / interface | PascalCase                         | `interface UserDTO`          |
-| Constant         | `SCREAMING_SNAKE_CASE`             | `const MAX_BATCH_SIZE = 100` |
-| Function         | `camelCase`                        | `function formatHash()`      |
-
-### 19.2 Exports
-
-- **Named exports only** for components, hooks, utilities
-- No default exports anywhere
-- Feature `index.ts` re-exports the feature's public surface only
-
-```ts
-// feature/user/index.ts
-export { UserList } from "./UserList";
-export { UserDetail } from "./UserDetail";
-export { UserCreate } from "./UserCreate";
-export * from "./schemas/user";
-// internal helpers NOT re-exported
-```
-
-### 19.3 Component Structure
-
-```tsx
-// 1. Imports (sorted: builtins, vendor, @app, @feature, @shared, relative)
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Button } from "@ui/button";
-import { Card } from "@shared/components/Card";
-import { useUsers } from "./api/useUsers";
-
-// 2. Types
-interface UserListProps {
-  initialFilter?: string;
-}
-
-// 3. Component (named export)
-export function UserList({ initialFilter = "" }: UserListProps) {
-  // 3a. Hooks at top
-  const [filter, setFilter] = useState(initialFilter);
-  const { data, isLoading } = useUsers({ search: filter });
-
-  // 3b. Derived values
-  const filteredCount = data?.data.length ?? 0;
-
-  // 3c. Handlers
-  const handleClear = () => setFilter("");
-
-  // 3d. Early returns
-  if (isLoading) return <SkeletonList />;
-
-  // 3e. Main render
-  return <Card>{/* ... */}</Card>;
-}
-
-// 4. Sub-components (if small + only-used-here)
-function SkeletonList() {
-  return <div className="animate-pulse">{/* ... */}</div>;
-}
-```
-
-### 19.4 className Composition
-
-Always through `cn()`. Never template-string concatenation:
-
-```tsx
-// CORRECT
-className={cn(
-  "px-4 py-2 rounded-xl font-bold",
-  isActive ? "bg-navy text-surface" : "text-gray-500",
-  disabled && "opacity-50 pointer-events-none",
-  className
-)}
-
-// WRONG - tailwind-merge can't dedupe
-className={`px-4 py-2 ${isActive ? "bg-navy" : ""} ${className}`}
-```
-
-### 19.5 Comments
-
-- Comment **why**, not **what**
-- TODO: include owner and ticket: `// TODO(arfan, CRED-123): use proper retry`
-- Avoid commented-out code - delete it (git remembers)
-
-### 19.6 ESLint Rules
-
-Key rules to enforce (in `eslint.config.js`):
-
-```js
-rules: {
-  "react/jsx-no-leaked-render": "error",        // catch {value && <X/>} bugs
-  "react/no-unstable-nested-components": "error",
-  "@typescript-eslint/no-explicit-any": "error",
-  "@typescript-eslint/consistent-type-imports": "error",
-  "import/order": ["error", { /* alphabetize, groups */ }],
-  "import/no-default-export": "error",
-  "no-console": ["warn", { allow: ["warn", "error"] }],
-}
-```
-
-### 19.7 Prettier Config
-
-```js
-// prettier.config.js
-export default {
-  printWidth: 100,
-  tabWidth: 2,
-  semi: true,
-  singleQuote: false,
-  trailingComma: "all",
-  arrowParens: "always",
-  plugins: ["prettier-plugin-tailwindcss"],
-};
-```
-
-### 19.8 Git
-
-- Branch name: `feat/<short-name>`, `fix/<short-name>`, `chore/<short-name>`
-- Commit prefix: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`
-- Squash on merge
-- PRs require: build pass, tests pass, lint pass, locale-sync pass
+See [AGENTS.md §Coding Conventions](AGENTS.md) for naming conventions and ESLint rules.
 
 ---
 
