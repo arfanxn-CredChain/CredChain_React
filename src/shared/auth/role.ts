@@ -31,9 +31,12 @@ export function canAccessAny(userRole: Role | undefined, allowed: Role[]): boole
   return ROLE_LEVEL[userRole] >= minLevel;
 }
 
-export function formatRole(role: Role): string {
-  return role.replace("_", " ");
-}
+export const ROLE_LABEL_KEY: Record<Role, string> = {
+  [Role.SUPER_ADMIN]: "role.superAdmin",
+  [Role.ADMIN]: "role.admin",
+  [Role.ISSUER]: "role.issuer",
+  [Role.HOLDER]: "role.holder",
+};
 
 export function canEditUser(
   currentUser: { id: string; role: Role } | null | undefined,

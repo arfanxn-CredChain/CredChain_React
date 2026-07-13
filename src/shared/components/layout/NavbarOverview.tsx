@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Menu, Search, User, Mail, LogOut, HelpCircle, Info } from "lucide-react";
 import { useStore } from "@app/store";
-import { formatRole } from "@shared/auth/role";
+import { ROLE_LABEL_KEY } from "@shared/auth/role";
 import { UserAvatar } from "@shared/components/UserAvatar";
 import { useLogout } from "@feature/auth/api/useLogout";
 import { useConfirm } from "@ui/confirm-dialog";
@@ -132,7 +132,7 @@ export function NavbarOverview({ onMenuClick }: NavbarOverviewProps) {
                       {user?.name?.split(" ")[0] ?? user?.email?.split("@")[0]}
                     </div>
                     <div className="text-xs text-gray-300 capitalize lg:text-gray-500">
-                      {user?.role ? formatRole(user.role) : ""}
+                      {user?.role ? t(ROLE_LABEL_KEY[user.role]) : ""}
                     </div>
                   </div>
                   {user && (

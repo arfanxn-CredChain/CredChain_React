@@ -1,5 +1,6 @@
+import { useTranslation } from "react-i18next";
 import { Badge } from "@ui/badge";
-import { Role, type Role as RoleType } from "@shared/auth/role";
+import { Role, ROLE_LABEL_KEY, type Role as RoleType } from "@shared/auth/role";
 
 const roleToneMap = {
   [Role.SUPER_ADMIN]: "error",
@@ -13,5 +14,6 @@ interface UserRoleBadgeProps {
 }
 
 export function UserRoleBadge({ role }: UserRoleBadgeProps) {
-  return <Badge tone={roleToneMap[role]}>{role.replace("_", " ")}</Badge>;
+  const { t } = useTranslation();
+  return <Badge tone={roleToneMap[role]}>{t(ROLE_LABEL_KEY[role])}</Badge>;
 }

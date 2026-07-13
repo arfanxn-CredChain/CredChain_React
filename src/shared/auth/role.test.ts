@@ -5,8 +5,8 @@ import {
   canDeleteUser,
   canEditUser,
   canTransferTo,
-  formatRole,
   Role,
+  ROLE_LABEL_KEY,
   ROLE_LEVEL,
 } from "./role";
 
@@ -58,10 +58,12 @@ describe("canAccessAny", () => {
   });
 });
 
-describe("formatRole", () => {
-  it("replaces underscore with space", () => {
-    expect(formatRole(Role.SUPER_ADMIN)).toBe("super admin");
-    expect(formatRole(Role.HOLDER)).toBe("holder");
+describe("ROLE_LABEL_KEY", () => {
+  it("maps each role to its i18n key", () => {
+    expect(ROLE_LABEL_KEY[Role.SUPER_ADMIN]).toBe("role.superAdmin");
+    expect(ROLE_LABEL_KEY[Role.ADMIN]).toBe("role.admin");
+    expect(ROLE_LABEL_KEY[Role.ISSUER]).toBe("role.issuer");
+    expect(ROLE_LABEL_KEY[Role.HOLDER]).toBe("role.holder");
   });
 });
 
