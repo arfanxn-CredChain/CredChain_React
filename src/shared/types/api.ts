@@ -150,3 +150,11 @@ export interface OverviewDTO {
   recents: OverviewRecents;
   chain_details?: OverviewChainDetails;
 }
+
+export interface MetaDTO {
+  issuing_organization_name: string;
+  authority_contract: string;
+  registry_contract: string;
+  chain_id: number;
+  last_block: number;
+}
