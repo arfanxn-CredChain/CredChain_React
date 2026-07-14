@@ -47,6 +47,16 @@ function applySorts(users: UserDTO[], sorts: string[]): UserDTO[] {
 export const handlers = [
   http.get("*/api/health", () => envelope(100000, "OK", { status: "ok" })),
 
+  http.get("*/api/meta", () =>
+    envelope(100200, "OK", {
+      issuing_organization_name: "University of Indonesia",
+      authority_contract: "0x0000000000000000000000000000000000000000",
+      registry_contract: "0x0000000000000000000000000000000000000000",
+      chain_id: 31337,
+      last_block: 0,
+    }),
+  ),
+
   http.get("*/api/users/self", () => envelope(100200, "OK", mockUsers[0])),
 
   http.get("*/api/users", ({ request }) => {
