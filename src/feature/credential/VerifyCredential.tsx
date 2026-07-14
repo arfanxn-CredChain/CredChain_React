@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import {
   AlertTriangle,
+  Building2,
   Calendar,
   Hash,
   HelpCircle,
@@ -13,6 +14,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useVerifyCredential } from "./api/useVerifyCredential";
+import { useMeta } from "./api/useMeta";
 import { getVerdictTier, getMethodLabel } from "./lib/verdict";
 import { verifyFileSchema } from "./schemas/credential";
 import type { CredentialVerifyDTO } from "@shared/types/api";
@@ -78,6 +80,7 @@ export function VerifyCredential() {
 
   const { user, isAuthenticated } = useStore();
   const verify = useVerifyCredential();
+  const { data: meta } = useMeta();
 
   const handleFileChange = (f: File | null) => {
     if (!f) {
@@ -264,13 +267,19 @@ export function VerifyCredential() {
               {/* Credential Section */}
               {hasCredential && (
                 <div className="border-t border-gray-100 pt-5">
-                  {/* Status Badge */}
+                  {/* Status + Issuer metadata */}
                   <div className="mb-3 flex flex-wrap items-center gap-2">
                     <CredentialStatusBadge revoked={result.credential!.revoked_at !== null} />
+                    {meta?.issuing_organization_name && (
+                      <span className="flex items-center gap-1.5 text-sm text-navy/60">
+                        <Building2 className="h-4 w-4 shrink-0 text-gold/70" aria-hidden="true" />
+                        {meta.issuing_organization_name}
+                      </span>
+                    )}
                   </div>
 
                   {/* Name */}
-                  <h4 className="font-bold text-base text-navy">{result.credential!.name}</h4>
+                  <h4 className="font-bold text-lg text-navy">{result.credential!.name}</h4>
 
                   {/* Credential ULID — shield icon */}
                   <div className="mt-2 flex items-center gap-2 text-xs">
@@ -380,16 +389,6 @@ export function VerifyCredential() {
                     {t("cred.verify.whatThisMeans")}
                   </p>
                   <p className="text-xs text-gray-500">{t("cred.verify.noMatchReason1")}</p>
-                </div>
-              )}
-
-              {/* Sign-in Nudge (unauthed + credential found) */}
-              {!isAuthenticated && hasCredential && (
-                <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-center">
-                  <p className="text-sm font-bold text-amber-800">{t("cred.verify.signInNudge")}</p>
-                  <p className="mt-0.5 text-xs text-amber-600">
-                    {t("cred.verify.signInNudgeDesc")}
-                  </p>
                 </div>
               )}
 
