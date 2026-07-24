@@ -50,3 +50,7 @@ Thumbs.db
 # Superpowers plans & specs
 docs/superpowers/plans/
 docs/superpowers/specs/
+
+# E2E artifacts
+e2e/.auth/
+e2e/screenshots/
