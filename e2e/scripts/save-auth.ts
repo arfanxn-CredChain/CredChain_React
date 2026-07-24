@@ -2,23 +2,10 @@ import { chromium } from "playwright";
 import path from "path";
 import fs from "fs";
 import readline from "readline";
-import os from "os";
-import { execSync } from "child_process";
 
 const VALID_ROLES = ["holder", "issuer", "admin", "super_admin"] as const;
 const BASE_URL = process.env.E2E_BASE_URL ?? "http://localhost:5173";
 const AUTH_DIR = path.resolve("e2e/.auth");
-const BRAVE_PATH = process.env.E2E_BRAVE_PATH ?? "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser";
-const BRAVE_PROFILE = process.env.E2E_BRAVE_PROFILE ?? path.join(os.homedir(), "Library/Application Support/BraveSoftware/Brave-Browser");
-
-function isBraveRunning(): boolean {
-  try {
-    execSync('pgrep -f "Brave Browser"', { stdio: "ignore" });
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 function prompt(question: string): Promise<string> {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -30,77 +17,52 @@ function prompt(question: string): Promise<string> {
   });
 }
 
-async function recordRole(role: string, useBrave: boolean): Promise<void> {
-  fs.mkdirSync(AUTH_DIR, { recursive: true });
-
-  if (useBrave) {
-    while (isBraveRunning()) {
-      console.log("Brave is running. Please close all Brave windows completely, then press Enter.");
-      await prompt("> ");
-    }
-
-    const lockFiles = ["SingletonLock", "SingletonSocket", "SingletonCookie"];
-    for (const f of lockFiles) {
-      fs.rmSync(path.join(BRAVE_PROFILE, f), { force: true, recursive: true });
-    }
-
-    console.log(`Launching Brave with profile: ${BRAVE_PROFILE}`);
-    const context = await chromium.launchPersistentContext(BRAVE_PROFILE, {
-      headless: false,
-      viewport: { width: 1440, height: 900 },
-      executablePath: BRAVE_PATH,
-    });
-    const page = context.pages()[0] ?? (await context.newPage());
-    await recordAndSave(context, page, role, useBrave);
-    await context.close();
-    return;
-  }
-
-  const browser = await chromium.launch({ headless: false, channel: "chromium" });
-  const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-  const page = await context.newPage();
-  await recordAndSave(context, page, role, useBrave);
-  await browser.close();
-}
-
-async function recordAndSave(context: any, page: any, role: string, useBrave: boolean): Promise<void> {
+async function recordAndSave(page: any, context: any, role: string): Promise<void> {
   console.log(`\n=== Recording auth state for ${role} ===`);
   console.log(`Navigating to ${BASE_URL}/login ...`);
   await page.goto(`${BASE_URL}/login`);
 
-  if (useBrave) {
-    console.log("Brave opened with your saved Google sessions.");
-    console.log("Click the right Google account to sign in.");
-  } else {
-    console.log("Complete Google OAuth in the Chromium window.");
-  }
+  console.log("Complete Google OAuth in the opened Chromium window.");
   console.log("Waiting for redirect to /overview (up to 120s)...");
 
   try {
     await page.waitForURL("**/overview", { timeout: 120_000 });
     const statePath = path.join(AUTH_DIR, `${role}.json`);
     await context.storageState({ path: statePath });
+    fs.writeFileSync(
+      statePath,
+      JSON.stringify(await context.storageState(), null, 2),
+    );
     console.log(`✓ ${role} auth saved to ${statePath}`);
   } catch {
     console.error(`✗ ${role} timed out — skipped`);
   }
 }
 
-function parseArgs(): { role: string | null; brave: boolean } {
-  const args = process.argv.slice(2);
-  const brave = args.includes("--brave");
-  const roleArg = args.find((a) => !a.startsWith("--"));
-  const role = roleArg && VALID_ROLES.includes(roleArg as (typeof VALID_ROLES)[number])
-    ? roleArg
+async function recordRole(role: string): Promise<void> {
+  fs.mkdirSync(AUTH_DIR, { recursive: true });
+
+  const browser = await chromium.launch({ headless: false });
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const page = await context.newPage();
+
+  await recordAndSave(page, context, role);
+  await browser.close();
+}
+
+function parseArgs(): { role: string | null } {
+  const args = process.argv.slice(2).filter((a) => !a.startsWith("--"));
+  const role = args[0] && VALID_ROLES.includes(args[0] as (typeof VALID_ROLES)[number])
+    ? args[0]
     : null;
-  return { role, brave };
+  return { role };
 }
 
 async function main() {
-  const { role, brave } = parseArgs();
+  const { role } = parseArgs();
 
   if (role) {
-    await recordRole(role, brave);
+    await recordRole(role);
     process.exit(0);
   }
 
@@ -113,7 +75,7 @@ async function main() {
       console.log(`  Skipping ${r}\n`);
       continue;
     }
-    await recordRole(r, brave);
+    await recordRole(r);
   }
 
   console.log("\nDone.");
