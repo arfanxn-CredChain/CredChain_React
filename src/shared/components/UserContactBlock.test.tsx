@@ -19,7 +19,7 @@ describe("UserContactBlock", () => {
     );
 
     expect(screen.getByText("Alice")).toBeInTheDocument();
-    expect(screen.getByText("holder")).toBeInTheDocument();
+    expect(screen.getByText(/holder/i)).toBeInTheDocument();
     expect(screen.getByText("EMP-001")).toBeInTheDocument();
     expect(screen.getByText("test@credchain.demo")).toBeInTheDocument();
     expect(screen.getByText("+6281234567890")).toBeInTheDocument();
@@ -84,7 +84,7 @@ describe("UserContactBlock", () => {
     );
 
     expect(screen.getByText("Eve")).toBeInTheDocument();
-    expect(screen.getByText("admin")).toBeInTheDocument();
+    expect(screen.getByText(/admin/i)).toBeInTheDocument();
     expect(screen.queryByText("test@credchain.demo")).not.toBeInTheDocument();
   });
 

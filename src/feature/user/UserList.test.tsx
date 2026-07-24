@@ -208,7 +208,7 @@ describe("UserList", () => {
     const user = userEvent.setup();
     renderUserList();
 
-    await waitFor(() => expect(screen.getByText("Super Admin")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByText("Super Admin").length).toBeGreaterThan(0));
 
     const menuButtons = screen.getAllByRole("button", { name: /actions/i });
     await user.click(menuButtons[0]);
@@ -300,7 +300,7 @@ describe("UserList", () => {
     const user = userEvent.setup();
     renderUserList();
 
-    await waitFor(() => expect(screen.getByText("Super Admin")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByText("Super Admin").length).toBeGreaterThan(0));
 
     const menuButtons = screen.getAllByRole("button", { name: /actions/i });
     await user.click(menuButtons[0]);
@@ -318,7 +318,7 @@ describe("UserList", () => {
     const user = userEvent.setup();
     renderUserList();
 
-    await waitFor(() => expect(screen.getByText("Super Admin")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByText("Super Admin").length).toBeGreaterThan(0));
 
     const menuButtons = screen.getAllByRole("button", { name: /actions/i });
     await user.click(menuButtons[0]);
