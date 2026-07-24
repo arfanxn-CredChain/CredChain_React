@@ -6,6 +6,7 @@ import readline from "readline";
 const VALID_ROLES = ["holder", "issuer", "admin", "super_admin"] as const;
 const BASE_URL = process.env.E2E_BASE_URL ?? "http://localhost:5173";
 const AUTH_DIR = path.resolve("e2e/.auth");
+const BRAVE_PATH = "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser";
 
 function prompt(question: string): Promise<string> {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -17,10 +18,16 @@ function prompt(question: string): Promise<string> {
   });
 }
 
-async function recordRole(role: string): Promise<void> {
+async function recordRole(role: string, useBrave: boolean): Promise<void> {
   fs.mkdirSync(AUTH_DIR, { recursive: true });
 
-  const browser = await chromium.launch({ headless: false });
+  const launchOptions: Record<string, unknown> = { headless: false };
+  if (useBrave) {
+    launchOptions.executablePath = BRAVE_PATH;
+    console.log(`Launching Brave (${BRAVE_PATH})...`);
+  }
+
+  const browser = await chromium.launch(launchOptions);
   const context = await browser.newContext();
   const page = await context.newPage();
 
@@ -28,7 +35,12 @@ async function recordRole(role: string): Promise<void> {
   console.log(`Navigating to ${BASE_URL}/login ...`);
   await page.goto(`${BASE_URL}/login`);
 
-  console.log("Complete Google OAuth in the browser window.");
+  if (useBrave) {
+    console.log("Brave opened with your saved Google sessions.");
+    console.log("Click the right Google account to sign in.");
+  } else {
+    console.log("Complete Google OAuth in the Chromium window.");
+  }
   console.log("Waiting for redirect to /overview (up to 120s)...");
 
   try {
@@ -43,28 +55,34 @@ async function recordRole(role: string): Promise<void> {
   }
 }
 
-async function main() {
-  const arg = process.argv[2];
+function parseArgs(): { role: string | null; brave: boolean } {
+  const args = process.argv.slice(2);
+  const brave = args.includes("--brave");
+  const roleArg = args.find((a) => !a.startsWith("--"));
+  const role = roleArg && VALID_ROLES.includes(roleArg as (typeof VALID_ROLES)[number])
+    ? roleArg
+    : null;
+  return { role, brave };
+}
 
-  if (arg) {
-    if (!VALID_ROLES.includes(arg as (typeof VALID_ROLES)[number])) {
-      console.error(`Invalid role "${arg}". Valid: ${VALID_ROLES.join(", ")}`);
-      process.exit(1);
-    }
-    await recordRole(arg);
+async function main() {
+  const { role, brave } = parseArgs();
+
+  if (role) {
+    await recordRole(role, brave);
     process.exit(0);
   }
 
   console.log("No role specified — recording all 4 roles interactively.\n");
   console.log("For each role: press Enter to record, or Space+Enter to skip.\n");
 
-  for (const role of VALID_ROLES) {
-    const answer = await prompt(`Record "${role}"? [Y/n] `);
+  for (const r of VALID_ROLES) {
+    const answer = await prompt(`Record "${r}"? [Y/n] `);
     if (answer.toLowerCase() === "n" || answer === " ") {
-      console.log(`  Skipping ${role}\n`);
+      console.log(`  Skipping ${r}\n`);
       continue;
     }
-    await recordRole(role);
+    await recordRole(r, brave);
   }
 
   console.log("\nDone.");
