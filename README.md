@@ -44,4 +44,4 @@ src/
 - [AGENTS.md](AGENTS.md) — Full architecture, patterns, coding conventions, change log
 - [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) — Design tokens, typography, component recipes, layout system
 
-> **¹ E2E auth setup:** Role-authenticated tests need `e2e/.auth/{role}.json` files. Record once per role via `npx tsx e2e/scripts/save-auth.ts <role>` (opens browser, complete Google OAuth). Guest-flow public page tests work without auth.
+> **¹ E2E test setup:** Role-authenticated tests need `e2e/.auth/{role}.json` files. Record once per role via `npx tsx e2e/scripts/save-auth.ts <role>` (opens browser, complete Google OAuth). Guest-flow public page tests work without auth. Set `E2E_BASE_URL` env var to override the default Playwright target (`http://localhost:5173`).

@@ -52,6 +52,7 @@ npm run check-locales         # verify en.json/id.json sync with backend locales
 | `VITE_API_PROXY`        | no       | `http://localhost:8080` | dev-server proxy target for `/api` (Vite only, not bundled) |
 | `VITE_APP_ENV`          | no       | `development`           | `development` / `staging` / `production`                    |
 | `VITE_SUPPORT_EMAIL`    | no       | `support@credchain.app` | contact address shown on Help & About pages                 |
+| `E2E_BASE_URL`          | no       | `http://localhost:5173` | Playwright and save-auth base URL (overrides default)      |
 
 Engine note: tested on Node 20.x; `package.json` does not pin `engines`.
 
