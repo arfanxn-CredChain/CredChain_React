@@ -23,17 +23,27 @@ function prompt(question: string): Promise<string> {
 async function recordRole(role: string, useBrave: boolean): Promise<void> {
   fs.mkdirSync(AUTH_DIR, { recursive: true });
 
-  const launchOptions: Record<string, unknown> = { headless: false };
   if (useBrave) {
-    launchOptions.executablePath = BRAVE_PATH;
-    launchOptions.args = [`--user-data-dir=${BRAVE_PROFILE}`];
     console.log(`Launching Brave (${BRAVE_PATH}) with profile (${BRAVE_PROFILE})...`);
+    const context = await chromium.launchPersistentContext(BRAVE_PROFILE, {
+      headless: false,
+      viewport: { width: 1440, height: 900 },
+      executablePath: BRAVE_PATH,
+    });
+    const page = context.pages()[0] ?? (await context.newPage());
+    await recordAndSave(context, page, role, useBrave);
+    await context.close();
+    return;
   }
 
-  const browser = await chromium.launch(launchOptions);
-  const context = await browser.newContext();
+  const browser = await chromium.launch({ headless: false, channel: "chromium" });
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   const page = await context.newPage();
+  await recordAndSave(context, page, role, useBrave);
+  await browser.close();
+}
 
+async function recordAndSave(context: any, page: any, role: string, useBrave: boolean): Promise<void> {
   console.log(`\n=== Recording auth state for ${role} ===`);
   console.log(`Navigating to ${BASE_URL}/login ...`);
   await page.goto(`${BASE_URL}/login`);
@@ -53,8 +63,6 @@ async function recordRole(role: string, useBrave: boolean): Promise<void> {
     console.log(`✓ ${role} auth saved to ${statePath}`);
   } catch {
     console.error(`✗ ${role} timed out — skipped`);
-  } finally {
-    await browser.close();
   }
 }
 
