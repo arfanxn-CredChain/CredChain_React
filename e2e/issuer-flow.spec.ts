@@ -267,11 +267,12 @@ test.describe("issuer flow — role escalation", () => {
 test.describe("issuer flow — logout", () => {
   test.use({ storageState: AUTH_STATE });
 
-  test("logout button is visible in sidebar", async ({ page }) => {
+  test("logout shows confirm dialog", async ({ page }) => {
     await page.goto("/overview");
-    await expect(page.getByRole("button", { name: /keluar|log out|sign out/i })).toBeVisible();
+    await page.getByRole("button", { name: /keluar|log out|sign out/i }).click();
+    await expect(page.getByRole("button", { name: /batal|cancel/i })).toBeVisible();
     await page.screenshot({
-      path: `${SCREENSHOT_DIR}/logout/logout-button-visible.png`,
+      path: `${SCREENSHOT_DIR}/logout/logout-confirm-dialog.png`,
       fullPage: true,
     });
   });

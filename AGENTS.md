@@ -75,10 +75,17 @@ For testing: `.env.test` is committed and contains placeholder values. Tests do 
 ```
 CredChain_React/
   public/
-  e2e/                         # Playwright specs (auth, public, a11y)
-    auth.spec.ts
-    public.spec.ts
+  e2e/                         # Playwright specs (guest, holder, issuer, admin, super-admin, a11y)
+    guest-flow.spec.ts
+    holder-flow.spec.ts
+    issuer-flow.spec.ts
+    admin-flow.spec.ts
+    super-admin-flow.spec.ts
     a11y.spec.ts
+    helpers/
+      screenshots.ts
+    scripts/
+      save-auth.ts
   scripts/
     check-locales-sync.mjs     # verifies en.json/id.json sync with ../CredChain_Golang/locales/
   src/
@@ -471,7 +478,8 @@ See the **Required env vars** table under [Critical Commands](#critical-commands
 | Integration | Vitest + MSW | Feature flows with mocked `/api`                            |
 | E2E         | Playwright   | Auth flow, public routes, a11y smoke                        |
 
-**Current count:** **545 unit/component tests across 59 spec files** under `src/`, plus **20 Playwright tests across 3 e2e specs** (`auth.spec.ts`, `public.spec.ts`, `a11y.spec.ts`).
+**Current count:** **545 unit/component tests across 59 spec files** under `src/`, plus **~85 Playwright tests across 6 e2e specs** (`guest-flow.spec.ts`, `holder-flow.spec.ts`, `issuer-flow.spec.ts`, `admin-flow.spec.ts`, `super-admin-flow.spec.ts`, `a11y.spec.ts`).
+
 
 **Coverage** (in `vitest.config.ts`): the `coverage` config uses a **selective `include` allowlist** (NOT global). Per-file thresholds of 90% lines / 85% branches / 90% functions / 90% statements apply only to the curated paths:
 
