@@ -2,11 +2,13 @@ import { chromium } from "playwright";
 import path from "path";
 import fs from "fs";
 import readline from "readline";
+import os from "os";
 
 const VALID_ROLES = ["holder", "issuer", "admin", "super_admin"] as const;
 const BASE_URL = process.env.E2E_BASE_URL ?? "http://localhost:5173";
 const AUTH_DIR = path.resolve("e2e/.auth");
 const BRAVE_PATH = process.env.E2E_BRAVE_PATH ?? "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser";
+const BRAVE_PROFILE = process.env.E2E_BRAVE_PROFILE ?? path.join(os.homedir(), "Library/Application Support/BraveSoftware/Brave-Browser");
 
 function prompt(question: string): Promise<string> {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -24,7 +26,8 @@ async function recordRole(role: string, useBrave: boolean): Promise<void> {
   const launchOptions: Record<string, unknown> = { headless: false };
   if (useBrave) {
     launchOptions.executablePath = BRAVE_PATH;
-    console.log(`Launching Brave (${BRAVE_PATH})...`);
+    launchOptions.args = [`--user-data-dir=${BRAVE_PROFILE}`];
+    console.log(`Launching Brave (${BRAVE_PATH}) with profile (${BRAVE_PROFILE})...`);
   }
 
   const browser = await chromium.launch(launchOptions);
