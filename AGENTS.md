@@ -505,13 +505,19 @@ This is intentional: not all of the codebase is covered to threshold yet. Add ne
 
 **E2E test setup — one-time auth recording:**
 
-Role-authenticated tests require `storageState` files. Record once per role via Google OAuth:
+Role-authenticated tests require `storageState` files. Record once per role via Google OAuth.
+
+**Interactive mode (recommended):** loops through all 4 roles, prompts per role:
 
 ```bash
-npx tsx e2e/scripts/save-auth.ts holder    # opens browser, complete OAuth, waits for /overview
+npx tsx e2e/scripts/save-auth.ts
+# Press Enter to record, 'n' + Enter to skip
+```
+
+**Single role:** record one role only:
+
+```bash
 npx tsx e2e/scripts/save-auth.ts issuer
-npx tsx e2e/scripts/save-auth.ts admin
-npx tsx e2e/scripts/save-auth.ts super_admin
 ```
 
 Files saved to `e2e/.auth/{role}.json` (gitignored). Guest-flow public page tests work without auth. After recording all roles, run:
