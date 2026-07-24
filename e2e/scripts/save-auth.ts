@@ -42,8 +42,18 @@ async function recordAndSave(page: any, context: any, role: string): Promise<voi
 async function recordRole(role: string): Promise<void> {
   fs.mkdirSync(AUTH_DIR, { recursive: true });
 
-  const browser = await chromium.launch({ headless: false });
-  const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const browser = await chromium.launch({
+    headless: false,
+    args: [
+      "--disable-blink-features=AutomationControlled",
+    ],
+  });
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 900 },
+  });
+  await context.addInitScript(() => {
+    Object.defineProperty(navigator, "webdriver", { get: () => false });
+  });
   const page = await context.newPage();
 
   await recordAndSave(page, context, role);
