@@ -201,6 +201,26 @@ test.describe("admin flow — sidebar", () => {
   });
 });
 
+test.describe("admin flow — role escalation", () => {
+  test.use({ storageState: AUTH_STATE });
+
+  test("admin cannot see transfer-super-admin option on user list", async ({ page }) => {
+    await page.goto("/users");
+    await page.waitForLoadState("networkidle");
+    const kebabButtons = page.getByRole("button", { name: /more|actions|menu/i });
+    const kebabCount = await kebabButtons.count();
+    if (kebabCount > 0) {
+      await kebabButtons.last().click();
+      await page.waitForTimeout(300);
+      await expect(page.getByText(/transfer super admin/i)).not.toBeVisible();
+      await page.screenshot({
+        path: `${SCREENSHOT_DIR}/sidebar/admin-no-transfer-option.png`,
+        fullPage: true,
+      });
+    }
+  });
+});
+
 test.describe("admin flow — logout", () => {
   test.use({ storageState: AUTH_STATE });
 

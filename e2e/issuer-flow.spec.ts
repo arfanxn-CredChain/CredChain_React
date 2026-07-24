@@ -250,6 +250,20 @@ test.describe("issuer flow — sidebar", () => {
   });
 });
 
+test.describe("issuer flow — role escalation", () => {
+  test.use({ storageState: AUTH_STATE });
+
+  test("issuer cannot access admin-only /users/create route", async ({ page }) => {
+    await page.goto("/users/create");
+    await page.waitForURL("**/overview");
+    await expect(page).not.toHaveURL(/\/users\/create/);
+    await page.screenshot({
+      path: `${SCREENSHOT_DIR}/sidebar/issuer-blocked-from-create-user.png`,
+      fullPage: true,
+    });
+  });
+});
+
 test.describe("issuer flow — logout", () => {
   test.use({ storageState: AUTH_STATE });
 
