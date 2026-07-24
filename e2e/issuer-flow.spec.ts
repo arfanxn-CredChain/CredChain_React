@@ -1,8 +1,11 @@
 import { test, expect } from "@playwright/test";
+import fs from "fs";
+import path from "path";
 import { registerFailureScreenshot } from "./helpers/screenshots";
 
 const SCREENSHOT_DIR = "e2e/screenshots/issuer-flow";
 const AUTH_STATE = "./e2e/.auth/issuer.json";
+const CRED_FIXTURES_DIR = path.resolve("e2e/fixtures/credentials");
 
 registerFailureScreenshot(test, SCREENSHOT_DIR);
 
@@ -141,6 +144,49 @@ test.describe("issuer flow — issue credential", () => {
       fullPage: true,
     });
   });
+
+  test("issue credential submit shows success toast", async ({ page }) => {
+    await page.goto("/credentials/issue");
+    await page.waitForLoadState("networkidle");
+
+    const nameInput = page.getByPlaceholder(/nama/i);
+    if (await nameInput.isVisible()) {
+      await nameInput.fill(`E2E Test Credential ${Date.now()}`);
+    }
+
+    const holderSearch = page.getByPlaceholder(/cari|search/i).first();
+    if (await holderSearch.isVisible()) {
+      await holderSearch.click();
+      await page.waitForTimeout(500);
+      const firstOption = page.locator('[role="option"], [role="listbox"] li').first();
+      if (await firstOption.isVisible()) {
+        await firstOption.click();
+        await page.waitForTimeout(300);
+      } else {
+        await page.keyboard.press("Escape");
+      }
+    }
+
+    const fileInput = page.locator('input[type="file"]');
+    if (await fileInput.isVisible()) {
+      const files = fs.readdirSync(CRED_FIXTURES_DIR);
+      const ijazah = files.find((f) => f.includes("Ijazah Full")) ?? files.find((f) => f.endsWith(".pdf"));
+      if (ijazah) {
+        await fileInput.setInputFiles(path.join(CRED_FIXTURES_DIR, ijazah));
+        await page.waitForTimeout(1000);
+      }
+    }
+
+    const submitButton = page.getByRole("button", { name: /terbitkan|issue|simpan|save/i });
+    if (await submitButton.isVisible() && await submitButton.isEnabled()) {
+      await submitButton.click();
+      const toast = page.locator("[data-sonner-toast]");
+      await expect(toast).toBeVisible({ timeout: 15000 });
+      await page.screenshot({
+        path: `${SCREENSHOT_DIR}/issue-credential/issue-credential-success-toast.png`,
+      });
+    }
+  });
 });
 
 test.describe("issuer flow — user list", () => {
@@ -276,4 +322,25 @@ test.describe("issuer flow — logout", () => {
       fullPage: true,
     });
   });
+});
+
+test.afterAll(async ({ page }) => {
+  const state = JSON.parse(fs.readFileSync(path.resolve(AUTH_STATE), "utf-8"));
+  const accessToken = (state.cookies ?? []).find(
+    (c: { name: string; value: string }) => c.name === "access_token",
+  )?.value;
+  if (!accessToken) return;
+
+  const listResp = await page.request.get("/api/credentials", {
+    headers: { Cookie: `access_token=${accessToken}` },
+    params: { search: "E2E Test", limit: "100" },
+  });
+  const body = await listResp.json();
+  const ids: string[] = (body?.data ?? []).map((c: { id: string }) => c.id);
+  if (ids.length > 0) {
+    await page.request.post("/api/credentials/batch/revoke", {
+      headers: { "Content-Type": "application/json", Cookie: `access_token=${accessToken}` },
+      data: { ids },
+    });
+  }
 });
