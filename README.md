@@ -36,10 +36,12 @@ src/
 | `npm run build` | Production build |
 | `npm run lint` | ESLint |
 | `npm run test` | Unit/component tests |
-| `npm run test:e2e` | Playwright E2E tests |
+| `npm run test:e2e` | Playwright E2E tests (guest, holder, issuer, admin, super-admin) — requires :5173 + auth setup¹ |
 | `npm run check-locales` | Verify i18n keys match backend |
 
 ## Related Docs
 
 - [AGENTS.md](AGENTS.md) — Full architecture, patterns, coding conventions, change log
 - [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) — Design tokens, typography, component recipes, layout system
+
+> **¹ E2E auth setup:** Role-authenticated tests need `e2e/.auth/{role}.json` files. Record once per role via `npx tsx e2e/scripts/save-auth.ts <role>` (opens browser, complete Google OAuth). Guest-flow public page tests work without auth.

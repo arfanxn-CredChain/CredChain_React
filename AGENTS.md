@@ -37,7 +37,7 @@ npm run format:check          # Prettier check (CI)
 npm run test                  # Vitest run
 npm run test:watch            # Vitest watch mode
 npm run test:coverage         # Vitest with v8 coverage
-npm run test:e2e              # Playwright tests (auth, public, a11y) — requires :5173
+npm run test:e2e              # Playwright E2E (requires :5173 + .auth/*.json files)
 npm run check-locales         # verify en.json/id.json sync with backend locales/
 ```
 
@@ -500,7 +500,27 @@ This is intentional: not all of the codebase is covered to threshold yet. Add ne
 
 **File API polyfill:** jsdom doesn't implement `File.prototype.arrayBuffer`. `setup.ts` polyfills it from `Blob.prototype.arrayBuffer`. The hash module uses `FileReader` for broad compatibility.
 
-**Playwright** runs against `localhost:5173` by default. Set `E2E_BASE_URL` for staging. Configures `chromium` and `mobile` (Pixel 5) projects. `@axe-core/playwright` filters for critical/serious violations only.
+**Playwright** runs against `localhost:5173` by default. Set `E2E_BASE_URL` for staging. Configures `chromium` and `mobile` (Pixel 5) projects. ~85 tests across 5 spec files (`guest-flow.spec.ts`, `holder-flow.spec.ts`, `issuer-flow.spec.ts`, `admin-flow.spec.ts`, `super-admin-flow.spec.ts`).
+
+**E2E test setup — one-time auth recording:**
+
+Role-authenticated tests require `storageState` files. Record once per role via Google OAuth:
+
+```bash
+npx tsx e2e/scripts/save-auth.ts holder    # opens browser, complete OAuth, waits for /overview
+npx tsx e2e/scripts/save-auth.ts issuer
+npx tsx e2e/scripts/save-auth.ts admin
+npx tsx e2e/scripts/save-auth.ts super_admin
+```
+
+Files saved to `e2e/.auth/{role}.json` (gitignored). Guest-flow public page tests work without auth. After recording all roles, run:
+
+```bash
+npx playwright test --project=chromium   # all ~85 tests
+npx playwright test e2e/guest-flow.spec.ts --project=chromium   # public-only (no auth needed)
+```
+
+Screenshots captured to `e2e/screenshots/{spec-file}/{feature-group}/`. Failure screenshots saved to `e2e/screenshots/{spec-file}/{test-slug}-failed-test.png`.
 
 When adding tests, prefer integration tests via MSW over heavy mocking. Schema tests should cover every required field, every max-length boundary, every enum value, and every regex format constraint.
 
