@@ -11,6 +11,15 @@ const AUTH_DIR = path.resolve("e2e/.auth");
 const BRAVE_PATH = process.env.E2E_BRAVE_PATH ?? "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser";
 const BRAVE_PROFILE = process.env.E2E_BRAVE_PROFILE ?? path.join(os.homedir(), "Library/Application Support/BraveSoftware/Brave-Browser");
 
+function isBraveRunning(): boolean {
+  try {
+    execSync('pgrep -f "Brave Browser"', { stdio: "ignore" });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function prompt(question: string): Promise<string> {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   return new Promise((resolve) => {
@@ -25,9 +34,17 @@ async function recordRole(role: string, useBrave: boolean): Promise<void> {
   fs.mkdirSync(AUTH_DIR, { recursive: true });
 
   if (useBrave) {
-    try { execSync('pkill -f "Brave Browser"', { timeout: 3000 }); } catch { /* not running */ }
-    await new Promise((r) => setTimeout(r, 1000));
-    console.log(`Launching Brave (${BRAVE_PATH}) with profile (${BRAVE_PROFILE})...`);
+    while (isBraveRunning()) {
+      console.log("Brave is running. Please close all Brave windows completely, then press Enter.");
+      await prompt("> ");
+    }
+
+    const lockFiles = ["SingletonLock", "SingletonSocket", "SingletonCookie"];
+    for (const f of lockFiles) {
+      fs.rmSync(path.join(BRAVE_PROFILE, f), { force: true, recursive: true });
+    }
+
+    console.log(`Launching Brave with profile: ${BRAVE_PROFILE}`);
     const context = await chromium.launchPersistentContext(BRAVE_PROFILE, {
       headless: false,
       viewport: { width: 1440, height: 900 },
