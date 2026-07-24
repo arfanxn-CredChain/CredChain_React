@@ -3,6 +3,7 @@ import path from "path";
 import fs from "fs";
 import readline from "readline";
 import os from "os";
+import { execSync } from "child_process";
 
 const VALID_ROLES = ["holder", "issuer", "admin", "super_admin"] as const;
 const BASE_URL = process.env.E2E_BASE_URL ?? "http://localhost:5173";
@@ -24,6 +25,8 @@ async function recordRole(role: string, useBrave: boolean): Promise<void> {
   fs.mkdirSync(AUTH_DIR, { recursive: true });
 
   if (useBrave) {
+    try { execSync('pkill -f "Brave Browser"', { timeout: 3000 }); } catch { /* not running */ }
+    await new Promise((r) => setTimeout(r, 1000));
     console.log(`Launching Brave (${BRAVE_PATH}) with profile (${BRAVE_PROFILE})...`);
     const context = await chromium.launchPersistentContext(BRAVE_PROFILE, {
       headless: false,
