@@ -28,13 +28,17 @@ Sibling to `CredChain_Golang/` (Go backend), `CredChain_Solidity/` (smart contra
 
 ```bash
 npm install                   # one-time, after cloning
-npm run dev                   # Vite dev server on :5173 (proxies /api → :8080)
-npm run build                 # tsc -b && vite build (strict TypeScript; must pass before push)
+
+# Parity verbs (thin Makefile wrappers over npm — same as other repos):
+make dev                      # Vite dev server on :5173 (proxies /api → :8080)
+make build                    # tsc -b && vite build (strict TypeScript; must pass before push)
+make lint                     # ESLint
+make format                   # Prettier write
+make test                     # Vitest run
+
+# Unwrapped scripts (run via npm):
 npm run preview               # serve production build locally
-npm run lint                  # ESLint
-npm run format                # Prettier write
 npm run format:check          # Prettier check (CI)
-npm run test                  # Vitest run
 npm run test:watch            # Vitest watch mode
 npm run test:coverage         # Vitest with v8 coverage
 npm run test:e2e              # Playwright E2E (requires :5173 + .auth/*.json files)
@@ -66,7 +70,7 @@ A `prepare` script wires `husky`; commits trigger `lint-staged` (Prettier on `*.
 cp .env.example .env
 # Fill VITE_GOOGLE_CLIENT_ID in .env
 npm install
-npm run dev
+make dev
 ```
 
 For testing: `.env.test` is committed and contains placeholder values. Tests do not require a running backend (MSW mocks all `/api/*` calls).
@@ -432,7 +436,7 @@ Step-by-step checklist for adding a new domain feature (e.g., `feature/audit-log
    - Schema tests (deeply, all edge cases)
    - Component test using `TestProviders` wrapper
 10. If user-facing: add Playwright E2E in `e2e/`.
-11. Run full verification: `npm run lint && npm run build && npm run test && npm run check-locales`.
+11. Run full verification: `make lint && make build && make test && npm run check-locales`.
 
 ### Common Pitfalls (DO NOT DO)
 
@@ -507,11 +511,10 @@ This is intentional: not all of the codebase is covered to threshold yet. Add ne
 
 Role-authenticated tests require `storageState` files. Record once per role via Google OAuth.
 
-**Interactive mode (recommended):** loops through all 4 roles, prompts per role:
+**All roles (sequential):** launches a browser for each role. Complete Google OAuth to record, or close the browser window to skip:
 
 ```bash
 npx tsx e2e/scripts/save-auth.ts
-# Press Enter to record, 'n' + Enter to skip
 ```
 
 **Single role:** record one role only:
@@ -520,7 +523,21 @@ npx tsx e2e/scripts/save-auth.ts
 npx tsx e2e/scripts/save-auth.ts issuer
 ```
 
-Files saved to `e2e/.auth/{role}.json` (gitignored). Guest-flow public page tests work without auth. After recording all roles, run:
+Files saved to `e2e/.auth/{role}.json` (gitignored). Guest-flow public page tests work without auth.
+
+**E2E auth auto-refresh:**
+
+The test suite includes automatic token refresh via `e2e/helpers/auth-refresh.ts`:
+
+- **`globalSetup`** (in `playwright.config.ts`) validates all 4 auth files exist at test start
+- **`test.beforeAll`** in each spec file calls `refreshAuthState(role)` to refresh the `access_token` via `POST /api/auth/refresh` before tests run. A lock-file mechanism serializes refreshes across parallel workers: each worker checks the file's `mtime` (60s cooldown) and an exclusive lock file (30s TTL) before attempting a refresh
+- On success: updated cookies are saved back to the `.auth/{role}.json` file
+- On failure (refresh token expired): a warning is logged; the auth file is preserved (tests may fail with stale tokens, but it's safer than deleting the file mid-run)
+- The `afterAll` in `issuer-flow.spec.ts` no longer manually extracts `access_token` from JSON — Playwright's `context.request` sends cookies from `storageState` automatically
+
+This means you no longer need to re-run `save-auth` when tokens expire. The refresh happens automatically before each test run.
+
+After recording all roles, run:
 
 ```bash
 npx playwright test --project=chromium   # all ~85 tests
@@ -585,10 +602,10 @@ Run `npm run check-locales` from the React repo after step 4 to verify drift is 
 
 Before pushing, run the repo's canonical verification command and confirm it passes:
 
-- `CredChain_Golang`: `go test ./... && go vet ./... && gofmt -l .` (last must produce zero output)
-- `CredChain_Solidity`: `npx hardhat compile && npx hardhat test`
-- `CredChain_Python`: `make lint && make typecheck && make test`
-- `CredChain_React`: `npm run lint && npm run build && npm run test && npm run check-locales`
+- `CredChain_Golang`: `make test && make lint`
+- `CredChain_Solidity`: `make compile && make test`
+- `CredChain_Python`: `make check`
+- `CredChain_React`: `make lint && make build && make test && npm run check-locales`
 
 ## Change Log
 
