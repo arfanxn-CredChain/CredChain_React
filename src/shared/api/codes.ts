@@ -110,6 +110,7 @@ export const CODE_TO_MESSAGE_KEY: Record<number, string> = {
   400443: "credential.verify.extract_failed",
   400444: "credential.verify.ai_service_failed",
   400445: "credential.verify.credential_not_found",
+  400446: "credential.verify.document_unreadable",
   400401: "credential.verify.verdict.authentic",
   400402: "credential.verify.verdict.revoked",
   400403: "credential.verify.verdict.integrity_warning",
