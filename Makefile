@@ -5,6 +5,8 @@
 .PHONY: dev build test lint format
 
 dev:
+	@PORT=$$(grep -E '^VITE_PORT=' .env | cut -d= -f2); \
+	if [ -n "$$PORT" ]; then echo "freeing port $$PORT"; kill $$(lsof -ti tcp:$$PORT) 2>/dev/null || true; fi
 	npm run dev
 
 build:
