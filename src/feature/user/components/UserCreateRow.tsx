@@ -115,7 +115,7 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
             onValueChange={(value) => {
               form.setValue(
                 `users.${index}.gender`,
-                value === "__none__" ? undefined : (value as "male" | "female" | "other"),
+                value === "__none__" ? undefined : (value as "male" | "female"),
                 { shouldValidate: true },
               );
             }}
@@ -127,7 +127,6 @@ export function UserCreateRow({ index, form, onRemove }: UserCreateRowProps) {
               <SelectItem value="__none__">{t("common.notSet")}</SelectItem>
               <SelectItem value="male">{t("user.field.gender.male")}</SelectItem>
               <SelectItem value="female">{t("user.field.gender.female")}</SelectItem>
-              <SelectItem value="other">{t("user.field.gender.other")}</SelectItem>
             </SelectContent>
           </Select>
         </FormField>

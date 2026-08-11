@@ -163,7 +163,6 @@
   "user.field.gender": "Gender",
   "user.field.gender.male": "Male",
   "user.field.gender.female": "Female",
-  "user.field.gender.other": "Other",
   "user.field.gender.placeholder": "Select gender",
   "user.edit.unnamed": "Unnamed",
   "user.edit.title": "User",

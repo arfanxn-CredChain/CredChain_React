@@ -148,7 +148,7 @@ export function UserImportModal({ open, onClose, onImport }: UserImportModalProp
 
           if (field === "gender") {
             const lower = val.toLowerCase();
-            if (lower === "male" || lower === "female" || lower === "other") {
+            if (lower === "male" || lower === "female") {
               mapped.gender = lower;
             }
           } else if (field === "role") {

@@ -1,6 +1,6 @@
 import type { Role } from "@shared/auth/role";
 
-export type Gender = "male" | "female" | "other";
+export type Gender = "male" | "female";
 
 /**
  * Mirrors backend response.User from infrastructure/http/response/user.go

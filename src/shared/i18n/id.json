@@ -163,7 +163,6 @@
   "user.field.gender": "Jenis Kelamin",
   "user.field.gender.male": "Laki-laki",
   "user.field.gender.female": "Perempuan",
-  "user.field.gender.other": "Lainnya",
   "user.field.gender.placeholder": "Pilih jenis kelamin",
   "user.edit.unnamed": "Tanpa nama",
   "user.edit.title": "Pengguna",

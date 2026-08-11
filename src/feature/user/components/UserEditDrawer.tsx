@@ -252,7 +252,7 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
                   onValueChange={(v) =>
                     form.setValue(
                       "gender",
-                      v === "__none__" ? null : (v as "male" | "female" | "other"),
+                      v === "__none__" ? null : (v as "male" | "female"),
                       { shouldDirty: true },
                     )
                   }
@@ -264,7 +264,6 @@ export function UserEditDrawer({ user, onClose }: UserEditDrawerProps) {
                     <SelectItem value="__none__">{t("common.notSet")}</SelectItem>
                     <SelectItem value="male">{t("user.field.gender.male")}</SelectItem>
                     <SelectItem value="female">{t("user.field.gender.female")}</SelectItem>
-                    <SelectItem value="other">{t("user.field.gender.other")}</SelectItem>
                   </SelectContent>
                 </Select>
               </FormField>

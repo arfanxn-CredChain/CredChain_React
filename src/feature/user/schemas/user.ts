@@ -34,7 +34,7 @@ export const birthDateSchema = z.string().regex(ISO_DATE, "zod.user.dateFormat")
 
 export const metaSchema = z.record(z.string(), z.unknown());
 
-export const genderSchema = z.enum(["male", "female", "other"]);
+export const genderSchema = z.enum(["male", "female"]);
 
 const baseUserFields = {
   name: z.string().min(1, "zod.user.nameRequired").max(256, "zod.user.nameTooLong"),

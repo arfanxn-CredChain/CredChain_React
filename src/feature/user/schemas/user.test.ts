@@ -243,7 +243,7 @@ describe("userSelfEmailSchema", () => {
 });
 
 describe("genderSchema", () => {
-  it.each(["male", "female", "other"] as const)("accepts %s", (value) => {
+  it.each(["male", "female"] as const)("accepts %s", (value) => {
     expect(genderSchema.parse(value)).toBe(value);
   });
 
@@ -272,7 +272,7 @@ describe("userStoreSchema gender field", () => {
   });
 
   it("accepts valid gender values", () => {
-    for (const g of ["male", "female", "other"] as const) {
+    for (const g of ["male", "female"] as const) {
       expect(userStoreSchema.safeParse({ ...baseValid, gender: g }).success).toBe(true);
     }
   });
